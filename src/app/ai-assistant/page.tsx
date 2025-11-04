@@ -1,166 +1,70 @@
-'use client';
+"use client";
+import { useState } from "react";
+import Header from '@/components/layout/header'; // Garder l'import pour le layout global
+import Footer from '@/components/layout/footer'; // Garder l'import pour le layout global
 
-import React, { useState, useRef, useEffect } from 'react';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Send, Bot, User } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+export default function AIAssistantPage() { // Renommé en AIAssistantPage pour correspondre au fichier
+  const [message, setMessage] = useState("");
+  const [reply, setReply] = useState("");
+  const [loading, setLoading] = useState(false);
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'ai';
-}
-
-export default function AIAssistantPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(scrollToBottom, [messages]);
-
-  const handleSendMessage = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (input.trim() === '') return;
-
-    const userMessage: Message = { id: Date.now().toString(), text: input, sender: 'user' };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInput('');
-    setIsLoading(true);
+  const handleSendMessage = async () => {
+    if (!message.trim()) return;
+    setLoading(true);
 
     try {
-      const response = await fetch('/api/chat', { // Appel à la nouvelle route /api/chat
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: input }), // Envoi de 'message'
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
       });
 
       if (!response.ok) {
         const text = await response.text();
-        if (text.startsWith('<!DOCTYPE')) {
-          throw new Error('Erreur du serveur : la route API ne renvoie pas de JSON. Vérifiez la configuration de l\'API.');
-        }
-        let errorMessageText = `Erreur HTTP ${response.status}`;
-        try {
-          const errorData = JSON.parse(text);
-          if (errorData && errorData.error) {
-            errorMessageText = `Erreur de l'API : ${errorData.error}`;
-          }
-        } catch (parseError) {
-          console.error('Failed to parse error response as JSON:', parseError);
-        }
-        throw new Error(errorMessageText);
+        // Amélioration de la gestion d'erreur pour inclure le texte de la réponse si disponible
+        const errorDetail = text.startsWith('<!DOCTYPE') ? 'La route API ne renvoie pas de JSON (page HTML reçue).' : text;
+        throw new Error(`Erreur HTTP ${response.status} : ${errorDetail}`);
       }
 
-      const data = await response.json(); // Attend un objet JSON avec une propriété 'reply'
-      const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data.reply, sender: 'ai' };
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      const data = await response.json();
+      if (data.reply) setReply(data.reply);
+      else setReply("Aucune réponse reçue du serveur.");
     } catch (error: any) {
-      console.error('Error sending message to AI:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: error.message || "Désolé, je n'ai pas pu traiter votre demande pour le moment. Veuillez réessayer.",
-        sender: 'ai',
-      };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      console.error(error);
+      setReply(`❌ Une erreur s'est produite : ${error.message || "Vérifie la console."}`);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-grow container mx-auto max-w-4xl px-4 py-8">
-        <section className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary">Votre Assistant Voyage IA</h1>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Posez vos questions sur les destinations, les services, les démarches de visa ou tout autre sujet lié à votre voyage.
-          </p>
-        </section>
+      <main className="flex-grow p-8 bg-gray-50 flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">Assistant IA ✨</h1>
 
-        <Card className="flex flex-col h-[70vh] max-h-[800px] shadow-lg">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2 text-primary">
-              <Bot className="h-6 w-6" /> Assistant Zahra Voyages
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex-grow p-4 overflow-hidden">
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-4">
-                {messages.length === 0 && (
-                  <div className="text-center text-muted-foreground py-10">
-                    Bonjour ! Comment puis-je vous aider aujourd'hui ?
-                  </div>
-                )}
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex items-start gap-3 ${
-                      message.sender === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    {message.sender === 'ai' && (
-                      <div className="flex-shrink-0 p-2 bg-primary/10 rounded-full">
-                        <Bot className="h-5 w-5 text-primary" />
-                      </div>
-                    )}
-                    <div
-                      className={`max-w-[70%] p-3 rounded-lg ${
-                        message.sender === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-secondary text-secondary-foreground'
-                      }`}
-                    >
-                      {message.text}
-                    </div>
-                    {message.sender === 'user' && (
-                      <div className="flex-shrink-0 p-2 bg-accent/10 rounded-full">
-                        <User className="h-5 w-5 text-accent-foreground" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex items-start gap-3 justify-start">
-                    <div className="flex-shrink-0 p-2 bg-primary/10 rounded-full">
-                      <Bot className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="max-w-[70%] p-3 rounded-lg bg-secondary text-secondary-foreground animate-pulse">
-                      Typing...
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
-          </CardContent>
-          <div className="p-4 border-t">
-            <form onSubmit={handleSendMessage} className="flex gap-2">
-              <Input
-                placeholder="Posez votre question..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={isLoading}
-                className="flex-grow"
-              />
-              <Button type="submit" disabled={isLoading}>
-                <Send className="h-5 w-5" />
-                <span className="sr-only">Envoyer</span>
-              </Button>
-            </form>
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Pose ta question ici..."
+          className="w-full max-w-lg p-3 border border-gray-300 rounded-lg"
+          rows={5}
+        />
+
+        <button
+          onClick={handleSendMessage}
+          disabled={loading}
+          className="mt-3 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          {loading ? "Envoi..." : "Envoyer"}
+        </button>
+
+        {reply && (
+          <div className="mt-6 p-4 bg-white shadow-md rounded-lg w-full max-w-lg">
+            <h2 className="font-semibold text-gray-700 mb-2">Réponse :</h2>
+            <p className="text-gray-800 whitespace-pre-wrap">{reply}</p>
           </div>
-        </Card>
+        )}
       </main>
       <Footer />
     </div>
