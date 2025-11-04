@@ -1,37 +1,36 @@
 "use client";
 import { useState } from "react";
-import Header from '@/components/layout/header'; // Garder l'import pour le layout global
-import Footer from '@/components/layout/footer'; // Garder l'import pour le layout global
+import Header from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
 
-export default function AIAssistantPage() { // Renommé en AIAssistantPage pour correspondre au fichier
-  const [message, setMessage] = useState("");
-  const [reply, setReply] = useState("");
+export default function AIAssistantPage() {
+  const [question, setQuestion] = useState(""); // Changé de 'message' à 'question'
+  const [answer, setAnswer] = useState("");     // Changé de 'reply' à 'answer'
   const [loading, setLoading] = useState(false);
 
   const handleSendMessage = async () => {
-    if (!message.trim()) return;
+    if (!question.trim()) return; // Utilise 'question'
     setLoading(true);
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ question }), // Envoie 'question'
       });
 
       if (!response.ok) {
         const text = await response.text();
-        // Amélioration de la gestion d'erreur pour inclure le texte de la réponse si disponible
         const errorDetail = text.startsWith('<!DOCTYPE') ? 'La route API ne renvoie pas de JSON (page HTML reçue).' : text;
         throw new Error(`Erreur HTTP ${response.status} : ${errorDetail}`);
       }
 
       const data = await response.json();
-      if (data.reply) setReply(data.reply);
-      else setReply("Aucune réponse reçue du serveur.");
+      if (data.answer) setAnswer(data.answer); // Reçoit 'answer'
+      else setAnswer("Aucune réponse reçue du serveur.");
     } catch (error: any) {
       console.error(error);
-      setReply(`❌ Une erreur s'est produite : ${error.message || "Vérifie la console."}`);
+      setAnswer(`❌ Une erreur s'est produite : ${error.message || "Vérifie la console."}`); // Utilise 'answer'
     } finally {
       setLoading(false);
     }
@@ -44,8 +43,8 @@ export default function AIAssistantPage() { // Renommé en AIAssistantPage pour 
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Assistant IA ✨</h1>
 
         <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={question} // Utilise 'question'
+          onChange={(e) => setQuestion(e.target.value)} // Met à jour 'question'
           placeholder="Pose ta question ici..."
           className="w-full max-w-lg p-3 border border-gray-300 rounded-lg"
           rows={5}
@@ -59,10 +58,10 @@ export default function AIAssistantPage() { // Renommé en AIAssistantPage pour 
           {loading ? "Envoi..." : "Envoyer"}
         </button>
 
-        {reply && (
+        {answer && ( // Affiche 'answer'
           <div className="mt-6 p-4 bg-white shadow-md rounded-lg w-full max-w-lg">
             <h2 className="font-semibold text-gray-700 mb-2">Réponse :</h2>
-            <p className="text-gray-800 whitespace-pre-wrap">{reply}</p>
+            <p className="text-gray-800 whitespace-pre-wrap">{answer}</p> {/* Affiche 'answer' */}
           </div>
         )}
       </main>
