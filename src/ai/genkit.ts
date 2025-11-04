@@ -6,6 +6,6 @@ console.log('Initializing Genkit...');
 export const ai = genkit({
   plugins: [googleAI()],
   model: 'googleai/gemini-2.0-flash',
-  flows: { chatFlow }, // Explicitly register the flow
+  // flows: { chatFlow }, // This property is not valid here and has been removed.
 });
 console.log('Genkit initialized successfully.');

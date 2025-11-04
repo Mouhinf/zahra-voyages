@@ -2,8 +2,8 @@ import { defineFlow, run } from '@genkit-ai/core';
 import { googleAI } from '@genkit-ai/googleai';
 
 export const chatFlow = defineFlow(
-  {
-    name: 'chatFlow',
+  'chatFlow', // Le nom du flux doit être le premier argument
+  { // Les options du flux sont le deuxième argument
     inputSchema: {
       type: 'object',
       properties: {
@@ -19,10 +19,9 @@ export const chatFlow = defineFlow(
       required: ['response'],
     },
   },
-  async (input: { message: string }) => {
-    // Correctly access the Gemini Flash model using googleAI.model()
+  async (input: { message: string }) => { // Le gestionnaire de flux est le troisième argument
     const model = googleAI.model('gemini-2.0-flash'); 
-    const response = await model.generate({ // Utilisation de model.generate()
+    const response = await model.generate({
       prompt: `You are a helpful AI assistant for Zahra Voyages, a travel agency based in Dakar, Senegal. Your goal is to provide information and guidance regarding travel, destinations, visa procedures, and general inquiries about Zahra Voyages' services. Keep your answers concise and helpful.
 
 User: ${input.message}
