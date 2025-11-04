@@ -37,7 +37,8 @@ export default function AIAssistantPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      // Mise à jour de l'URL de l'API pour correspondre à la nouvelle structure de route Genkit
+      const response = await fetch('/api/flows/chatFlow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,15 +52,18 @@ export default function AIAssistantPage() {
           const errorData = await response.json();
           if (errorData && errorData.error) {
             errorMessageText = `Erreur de l'IA : ${errorData.error}`;
+          } else if (typeof errorData === 'string') { // Genkit might return a string error directly
+            errorMessageText = `Erreur de l'IA : ${errorData}`;
           }
         } catch (parseError) {
           console.error('Failed to parse error response:', parseError);
         }
-        throw new Error(errorMessageText); // Throw the more detailed error
+        throw new Error(errorMessageText);
       }
 
-      const data = await response.json();
-      const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data.response, sender: 'ai' };
+      // Le flux Genkit retourne maintenant directement une chaîne de caractères
+      const data: string = await response.json(); 
+      const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data, sender: 'ai' };
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error: any) {
       console.error('Error sending message to AI:', error);
