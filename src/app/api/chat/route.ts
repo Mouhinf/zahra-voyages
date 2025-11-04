@@ -1,4 +1,4 @@
-import { runFlow } from '@genkit-ai/next';
+import { run } from 'genkit'; // Import correct de la fonction 'run'
 import { chatFlow } from '@/ai/flows/chatFlow';
 
 export async function POST(req: Request) {
@@ -12,7 +12,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    const flowResponse = await runFlow(chatFlow, { message });
+    // Utilisation de la fonction 'run' pour exécuter le flux
+    const flowResponse = await run(chatFlow, { message });
     return new Response(JSON.stringify(flowResponse), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
