@@ -2,6 +2,8 @@ import { configureGenkit } from '@genkit-ai/core';
 import { googleCloud } from '@genkit-ai/google-cloud';
 import { chatFlow } from './flows/chatFlow'; // Importez le flux que nous venons de créer
 
+export let isGenkitConfigured = false; // Export a status flag
+
 const geminiApiKey = process.env.GEMINI_API_KEY;
 
 if (!geminiApiKey) {
@@ -19,4 +21,5 @@ if (!geminiApiKey) {
     flows: { chatFlow }, // Enregistre le flux de chat
     logLevel: 'debug', // Utile pour le débogage
   });
+  isGenkitConfigured = true;
 }
