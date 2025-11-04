@@ -37,31 +37,31 @@ export default function AIAssistantPage() {
     setIsLoading(true);
 
     try {
-      // Mise à jour de l'URL de l'API pour correspondre à la nouvelle structure de route Genkit
       const response = await fetch('/api/flows/chatFlow', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ question: input }), // Changement de 'message' à 'question'
       });
 
       if (!response.ok) {
-        let errorMessageText = "Désolé, je n'ai pas pu traiter votre demande pour le moment. Veuillez réessayer.";
+        const text = await response.text();
+        if (text.startsWith('<!DOCTYPE')) {
+          throw new Error('Erreur du serveur : la route API ne renvoie pas de JSON. Vérifiez la configuration de Genkit.');
+        }
+        let errorMessageText = `Erreur HTTP ${response.status}`;
         try {
-          const errorData = await response.json();
+          const errorData = JSON.parse(text); // Tente de parser même si !response.ok
           if (errorData && errorData.error) {
             errorMessageText = `Erreur de l'IA : ${errorData.error}`;
-          } else if (typeof errorData === 'string') { // Genkit might return a string error directly
-            errorMessageText = `Erreur de l'IA : ${errorData}`;
           }
         } catch (parseError) {
-          console.error('Failed to parse error response:', parseError);
+          console.error('Failed to parse error response as JSON:', parseError);
         }
         throw new Error(errorMessageText);
       }
 
-      // Le flux Genkit retourne maintenant directement une chaîne de caractères
       const data: string = await response.json(); 
       const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data, sender: 'ai' };
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
