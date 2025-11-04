@@ -2,6 +2,7 @@ import { run } from 'genkit';
 import { chatFlow } from '@/ai/flows/chatFlow';
 
 export async function POST(req: Request) {
+  console.log('API /api/chat POST request received.');
   const { message } = await req.json();
 
   if (!message) {
@@ -17,8 +18,8 @@ export async function POST(req: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) { // Capture l'erreur pour renvoyer son message
-    console.error('Error running Genkit flow:', error);
+  } catch (error: any) {
+    console.error('Error running Genkit flow in /api/chat:', error);
     return new Response(JSON.stringify({ error: error.message || 'Failed to get response from AI assistant' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
