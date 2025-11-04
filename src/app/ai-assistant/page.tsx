@@ -46,17 +46,26 @@ export default function AIAssistantPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let errorMessageText = "Désolé, je n'ai pas pu traiter votre demande pour le moment. Veuillez réessayer.";
+        try {
+          const errorData = await response.json();
+          if (errorData && errorData.error) {
+            errorMessageText = `Erreur de l'IA : ${errorData.error}`;
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+        }
+        throw new Error(errorMessageText); // Throw the more detailed error
       }
 
       const data = await response.json();
       const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data.response, sender: 'ai' };
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message to AI:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Désolé, je n'ai pas pu traiter votre demande pour le moment. Veuillez réessayer.",
+        text: error.message || "Désolé, je n'ai pas pu traiter votre demande pour le moment. Veuillez réessayer.",
         sender: 'ai',
       };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
