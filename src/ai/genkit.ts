@@ -2,10 +2,21 @@ import { configureGenkit } from '@genkit-ai/core';
 import { googleCloud } from '@genkit-ai/google-cloud';
 import { chatFlow } from './flows/chatFlow'; // Importez le flux que nous venons de créer
 
+const geminiApiKey = process.env.GEMINI_API_KEY;
+
+if (!geminiApiKey) {
+  console.error("❌ ERREUR: La variable d'environnement GEMINI_API_KEY est manquante.");
+  // Lancer une erreur ici empêchera la configuration de Genkit de se terminer
+  // et devrait entraîner une erreur de serveur qui sera capturée par le try/catch de la route API.
+  throw new Error("GEMINI_API_KEY n'est pas définie. Veuillez la configurer dans votre fichier .env.local.");
+} else {
+  console.log("✅ GEMINI_API_KEY est chargée.");
+}
+
 configureGenkit({
   plugins: [
     googleCloud({
-      apiKey: process.env.GEMINI_API_KEY, // Utilise la clé API depuis les variables d'environnement
+      apiKey: geminiApiKey, // Utilise la clé API depuis les variables d'environnement
       defaultRegion: 'us-central1', // Région par défaut, vous pouvez la changer si nécessaire
     }),
   ],
