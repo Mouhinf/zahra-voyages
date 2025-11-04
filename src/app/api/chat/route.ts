@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     // 🔧 Étape 1 : Mets ta clé API ici directement
     const apiKey =
       process.env.GEMINI_API_KEY ||
-      "AIzaSyD1234567890abcdefghij_klmnopqrst"; // REMPLACEZ CECI PAR VOTRE VRAIE CLÉ API
+      "AIzaSyA7YoSJKviUpzbgm9j2tiRUXprxjx0KoIg"; // REMPLACEZ CECI PAR VOTRE VRAIE CLÉ API
 
     // Vérification
     if (!apiKey || apiKey.includes("REMPLACE")) {
