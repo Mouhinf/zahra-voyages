@@ -1,4 +1,4 @@
-import { run } from 'genkit'; // Import correct de la fonction 'run'
+import { run } from 'genkit';
 import { chatFlow } from '@/ai/flows/chatFlow';
 
 export async function POST(req: Request) {
@@ -12,15 +12,14 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Utilisation de la fonction 'run' pour exécuter le flux
     const flowResponse = await run(chatFlow, { message });
     return new Response(JSON.stringify(flowResponse), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
+  } catch (error: any) { // Capture l'erreur pour renvoyer son message
     console.error('Error running Genkit flow:', error);
-    return new Response(JSON.stringify({ error: 'Failed to get response from AI assistant' }), {
+    return new Response(JSON.stringify({ error: error.message || 'Failed to get response from AI assistant' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
