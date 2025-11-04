@@ -24,14 +24,15 @@ export default function AIAssistantPage() {
       });
 
       if (!response.ok) {
-        // Tente d'abord de parser comme JSON
+        // Clone la réponse pour pouvoir la lire plusieurs fois si nécessaire
+        const errorResponse = response.clone(); 
         try {
-          const errorData = await response.json();
+          const errorData = await response.json(); // Tente de lire l'original comme JSON
           const errorDetail = errorData.error || `Erreur HTTP ${response.status}`;
           throw new Error(`Erreur API : ${errorDetail}`);
         } catch (jsonParseError) {
-          // Si le parsing JSON échoue, lit la réponse comme texte brut
-          const errorText = await response.text();
+          // Si le parsing JSON échoue, lit le clone comme texte brut
+          const errorText = await errorResponse.text(); 
           throw new Error(`Erreur API (non-JSON) : ${response.status} - ${errorText.substring(0, 500)}...`); // Affiche les 500 premiers caractères
         }
       }
