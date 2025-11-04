@@ -1,4 +1,4 @@
-import { runFlow } from 'genkit/next';
+import { runFlow } from '@genkit-ai/next';
 import { chatFlow } from '@/ai/flows/chatFlow';
 
 export async function POST(req: Request) {
