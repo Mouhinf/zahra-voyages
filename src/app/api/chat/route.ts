@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const flowResponse = await run(chatFlow, { message });
+    const flowResponse = await run('chatFlow', { message }); // Appel du flux par son nom
     return new Response(JSON.stringify(flowResponse), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
