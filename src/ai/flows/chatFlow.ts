@@ -20,7 +20,8 @@ export const chatFlow = defineFlow(
     },
   },
   async (input: { message: string }) => {
-    const model = googleAI.geminiFlash; // Utilisation du modèle geminiFlash
+    // Correctly access the Gemini Flash model using googleAI.model()
+    const model = googleAI.model('gemini-2.0-flash'); 
     const response = await run(model, {
       prompt: `You are a helpful AI assistant for Zahra Voyages, a travel agency based in Dakar, Senegal. Your goal is to provide information and guidance regarding travel, destinations, visa procedures, and general inquiries about Zahra Voyages' services. Keep your answers concise and helpful.
 
