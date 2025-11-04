@@ -27,24 +27,6 @@ const importExportServices = [
   },
 ];
 
-const vehicleServices = [
-  {
-    icon: <Plane className="h-8 w-8 text-primary" />,
-    title: 'Location de Voitures',
-    description: "Large gamme de véhicules disponibles à la location, adaptés à tous vos besoins et budgets.",
-  },
-  {
-    icon: <Package className="h-8 w-8 text-primary" />,
-    title: 'Vente de Véhicules',
-    description: "Conseil et accompagnement pour l'achat ou la vente de véhicules neufs ou d'occasion.",
-  },
-  {
-    icon: <ShieldCheck className="h-8 w-8 text-primary" />,
-    title: 'Gestion de Flotte',
-    description: "Solutions complètes pour la gestion de parcs automobiles d'entreprises.",
-  },
-];
-
 const services = [
   {
     icon: <Plane className="h-8 w-8 text-primary" />,
@@ -91,7 +73,8 @@ const services = [
 export default function ServicesPage() {
   const [showTourismServices, setShowTourismServices] = useState(false);
   const [showImportExportServices, setShowImportExportServices] = useState(false);
-  const [showVehicleServices, setShowVehicleServices] = useState(false);
+  // Removed showVehicleServices state
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -138,9 +121,7 @@ export default function ServicesPage() {
                 <Button onClick={() => setShowImportExportServices(!showImportExportServices)} size="lg" className="ml-4">
                     {showImportExportServices ? 'Masquer l\'Assistance importation et exportation' : 'Assistance importation et exportation'}
                 </Button>
-                <Button onClick={() => setShowVehicleServices(!showVehicleServices)} size="lg" className="ml-4">
-                    {showVehicleServices ? 'Masquer Ventes et Locations de Véhicules' : 'Ventes et Locations de Véhicules'}
-                </Button>
+                {/* Removed button for Vehicle Services */}
 
                 {showTourismServices && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
@@ -188,28 +169,7 @@ export default function ServicesPage() {
                     </div>
                 )}
 
-                {showVehicleServices && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-                      {vehicleServices.map((service) => (
-                        <Card key={service.title} className="text-center flex flex-col items-center p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 bg-background">
-                            <div className="bg-primary/10 rounded-full p-4 mb-4">
-                              {service.icon}
-                            </div>
-                            <CardHeader className="p-0">
-                              <CardTitle className="text-xl font-semibold text-primary">{service.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0 mt-2 flex-grow">
-                              <p className="text-muted-foreground">{service.description}</p>
-                            </CardContent>
-                            <div className="mt-4">
-                              <QuoteRequestDialog>
-                                <Button variant="link">Demander un devis</Button>
-                              </QuoteRequestDialog>
-                            </div>
-                        </Card>
-                      ))}
-                    </div>
-                )}
+                {/* Removed conditional rendering for Vehicle Services */}
             </div>
         </section>
       </main>
