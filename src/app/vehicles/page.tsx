@@ -179,7 +179,7 @@ export default function VehiclesPage() {
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-primary">Des Véhicules de Qualité pour Tous Vos Besoins</h2>
                 <p className="mt-4 text-lg text-muted-foreground">
-                  Chez SLAAC Voyages, nous vous offrons une sélection exceptionnelle de véhicules à la location et à la vente. Que ce soit pour un voyage d'affaires, des vacances en famille ou l'acquisition d'un véhicule importé de l'étranger, nous avons la solution.
+                  Chez Zahra Voyages, nous vous offrons une sélection exceptionnelle de véhicules à la location et à la vente. Que ce soit pour un voyage d'affaires, des vacances en famille ou l'acquisition d'un véhicule importé de l'étranger, nous avons la solution.
                 </p>
                 <p className="mt-4 text-muted-foreground">
                   Notre engagement : vous fournir des véhicules fiables, bien entretenus et adaptés à vos attentes, avec un service client irréproquable du début à la fin.
@@ -219,7 +219,7 @@ export default function VehiclesPage() {
         {activeSection === 'sale' && (
             <section className="py-16 sm:py-24 bg-background">
               <div className="container mx-auto max-w-7xl px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-6">Acheter Votre Véhicule avec SLAAC Voyages</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-6">Acheter Votre Véhicule avec Zahra Voyages</h2>
                 <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto">
                   À la recherche de votre prochaine voiture ? Explorez notre sélection de véhicules à vendre, incluant des modèles de qualité **directement importés de l'étranger**. Nous vous offrons un accompagnement complet pour un achat en toute confiance. Trouvez le véhicule qui correspond parfaitement à vos attentes et à votre budget.
                 </p>

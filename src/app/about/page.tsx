@@ -26,7 +26,7 @@ const companyInfo = [
   {
     icon: <Building className="h-10 w-10 text-primary" />,
     title: 'Notre Histoire',
-    description: "Fondée à Dakar, SLAAC Voyages est née d'une passion pour la découverte et le partage. Nous avons commencé avec une petite équipe et une grande vision : rendre le voyage accessible et inoubliable pour tous.",
+    description: "Fondée à Dakar, Zahra Voyages est née d'une passion pour la découverte et le partage. Nous avons commencé avec une petite équipe et une grande vision : rendre le voyage accessible et inoubliable pour tous.",
   },
   {
     icon: <Target className="h-10 w-10 text-primary" />,
@@ -49,7 +49,7 @@ export default function AboutPage() {
           <div className="container mx-auto max-w-7xl px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-primary">Qui Sommes-Nous ?</h1>
             <p className="mt-4 text-lg text-secondary-foreground max-w-3xl mx-auto">
-              Découvrez l'histoire, la mission et les valeurs qui font de SLAAC Voyages votre partenaire de confiance pour des aventures mémorables.
+              Découvrez l'histoire, la mission et les valeurs qui font de Zahra Voyages votre partenaire de confiance pour des aventures mémorables.
             </p>
           </div>
         </section>
@@ -70,17 +70,17 @@ export default function AboutPage() {
                 <h2 className="text-3xl md:text-4xl font-bold text-primary">Votre Guide pour des Voyages Inoubliables</h2>
                 <div className="mt-4 text-lg text-muted-foreground space-y-4">
                   <p>
-                    SLAAC VOYAGES est une agence de voyages et de tourisme, basée au Centre ville de Dakar à l'immeuble TRAMES au premier étage, spécialisée dans la vente des billets d'avion pour toutes les destinations, les préinscriptions, l'assistance visa, les réservations d'hôtel, les prises de rendez-vous et le tourisme.
+                    Zahra VOYAGES est une agence de voyages et de tourisme, basée au Centre ville de Dakar à l'immeuble TRAMES au premier étage, spécialisée dans la vente des billets d'avion pour toutes les destinations, les préinscriptions, l'assistance visa, les réservations d'hôtel, les prises de rendez-vous et le tourisme.
                   </p>
                   <p>
                     Nous proposons une gamme complète de services pour répondre à vos besoins professionnels et touristiques. Notre objectif est de vous offrir le meilleur du tourisme à travers des excursions authentiques, des circuits de voyages à thèmes, des séjours linguistiques, des séjours religieux, les Transferts en VTC ou par la plage.
                   </p>
                   <p>
-                    Que vous soyez à la recherche d'aventure, de culture, d'adrénaline, Slaac Voyages est votre partenaire incontournable pour la réalisation de vos projets. Grace à nos experts, nous mettons au service de nos clients un dispositif d'accompagnement personnalisé, un système de filtrage et des outils de dernière génération afin de leurs garantir les meilleures offres et les billets d'avion les moins chers.
+                    Que vous soyez à la recherche d'aventure, de culture, d'adrénaline, Zahra Voyages est votre partenaire incontournable pour la réalisation de vos projets. Grace à nos experts, nous mettons au service de nos clients un dispositif d'accompagnement personnalisé, un système de filtrage et des outils de dernière génération afin de leurs garantir les meilleures offres et les billets d'avion les moins chers.
                   </p>
                 </div>
                  <div className="mt-6">
-                  <a href="/brochure-slaac-voyages.pdf" download>
+                  <a href="/brochure-Zahra-voyages.pdf" download>
                     <Button size="lg" variant="default">
                       <Download className="mr-2 h-5 w-5" />
                       Télécharger notre brochure
@@ -116,7 +116,7 @@ export default function AboutPage() {
         <section className="py-16 sm:py-24 bg-background">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-primary">Plus sur SLAAC Voyages</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-primary">Plus sur Zahra Voyages</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8 text-center">
                     {companyInfo.map((item) => (

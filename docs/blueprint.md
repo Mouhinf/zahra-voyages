@@ -1,4 +1,4 @@
-# **App Name**: SLAAC Voyages Explorer
+# **App Name**: Zahra Voyages Explorer
 
 ## Core Features:
 

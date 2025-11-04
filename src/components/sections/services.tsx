@@ -80,7 +80,7 @@ export default function Services() {
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Des Services Complets pour un Voyage Parfait</h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            De la réservation de votre billet d'avion à l'organisation de vos activités sur place, SLAAC Voyages s'occupe de chaque détail pour vous garantir une expérience fluide et mémorable.
+            De la réservation de votre billet d'avion à l'organisation de vos activités sur place, Zahra Voyages s'occupe de chaque détail pour vous garantir une expérience fluide et mémorable.
           </p>
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

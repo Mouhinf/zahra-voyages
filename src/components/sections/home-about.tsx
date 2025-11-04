@@ -20,7 +20,7 @@ export default function HomeAbout() {
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Votre Partenaire de Confiance pour des Voyages Inoubliables</h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Chez SLAAC Voyages, nous croyons que chaque voyage est une histoire unique. Depuis notre base à Dakar, nous nous engageons à transformer vos rêves d'évasion en réalité, en concevant des expériences de voyage authentiques et mémorables.
+              Chez Zahra Voyages, nous croyons que chaque voyage est une histoire unique. Depuis notre base à Dakar, nous nous engageons à transformer vos rêves d'évasion en réalité, en concevant des expériences de voyage authentiques et mémorables.
             </p>
             <p className="mt-4 text-muted-foreground">
               Notre équipe d'experts passionnés est à votre écoute pour créer des itinéraires sur mesure qui correspondent à vos envies et à votre budget.

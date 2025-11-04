@@ -34,7 +34,7 @@ export default function Header() {
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
             <PlaneIcon className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
+          <span className="font-bold text-lg text-primary">Zahra Voyages</span>
         </Link>
 
         <nav className="hidden md:flex gap-6">
@@ -50,7 +50,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-            <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="icon" className="hidden sm:flex">
                     <WhatsAppIcon className="h-5 w-5 fill-current" />
                     <span className="sr-only">Contacter sur WhatsApp</span>
@@ -73,7 +73,7 @@ export default function Header() {
               <div className="grid gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                    <PlaneIcon className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
+                  <span className="font-bold text-lg text-primary">Zahra Voyages</span>
                 </Link>
                 <nav className="grid gap-4">
                   {navLinks.map((link) => (
@@ -92,7 +92,7 @@ export default function Header() {
                       <Send className="ml-2 h-4 w-4" />
                   </Button>
                 </QuoteRequestDialog>
-                <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="w-full">
                         <WhatsAppIcon className="mr-2 h-5 w-5 fill-current" /> Contacter sur WhatsApp
                     </Button>

@@ -20,7 +20,7 @@ export default function Hero() {
           Votre Passeport pour le Monde
         </h1>
         <p className="mt-4 text-xl md:text-2xl max-w-3xl mx-auto drop-shadow-md">
-          Découvrez des destinations incroyables et vivez des expériences uniques avec SLAAC Voyages.
+          Découvrez des destinations incroyables et vivez des expériences uniques avec Zahra Voyages.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link href="/destinations">
@@ -28,7 +28,7 @@ export default function Hero() {
               Explorer les Destinations
             </Button>
           </Link>
-           <a href="/brochure-slaac-voyages.pdf" download>
+           <a href="/brochure-zahra-voyages.pdf" download>
               <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                 <Download className="mr-2 h-5 w-5" />
                 Notre Brochure

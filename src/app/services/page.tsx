@@ -111,7 +111,7 @@ export default function ServicesPage() {
                     <div>
                         <h2 className="text-3xl md:text-4xl font-bold text-primary">Un Service Complet pour un Voyage Serein</h2>
                         <p className="mt-4 text-lg text-muted-foreground">
-                            Chez SLAAC Voyages, notre mission est de rendre votre expérience de voyage aussi simple et agréable que possible. Nous comprenons que chaque voyageur est unique, c'est pourquoi nous offrons une gamme de services entièrement personnalisables pour répondre à vos moindres désirs.
+                            Chez Zahra Voyages, notre mission est de rendre votre expérience de voyage aussi simple et agréable que possible. Nous comprenons que chaque voyageur est unique, c'est pourquoi nous offrons une gamme de services entièrement personnalisables pour répondre à vos moindres désirs.
                         </p>
                         <p className="mt-4 text-muted-foreground">
                             Grâce à notre expertise et à notre réseau de partenaires mondiaux, nous nous occupons de tous les détails, des plus simples aux plus complexes. Vous n'avez qu'à faire vos valises et vous préparer à créer des souvenirs inoubliables.
