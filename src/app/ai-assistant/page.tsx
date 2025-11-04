@@ -37,24 +37,24 @@ export default function AIAssistantPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/flows/chatFlow', {
+      const response = await fetch('/api/chat', { // Appel à la nouvelle route /api/chat
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ question: input }), // Changement de 'message' à 'question'
+        body: JSON.stringify({ message: input }), // Envoi de 'message'
       });
 
       if (!response.ok) {
         const text = await response.text();
         if (text.startsWith('<!DOCTYPE')) {
-          throw new Error('Erreur du serveur : la route API ne renvoie pas de JSON. Vérifiez la configuration de Genkit.');
+          throw new Error('Erreur du serveur : la route API ne renvoie pas de JSON. Vérifiez la configuration de l\'API.');
         }
         let errorMessageText = `Erreur HTTP ${response.status}`;
         try {
-          const errorData = JSON.parse(text); // Tente de parser même si !response.ok
+          const errorData = JSON.parse(text);
           if (errorData && errorData.error) {
-            errorMessageText = `Erreur de l'IA : ${errorData.error}`;
+            errorMessageText = `Erreur de l'API : ${errorData.error}`;
           }
         } catch (parseError) {
           console.error('Failed to parse error response as JSON:', parseError);
@@ -62,8 +62,8 @@ export default function AIAssistantPage() {
         throw new Error(errorMessageText);
       }
 
-      const data: string = await response.json(); 
-      const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data, sender: 'ai' };
+      const data = await response.json(); // Attend un objet JSON avec une propriété 'reply'
+      const aiMessage: Message = { id: (Date.now() + 1).toString(), text: data.reply, sender: 'ai' };
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error: any) {
       console.error('Error sending message to AI:', error);
