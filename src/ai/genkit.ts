@@ -1,46 +1,42 @@
-import { configure, defineFlow, getPlugin } from '@genkit-ai/core';
+import { configure, defineFlow } from '@genkit-ai/core';
 import { googleAI } from '@genkit-ai/googleai';
-import * as z from 'zod'; // Import Zod for schema definition
+import * as z from 'zod';
 
-console.log('Initializing Genkit...');
-// Configuration de Genkit
+// Configuration Genkit
 configure({
   plugins: [
     googleAI({
-      apiKey: process.env.GEMINI_API_KEY, // Utilisation de la clé API depuis les variables d'environnement
+      apiKey: process.env.GEMINI_API_KEY,
     }),
   ],
-  logLevel: 'debug', // Activation du niveau de log debug
-  enableTracingAndMetrics: true, // Activation du tracing et des métriques
+  logLevel: 'debug',
+  enableTracingAndMetrics: true,
 });
 
-const googleAIPlugin = getPlugin('googleAI');
-
+// Définition du flow
 export const chatFlow = defineFlow(
   'chatFlow', // Le nom du flow
   {
-    inputSchema: z.object({ question: z.string() }), // Utilisation de 'question' comme champ d'entrée
-    outputSchema: z.string(), // Le flux retourne directement une chaîne de caractères
+    inputSchema: z.object({ question: z.string() }),
+    outputSchema: z.string(),
   },
   async ({ question }) => {
-    const prompt = `You are a helpful AI assistant for Zahra Voyages, a travel agency based in Dakar, Senegal. Your goal is to provide information and guidance regarding travel, destinations, visa procedures, and general inquiries about Zahra Voyages' services. Keep your answers concise and helpful.
-
-User: ${question}
-Assistant:`;
+    const prompt = `Tu es un assistant IA de l'agence Zahra Voyages.
+Réponds toujours avec bienveillance et clarté à la question suivante :
+"${question}"`;
 
     try {
-      const response = await googleAIPlugin.generate({ // Utilisation de googleAIPlugin.generate
+      const model = googleAI(); // Instanciation du modèle comme suggéré
+      const result = await model.generate({
         model: 'gemini', // Utilisation du modèle 'gemini'
         prompt,
-        config: { temperature: 0.7 },
+        config: { temperature: 0.5 },
       });
 
-      return response.text(); // Retourne directement le texte de la réponse
-    } catch (err) {
-      console.error('Erreur de l’IA:', err);
-      return 'Une erreur est survenue côté IA. Réessaie plus tard.';
+      return result.text();
+    } catch (error) {
+      console.error('Erreur Gemini:', error);
+      return "Je n’ai pas pu traiter ta demande pour le moment.";
     }
   }
 );
-
-console.log('Genkit initialized successfully.');
