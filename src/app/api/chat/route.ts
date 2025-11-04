@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     // 🔧 Étape 1 : Mets ta clé API ici directement
     const apiKey =
       process.env.GEMINI_API_KEY ||
-      "AIzaSyA7YoSJKviUpzbgm9j2tiRUXprxjx0KoIg"; // REMPLACEZ CECI PAR VOTRE VRAIE CLÉ API
+      "AIzaSyXXXXXX-REMPLACE_CETTE_PARTIE_PAR_TA_CLÉ_GEMINIXXXXXX"; // REMPLACEZ CECI PAR VOTRE VRAIE CLÉ API
 
     // Vérification
     if (!apiKey || apiKey.includes("REMPLACE")) {
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     // 🔧 Étape 2 : Appel à l’API Gemini
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, // Changement ici : gemini-pro
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
