@@ -20,9 +20,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Correction finale: utiliser le modèle "gemini-pro" sans numéro de version
+    // Using the gemini-1.5-flash model
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -45,8 +45,13 @@ export async function POST(req: Request) {
     );
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: "Erreur inconnue" }));
-      throw new Error(`Erreur API: ${response.status} - ${errorData.error?.message || response.statusText}`);
+      const errorText = await response.text();
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(`Erreur API: ${response.status} - ${errorData.error?.message || response.statusText}`);
+      } catch (e) {
+        throw new Error(`Erreur API (non-JSON): ${response.status} - ${errorText.substring(0, 500)}...`);
+      }
     }
 
     const data = await response.json();
