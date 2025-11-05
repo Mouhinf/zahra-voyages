@@ -20,9 +20,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Using the correct model name: gemini-1.0-pro
+    // Using the stable gemini-pro model
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
