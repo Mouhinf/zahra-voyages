@@ -20,9 +20,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Final attempt with the stable gemini-1.0-pro model
+    // Trying with the latest powerful model: gemini-1.5-pro-latest
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
