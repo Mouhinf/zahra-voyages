@@ -21,21 +21,11 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
+import { PlusCircle, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
@@ -51,9 +41,6 @@ export default function DestinationsManager() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [destinationToDelete, setDestinationToDelete] = useState<Destination | null>(null);
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,10 +72,15 @@ export default function DestinationsManager() {
     const imageFile = values.image[0];
     const formData = new FormData();
     formData.append('file', imageFile);
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
     try {
+      // Simulating progress
       setUploadProgress(50);
-      const uploadResponse = await fetch('/api/upload', {
+      const uploadResponse = await fetch(url, {
         method: 'POST',
         body: formData,
       });
@@ -128,53 +120,12 @@ export default function DestinationsManager() {
     }
   }
 
-  const openDeleteConfirm = (destination: Destination) => {
-    setDestinationToDelete(destination);
-    setIsAlertOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!destinationToDelete) return;
-
-    try {
-      // Supprimer l'image de Cloudinary
-      const deleteResponse = await fetch('/api/delete-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ public_id: destinationToDelete.public_id }),
-      });
-
-      if (!deleteResponse.ok) {
-        // On continue même si la suppression de l'image échoue pour ne pas bloquer l'utilisateur
-        console.warn("La suppression de l'image sur Cloudinary a peut-être échoué, mais nous continuons.");
-      }
-
-      // Supprimer le document de Firestore
-      await deleteDoc(doc(db, 'destinations', destinationToDelete.id));
-
-      toast({
-        title: 'Succès !',
-        description: 'La destination a été supprimée.',
-      });
-    } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
-      toast({
-        title: 'Erreur',
-        description: "Une erreur est survenue lors de la suppression.",
-        variant: 'destructive',
-      });
-    } finally {
-      setIsAlertOpen(false);
-      setDestinationToDelete(null);
-    }
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
             <h2 className="text-2xl font-semibold">Gérer les Destinations</h2>
-            <p className="text-muted-foreground">Ajoutez, modifiez ou supprimez les destinations de votre site.</p>
+            <p className="text-muted-foreground">Ajoutez les destinations de votre site.</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -225,12 +176,11 @@ export default function DestinationsManager() {
               <TableHead>Nom</TableHead>
               <TableHead>Prix</TableHead>
               <TableHead>Catégorie</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={4} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
             ) : destinations.length > 0 ? (
               destinations.map((dest) => (
                 <TableRow key={dest.id}>
@@ -240,33 +190,14 @@ export default function DestinationsManager() {
                   <TableCell className="font-medium">{dest.name}</TableCell>
                   <TableCell>{dest.price}</TableCell>
                   <TableCell>{dest.tag}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => openDeleteConfirm(dest)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
                 </TableRow>
               ))
             ) : (
-              <TableRow><TableCell colSpan={5} className="text-center h-24">Aucune destination trouvée.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={4} className="text-center h-24">Aucune destination trouvée.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. La destination "{destinationToDelete?.name}" sera définitivement supprimée.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Supprimer</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
