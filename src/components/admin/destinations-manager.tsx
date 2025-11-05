@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Destination } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -36,7 +35,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
@@ -84,20 +83,29 @@ export default function DestinationsManager() {
     setUploadProgress(0);
 
     const imageFile = values.image[0];
-    const storageRef = ref(storage, `destinations/${Date.now()}_${imageFile.name}`);
+    const formData = new FormData();
+    formData.append('file', imageFile);
 
     try {
-      // Simulating progress for upload
       setUploadProgress(50);
-      const snapshot = await uploadBytes(storageRef, imageFile);
-      const imageUrl = await getDownloadURL(snapshot.ref);
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Image upload failed');
+      }
+
+      const { secure_url, public_id } = await uploadResponse.json();
       setUploadProgress(100);
 
       await addDoc(collection(db, 'destinations'), {
         name: values.name,
         price: values.price,
         tag: values.tag,
-        image: imageUrl,
+        image: secure_url,
+        public_id: public_id,
       });
 
       toast({
@@ -129,9 +137,17 @@ export default function DestinationsManager() {
     if (!destinationToDelete) return;
 
     try {
-      // Supprimer l'image du Storage
-      const imageRef = ref(storage, destinationToDelete.image);
-      await deleteObject(imageRef);
+      // Supprimer l'image de Cloudinary
+      const deleteResponse = await fetch('/api/delete-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: destinationToDelete.public_id }),
+      });
+
+      if (!deleteResponse.ok) {
+        // On continue même si la suppression de l'image échoue pour ne pas bloquer l'utilisateur
+        console.warn("La suppression de l'image sur Cloudinary a peut-être échoué, mais nous continuons.");
+      }
 
       // Supprimer le document de Firestore
       await deleteDoc(doc(db, 'destinations', destinationToDelete.id));

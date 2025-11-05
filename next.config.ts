@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'firebasestudio.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       }
     ],
   },
