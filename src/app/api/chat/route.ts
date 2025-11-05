@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Using the stable gemini-pro model
+    // Correction finale: utiliser le modèle "gemini-pro" sans numéro de version
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
       {

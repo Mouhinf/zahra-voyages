@@ -26,12 +26,22 @@ export default function AIAssistantPage() {
         body: JSON.stringify({ message: question }),
       });
 
-      const data = await response.json();
-      
+      // Vérifier si la réponse est vide
       if (!response.ok) {
-        throw new Error(data.error || "Erreur serveur");
+        const errorText = await response.text();
+        let errorMessage = `Erreur serveur (${response.status})`;
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
       }
 
+      const data = await response.json();
       setAnswer(data.text);
     } catch (error: any) {
       console.error(error);
