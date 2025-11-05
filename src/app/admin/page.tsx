@@ -5,7 +5,8 @@ import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
+import DestinationsManager from '@/components/admin/destinations-manager';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -32,8 +33,8 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -43,17 +44,21 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Tableau de Bord Administrateur</h1>
-        <Button onClick={handleLogout} variant="outline">
-          Déconnexion
-        </Button>
-      </div>
-      <p>Bienvenue, {user.email} !</p>
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold">Gérer les Destinations</h2>
-        <p className="text-muted-foreground">Bientôt, vous pourrez ajouter, modifier et supprimer des destinations ici.</p>
+    <div className="p-4 sm:p-8 bg-secondary/50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <header className="flex justify-between items-center mb-8 pb-4 border-b">
+            <div>
+                <h1 className="text-3xl font-bold text-primary">Tableau de Bord</h1>
+                <p className="text-muted-foreground">Bienvenue, {user.email}</p>
+            </div>
+            <Button onClick={handleLogout} variant="outline">
+                <LogOut className="mr-2 h-4 w-4" />
+                Déconnexion
+            </Button>
+        </header>
+        <main>
+            <DestinationsManager />
+        </main>
       </div>
     </div>
   );
