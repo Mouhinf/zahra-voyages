@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
-import { chatFlow } from '@/ai/flows/chatFlow'; // Importe le flux Genkit
-import '@/ai/genkit'; // Assure que Genkit est initialisé
-import { isGenkitConfigured } from '@/ai/genkit'; // Importe le statut
 
 export async function POST(req: Request) {
-  // Vérification principale : Genkit a-t-il été configuré avec succès ?
-  if (!isGenkitConfigured) {
-    const errorMessage = "Le serveur AI n'est pas configuré. Cause probable : la variable d'environnement GEMINI_API_KEY est manquante ou incorrecte. Veuillez vérifier votre fichier .env.local et redémarrer le serveur.";
-    console.error(errorMessage);
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
-  }
-
   try {
     const { message } = await req.json();
 
@@ -21,24 +11,51 @@ export async function POST(req: Request) {
       );
     }
 
-    // Appelle directement le flux Genkit
-    const result = await chatFlow.run({ input: message });
-
-    return NextResponse.json({ text: result });
-  } catch (error: any) {
-    console.error("Erreur interne lors de l'appel à l'API de chat :", error);
+    const apiKey = process.env.GEMINI_API_KEY;
     
-    let detailedError = "Erreur interne du serveur.";
-    if (error.message) {
-      if (error.message.includes('API key not valid')) {
-        detailedError = "La clé API Gemini fournie n'est pas valide. Veuillez vérifier la clé dans Google AI Studio et dans votre fichier .env.local.";
-      } else {
-        detailedError = error.message;
-      }
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "La clé API Gemini n'est pas configurée." },
+        { status: 500 }
+      );
     }
 
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Vous êtes un assistant de voyage pour Zahra Voyages, une agence de voyage basée à Dakar. Répondez de manière utile et amicale à cette question: ${message}`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erreur API: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Aucune réponse reçue.";
+    
+    return NextResponse.json({ text });
+  } catch (error: any) {
+    console.error("Erreur API:", error);
     return NextResponse.json(
-      { error: `Erreur interne du serveur : ${detailedError}` },
+      { error: `Erreur: ${error.message || "Une erreur inconnue s'est produite."}` },
       { status: 500 }
     );
   }
