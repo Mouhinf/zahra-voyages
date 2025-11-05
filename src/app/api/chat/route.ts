@@ -20,9 +20,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Using the gemini-1.5-flash model
+    // Using the stable gemini-pro model
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -46,12 +46,17 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = `Erreur de l'API Gemini (${response.status}): ${response.statusText}`;
       try {
         const errorData = JSON.parse(errorText);
-        throw new Error(`Erreur API: ${response.status} - ${errorData.error?.message || response.statusText}`);
+        if (errorData.error && errorData.error.message) {
+          errorMessage = `Erreur de l'API Gemini: ${errorData.error.message}`;
+        }
       } catch (e) {
-        throw new Error(`Erreur API (non-JSON): ${response.status} - ${errorText.substring(0, 500)}...`);
+        // The error response was not JSON, use the raw text
+        errorMessage = `Erreur de l'API Gemini (${response.status}): ${errorText}`;
       }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -61,7 +66,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Erreur API:", error);
     return NextResponse.json(
-      { error: `Erreur: ${error.message || "Une erreur inconnue s'est produite."}` },
+      { error: `${error.message || "Une erreur inconnue s'est produite."}` },
       { status: 500 }
     );
   }
