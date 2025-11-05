@@ -41,7 +41,6 @@ export default function Footer() {
               <li><Link href="/" className="hover:text-primary">Accueil</Link></li>
               <li><Link href="/services" className="hover:text-primary">Services</Link></li>
               <li><Link href="/destinations" className="hover:text-primary">Destinations</Link></li>
-              <li><Link href="/ai-assistant" className="hover:text-primary">Assistant IA</Link></li> {/* Changed from /vehicles */}
               <li><Link href="/contact" className="hover:text-primary">Contact</Link></li>
               <li><Link href="/about" className="hover:text-primary">À propos</Link></li>
             </ul>
