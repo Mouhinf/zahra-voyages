@@ -5,17 +5,19 @@ import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Send, Bot } from 'lucide-react';
+import { Send, Bot, AlertCircle } from 'lucide-react';
 
 export default function AIAssistantPage() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSendMessage = async () => {
     if (!question.trim()) return;
     setLoading(true);
     setAnswer("");
+    setError("");
 
     try {
       const response = await fetch("/api/chat", {
@@ -33,7 +35,7 @@ export default function AIAssistantPage() {
       setAnswer(data.text);
     } catch (error: any) {
       console.error(error);
-      setAnswer(`❌ Erreur: ${error.message || "Impossible de contacter le serveur."}`);
+      setError(error.message || "Impossible de contacter le serveur.");
     } finally {
       setLoading(false);
     }
@@ -41,6 +43,7 @@ export default function AIAssistantPage() {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
@@ -90,7 +93,19 @@ export default function AIAssistantPage() {
               </Button>
             </div>
 
-            {answer && (
+            {error && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-red-500 mt-1 flex-shrink-0" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-red-800 mb-2">Erreur :</h3>
+                    <p className="text-red-700">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {answer && !error && (
               <div className="mt-6 p-4 bg-background border border-border rounded-lg">
                 <div className="flex items-start gap-3">
                   <Bot className="h-5 w-5 text-primary mt-1 flex-shrink-0" />

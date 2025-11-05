@@ -15,13 +15,14 @@ export async function POST(req: Request) {
     
     if (!apiKey) {
       return NextResponse.json(
-        { error: "La clé API Gemini n'est pas configurée." },
+        { error: "La clé API Gemini n'est pas configurée. Veuillez définir la variable d'environnement GEMINI_API_KEY." },
         { status: 500 }
       );
     }
 
+    // Using the correct model name: gemini-1.5-flash instead of gemini-pro
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `Vous êtes un assistant de voyage pour Zahra Voyages, une agence de voyage basée à Dakar. Répondez de manière utile et amicale à cette question: ${message}`
+              text: `Vous êtes un assistant de voyage pour Zahra Voyages, une agence de voyage basée à Dakar. Répondez de manière utile, amicale et professionnelle à cette question: ${message}`
             }]
           }],
           generationConfig: {
@@ -44,8 +45,8 @@ export async function POST(req: Request) {
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Erreur API: ${response.status} - ${errorText}`);
+      const errorData = await response.json().catch(() => ({ error: "Erreur inconnue" }));
+      throw new Error(`Erreur API: ${response.status} - ${errorData.error?.message || response.statusText}`);
     }
 
     const data = await response.json();
