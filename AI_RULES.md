@@ -1,6 +1,6 @@
-# AI Rules for Zahra Voyages Explorer
+# AI Rules for SLAAC Voyages Explorer
 
-This document outlines the core technologies and best practices for developing the Zahra Voyages Explorer application.
+This document outlines the core technologies and best practices for developing the SLAAC Voyages Explorer application.
 
 ## Tech Stack
 

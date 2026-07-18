@@ -6,3 +6,56 @@ export type Destination = {
   tag: string;
   public_id: string; // Cloudinary public_id for deletion
 };
+
+type OffreBase = {
+  id: string;
+  titre: string;
+  description: string;
+  prix: string;
+  image: string;
+  public_id: string;
+  tag: string;
+  disponible: boolean;
+  ordre: number;
+};
+
+export type Hebergement = OffreBase & {
+  type: 'hotel' | 'appartement' | 'villa' | 'auberge' | 'residence';
+  localisation: string;
+  nombreEtoiles: number;
+  capacite: string;
+  equipements: string[];
+};
+
+export type Transport = OffreBase & {
+  type: 'location_voiture' | 'vtc' | 'transfert_aeroport' | 'bus_prive';
+  vehicule: string;
+  capacitePassagers: number;
+  avecChauffeur: boolean;
+  carburantInclus: boolean;
+};
+
+export type VoyageCroisiere = OffreBase & {
+  type: 'voyage' | 'croisiere';
+  destination: string;
+  duree: string;
+  dateDepart: string;
+  inclus: string[];
+  nonInclus: string[];
+};
+
+export type Excursion = OffreBase & {
+  lieu: string;
+  duree: string;
+  pointDepart: string;
+  inclus: string[];
+  difficulte: 'facile' | 'moyenne' | 'sportive';
+};
+
+export type OffreAffaires = OffreBase & {
+  type: 'seminaire' | 'incentive' | 'mice' | 'mission_sur_mesure';
+  capacite: string;
+  lieu: string;
+  duree: string;
+  services: string[];
+};

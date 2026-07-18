@@ -8,10 +8,12 @@ import { QuoteRequestDialog } from './quote-request-dialog';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
-  { href: '/services', label: 'Services' },
-  { href: '/destinations', label: 'Destinations' },
+  { href: '/hebergement', label: 'Hébergement' },
+  { href: '/transport', label: 'Transport' },
+  { href: '/voyages-croisieres', label: 'Voyages & Croisières' },
+  { href: '/excursions', label: 'Excursions' },
+  { href: '/tourisme-affaires', label: "Tourisme d'Affaires" },
   { href: '/contact', label: 'Contact' },
-  { href: '/about', label: 'À propos' },
 ];
 
 const PlaneIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -33,7 +35,7 @@ export default function Header() {
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
             <PlaneIcon className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg text-primary">Zahra Voyages</span>
+          <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
         </Link>
 
         <nav className="hidden md:flex gap-6">
@@ -72,7 +74,7 @@ export default function Header() {
               <div className="grid gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                    <PlaneIcon className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-lg text-primary">Zahra Voyages</span>
+                  <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
                 </Link>
                 <nav className="grid gap-4">
                   {navLinks.map((link) => (

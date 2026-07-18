@@ -5,8 +5,14 @@ import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, LogOut } from 'lucide-react';
 import DestinationsManager from '@/components/admin/destinations-manager';
+import HebergementsManager from '@/components/admin/hebergements-manager';
+import TransportsManager from '@/components/admin/transports-manager';
+import VoyagesCroisieresManager from '@/components/admin/voyages-croisieres-manager';
+import ExcursionsManager from '@/components/admin/excursions-manager';
+import OffresAffairesManager from '@/components/admin/offres-affaires-manager';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -57,7 +63,22 @@ export default function AdminDashboard() {
             </Button>
         </header>
         <main>
-            <DestinationsManager />
+            <Tabs defaultValue="destinations" className="w-full">
+              <TabsList className="flex flex-wrap h-auto gap-1 mb-6 bg-background border">
+                <TabsTrigger value="destinations">Destinations</TabsTrigger>
+                <TabsTrigger value="hebergements">Hébergements</TabsTrigger>
+                <TabsTrigger value="transports">Transports</TabsTrigger>
+                <TabsTrigger value="voyages">Voyages & Croisières</TabsTrigger>
+                <TabsTrigger value="excursions">Excursions</TabsTrigger>
+                <TabsTrigger value="affaires">Tourisme d'Affaires</TabsTrigger>
+              </TabsList>
+              <TabsContent value="destinations"><DestinationsManager /></TabsContent>
+              <TabsContent value="hebergements"><HebergementsManager /></TabsContent>
+              <TabsContent value="transports"><TransportsManager /></TabsContent>
+              <TabsContent value="voyages"><VoyagesCroisieresManager /></TabsContent>
+              <TabsContent value="excursions"><ExcursionsManager /></TabsContent>
+              <TabsContent value="affaires"><OffresAffairesManager /></TabsContent>
+            </Tabs>
         </main>
       </div>
     </div>

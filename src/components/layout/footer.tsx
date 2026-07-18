@@ -32,15 +32,18 @@ export default function Footer() {
       <div className="container mx-auto max-w-7xl px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-secondary-foreground">
           <div>
-            <h3 className="text-lg font-semibold text-primary">Zahra Voyages</h3>
+            <h3 className="text-lg font-semibold text-primary">SLAAC Voyages</h3>
             <p className="mt-2 text-sm">Votre passeport pour des aventures inoubliables.</p>
           </div>
           <div>
             <h3 className="text-lg font-semibold text-primary">Navigation</h3>
             <ul className="mt-2 space-y-1 text-sm">
               <li><Link href="/" className="hover:text-primary">Accueil</Link></li>
-              <li><Link href="/services" className="hover:text-primary">Services</Link></li>
-              <li><Link href="/destinations" className="hover:text-primary">Destinations</Link></li>
+              <li><Link href="/hebergement" className="hover:text-primary">Hébergement</Link></li>
+              <li><Link href="/transport" className="hover:text-primary">Transport</Link></li>
+              <li><Link href="/voyages-croisieres" className="hover:text-primary">Voyages & Croisières</Link></li>
+              <li><Link href="/excursions" className="hover:text-primary">Excursions</Link></li>
+              <li><Link href="/tourisme-affaires" className="hover:text-primary">Tourisme d'Affaires</Link></li>
               <li><Link href="/contact" className="hover:text-primary">Contact</Link></li>
               <li><Link href="/about" className="hover:text-primary">À propos</Link></li>
             </ul>
@@ -69,7 +72,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Zahra Voyages. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} SLAAC Voyages. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

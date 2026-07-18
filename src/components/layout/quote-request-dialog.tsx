@@ -45,7 +45,13 @@ const formSchema = z.object({
   message: z.string().optional(),
 });
 
-export function QuoteRequestDialog({ children }: { children: React.ReactNode }) {
+export function QuoteRequestDialog({
+  children,
+  defaultDestination,
+}: {
+  children: React.ReactNode;
+  defaultDestination?: string;
+}) {
   const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
 
@@ -55,7 +61,7 @@ export function QuoteRequestDialog({ children }: { children: React.ReactNode }) 
       name: '',
       email: '',
       phone: '',
-      destination: '',
+      destination: defaultDestination ?? '',
       travelers: 1,
       message: '',
     },
