@@ -8,6 +8,8 @@ import { ArrowRight, Loader2, Info } from 'lucide-react';
 import Image from 'next/image';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getDbInstance } from '@/lib/firebase';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 
 type Offre = {
   id: string;
@@ -31,8 +33,6 @@ export default function OffresGrid({ collectionName, emptyMessage }: OffresGridP
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { getDbInstance } = await import('@/lib/firebase');
-      const { collection, query, orderBy, getDocs } = await import('firebase/firestore');
       const q = query(collection(getDbInstance(), collectionName), orderBy('ordre', 'asc'));
       const snap = await getDocs(q);
       if (mounted) {
