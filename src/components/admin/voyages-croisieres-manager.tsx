@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
+import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { VoyageCroisiere } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -59,7 +59,7 @@ export default function VoyagesCroisieresManager() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'voyagesCroisieres'), orderBy('ordre', 'asc'));
+    const q = query(collection(getDbInstance(), 'voyagesCroisieres'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: VoyageCroisiere[] = [];
       snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as VoyageCroisiere));
@@ -76,7 +76,7 @@ export default function VoyagesCroisieresManager() {
       setUploadProgress(50);
       const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
       setUploadProgress(100);
-      await addDoc(collection(db, 'voyagesCroisieres'), {
+      await addDoc(collection(getDbInstance(), 'voyagesCroisieres'), {
         titre: values.titre, description: values.description, prix: values.prix, tag: values.tag,
         type: values.type, destination: values.destination, duree: values.duree, dateDepart: values.dateDepart,
         inclus: values.inclus.split(',').map((s) => s.trim()).filter(Boolean),
@@ -99,7 +99,7 @@ export default function VoyagesCroisieresManager() {
     setDeletingId(id);
     try {
       await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(db, 'voyagesCroisieres', id));
+      await deleteDoc(doc(getDbInstance(), 'voyagesCroisieres', id));
       toast({ title: 'Supprimé', description: "Le voyage / la croisière a été supprimé(e)." });
     } catch (error) {
       console.error('Erreur :', error);

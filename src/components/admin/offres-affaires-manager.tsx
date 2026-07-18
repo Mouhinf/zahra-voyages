@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
+import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { OffreAffaires } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -57,7 +57,7 @@ export default function OffresAffairesManager() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'offresAffaires'), orderBy('ordre', 'asc'));
+    const q = query(collection(getDbInstance(), 'offresAffaires'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: OffreAffaires[] = [];
       snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as OffreAffaires));
@@ -74,7 +74,7 @@ export default function OffresAffairesManager() {
       setUploadProgress(50);
       const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
       setUploadProgress(100);
-      await addDoc(collection(db, 'offresAffaires'), {
+      await addDoc(collection(getDbInstance(), 'offresAffaires'), {
         titre: values.titre, description: values.description, prix: values.prix, tag: values.tag,
         type: values.type, capacite: values.capacite, lieu: values.lieu, duree: values.duree,
         services: values.services.split(',').map((s) => s.trim()).filter(Boolean),
@@ -96,7 +96,7 @@ export default function OffresAffairesManager() {
     setDeletingId(id);
     try {
       await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(db, 'offresAffaires', id));
+      await deleteDoc(doc(getDbInstance(), 'offresAffaires', id));
       toast({ title: 'Supprimé', description: "L'offre d'affaires a été supprimée." });
     } catch (error) {
       console.error('Erreur :', error);

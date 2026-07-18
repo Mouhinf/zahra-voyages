@@ -31,9 +31,9 @@ export default function OffresGrid({ collectionName, emptyMessage }: OffresGridP
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { db } = await import('@/lib/firebase');
+      const { getDbInstance } = await import('@/lib/firebase');
       const { collection, query, orderBy, getDocs } = await import('firebase/firestore');
-      const q = query(collection(db, collectionName), orderBy('ordre', 'asc'));
+      const q = query(collection(getDbInstance(), collectionName), orderBy('ordre', 'asc'));
       const snap = await getDocs(q);
       if (mounted) {
         const data: Offre[] = [];

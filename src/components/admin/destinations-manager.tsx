@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
+import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { Destination } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -52,7 +52,7 @@ export default function DestinationsManager() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'destinations'), orderBy('name', 'asc'));
+    const q = query(collection(getDbInstance(), 'destinations'), orderBy('name', 'asc'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const destinationsData: Destination[] = [];
       querySnapshot.forEach((doc) => {
@@ -92,7 +92,7 @@ export default function DestinationsManager() {
       const { secure_url, public_id } = await uploadResponse.json();
       setUploadProgress(100);
 
-      await addDoc(collection(db, 'destinations'), {
+      await addDoc(collection(getDbInstance(), 'destinations'), {
         name: values.name,
         price: values.price,
         tag: values.tag,

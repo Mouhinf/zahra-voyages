@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
+import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { Excursion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -57,7 +57,7 @@ export default function ExcursionsManager() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'excursions'), orderBy('ordre', 'asc'));
+    const q = query(collection(getDbInstance(), 'excursions'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: Excursion[] = [];
       snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Excursion));
@@ -74,7 +74,7 @@ export default function ExcursionsManager() {
       setUploadProgress(50);
       const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
       setUploadProgress(100);
-      await addDoc(collection(db, 'excursions'), {
+      await addDoc(collection(getDbInstance(), 'excursions'), {
         titre: values.titre, description: values.description, prix: values.prix, tag: values.tag,
         lieu: values.lieu, duree: values.duree, pointDepart: values.pointDepart,
         inclus: values.inclus.split(',').map((s) => s.trim()).filter(Boolean),
@@ -97,7 +97,7 @@ export default function ExcursionsManager() {
     setDeletingId(id);
     try {
       await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(db, 'excursions', id));
+      await deleteDoc(doc(getDbInstance(), 'excursions', id));
       toast({ title: 'Supprimé', description: "L'excursion a été supprimée." });
     } catch (error) {
       console.error('Erreur :', error);

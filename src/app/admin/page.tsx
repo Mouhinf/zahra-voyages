@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getAuthInstance } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,7 +20,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(getAuthInstance(), (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
       } else {
@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   }, [router]);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await signOut(getAuthInstance());
     router.push('/admin/login');
   };
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
+import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { Hebergement } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -58,7 +58,7 @@ export default function HebergementsManager() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'hebergements'), orderBy('ordre', 'asc'));
+    const q = query(collection(getDbInstance(), 'hebergements'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: Hebergement[] = [];
       snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Hebergement));
@@ -75,7 +75,7 @@ export default function HebergementsManager() {
       setUploadProgress(50);
       const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
       setUploadProgress(100);
-      await addDoc(collection(db, 'hebergements'), {
+      await addDoc(collection(getDbInstance(), 'hebergements'), {
         titre: values.titre,
         description: values.description,
         prix: values.prix,
@@ -106,7 +106,7 @@ export default function HebergementsManager() {
     setDeletingId(id);
     try {
       await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(db, 'hebergements', id));
+      await deleteDoc(doc(getDbInstance(), 'hebergements', id));
       toast({ title: 'Supprimé', description: "L'hébergement a été supprimé." });
     } catch (error) {
       console.error('Erreur :', error);

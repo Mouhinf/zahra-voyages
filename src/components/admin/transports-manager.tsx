@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
+import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { Transport } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -58,7 +58,7 @@ export default function TransportsManager() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, 'transports'), orderBy('ordre', 'asc'));
+    const q = query(collection(getDbInstance(), 'transports'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: Transport[] = [];
       snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Transport));
@@ -75,7 +75,7 @@ export default function TransportsManager() {
       setUploadProgress(50);
       const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
       setUploadProgress(100);
-      await addDoc(collection(db, 'transports'), {
+      await addDoc(collection(getDbInstance(), 'transports'), {
         titre: values.titre, description: values.description, prix: values.prix, tag: values.tag,
         type: values.type, vehicule: values.vehicule, capacitePassagers: values.capacitePassagers,
         avecChauffeur: values.avecChauffeur, carburantInclus: values.carburantInclus,
@@ -97,7 +97,7 @@ export default function TransportsManager() {
     setDeletingId(id);
     try {
       await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(db, 'transports', id));
+      await deleteDoc(doc(getDbInstance(), 'transports', id));
       toast({ title: 'Supprimé', description: 'Le transport a été supprimé.' });
     } catch (error) {
       console.error('Erreur :', error);
