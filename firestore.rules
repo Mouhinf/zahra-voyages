@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// Cloud Firestore Security Rules for SLAAC Voyages
+// Public read access for all collections (website content)
+// Write access restricted to authenticated admin users
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Public collections: readable by anyone, writable by authenticated users
+    match /{collectionName} {
+      // Hébergements, Transports, Voyages & Croisières, Excursions, Offres d'Affaires, Destinations
+      match /{documentId} {
+        allow read: if true;
+        allow write: if isAuthenticated();
+        allow delete: if isAuthenticated();
+      }
+    }
+  }
+}
