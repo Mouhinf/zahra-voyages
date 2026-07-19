@@ -46,6 +46,8 @@ export type VoyageCroisiere = OffreBase & {
   dateDepart: string;
   inclus: string[];
   nonInclus: string[];
+  descriptionComplete: string;
+  images: string[];
 };
 
 export type Excursion = OffreBase & {

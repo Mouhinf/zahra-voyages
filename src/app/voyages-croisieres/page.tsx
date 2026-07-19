@@ -33,7 +33,7 @@ export default function VoyagesCroisieresPage() {
                 Explorez le monde avec nos packages de voyage et nos croisières soigneusement sélectionnés. Vol, hôtel, transferts et activités inclus.
               </p>
             </div>
-            <OffresGrid collectionName="voyagesCroisieres" emptyMessage="Aucun voyage ou croisière disponible pour le moment. Contactez-nous pour un voyage sur mesure." />
+            <OffresGrid collectionName="voyagesCroisieres" emptyMessage="Aucun voyage ou croisière disponible pour le moment. Contactez-nous pour un voyage sur mesure." detailBasePath="/voyages-croisieres" />
           </div>
         </section>
 
