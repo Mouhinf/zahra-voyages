@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from 'next/font/google';
+import Chatbot from '@/components/chatbot';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-body antialiased`}>
         {children}
         <Toaster />
+        <Chatbot />
       </body>
     </html>
   );
