@@ -69,3 +69,24 @@ export type OffreAffaires = OffreBase & {
   descriptionComplete: string;
   images: string[];
 };
+
+export type Temoignage = {
+  id: string;
+  nom: string;
+  ville: string;
+  note: number;
+  texte: string;
+  service: string;
+  date: string;
+  visible: boolean;
+  ordre: number;
+};
+
+export type ChiffreCle = {
+  id: string;
+  valeur: number;
+  suffixe: string;
+  label: string;
+  icone: string;
+  ordre: number;
+};
