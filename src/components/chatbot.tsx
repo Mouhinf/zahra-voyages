@@ -1,11 +1,75 @@
 'use client';
 
-import { useState, useRef, useEffect, FormEvent } from 'react';
+import { useState, useRef, useEffect, FormEvent, ReactNode } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type Message = { role: 'user' | 'assistant'; content: string };
+
+function renderMarkdown(text: string): ReactNode[] {
+  const lines = text.split('\n');
+  const nodes: ReactNode[] = [];
+  let listItems: { type: 'ul' | 'ol'; items: ReactNode[] } | null = null;
+
+  function flushList() {
+    if (listItems && listItems.items.length > 0) {
+      const Tag = listItems.type === 'ol' ? 'ol' : 'ul';
+      nodes.push(
+        <Tag key={`list-${nodes.length}`} className={cn('space-y-1 my-1', listItems.type === 'ol' ? 'list-decimal list-inside' : 'list-disc list-inside ml-1')}>
+          {listItems.items}
+        </Tag>
+      );
+    }
+    listItems = null;
+  }
+
+  function parseInline(text: string): ReactNode[] {
+    const parts: ReactNode[] = [];
+    let remaining = text;
+    let key = 0;
+    const boldRegex = /\*\*(.+?)\*\*/;
+    while (remaining.length > 0) {
+      const match = remaining.match(boldRegex);
+      if (match && match.index !== undefined) {
+        if (match.index > 0) parts.push(remaining.slice(0, match.index));
+        parts.push(<strong key={key++} className="font-semibold text-primary">{match[1]}</strong>);
+        remaining = remaining.slice(match.index + match[0].length);
+      } else {
+        parts.push(remaining);
+        break;
+      }
+    }
+    return parts;
+  }
+
+  lines.forEach((line, idx) => {
+    const orderedMatch = line.match(/^(\d+)\.\s+(.*)/);
+    const unorderedMatch = line.match(/^[-•]\s+(.*)/);
+
+    if (orderedMatch) {
+      if (!listItems || listItems.type !== 'ol') {
+        flushList();
+        listItems = { type: 'ol', items: [] };
+      }
+      listItems!.items.push(<li key={`li-${idx}`}>{parseInline(orderedMatch[2])}</li>);
+    } else if (unorderedMatch) {
+      if (!listItems || listItems.type !== 'ul') {
+        flushList();
+        listItems = { type: 'ul', items: [] };
+      }
+      listItems!.items.push(<li key={`li-${idx}`}>{parseInline(unorderedMatch[1])}</li>);
+    } else if (line.trim() === '') {
+      flushList();
+    } else {
+      flushList();
+      nodes.push(<p key={`p-${idx}`} className="leading-relaxed">{parseInline(line)}</p>);
+    }
+  });
+  flushList();
+
+  return nodes;
+}
 
 const SUGGESTIONS = [
   'Quels services proposez-vous ?',
@@ -127,13 +191,13 @@ export default function Chatbot() {
                 </div>
                 <div
                   className={cn(
-                    'rounded-2xl px-3 py-2 text-sm',
+                    'rounded-2xl px-3 py-2 text-sm space-y-1',
                     msg.role === 'user'
                       ? 'bg-primary text-primary-foreground rounded-tr-sm'
                       : 'bg-card border rounded-tl-sm'
                   )}
                 >
-                  {msg.content}
+                  {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
                 </div>
               </div>
             ))}
