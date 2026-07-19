@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getDbInstance } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -11,7 +11,7 @@ import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, Star, Users, Loader2, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Users, Loader2, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
 
 export default function HebergementDetailPage() {
   const params = useParams();
@@ -19,6 +19,7 @@ export default function HebergementDetailPage() {
   const [item, setItem] = useState<Hebergement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -63,13 +64,30 @@ export default function HebergementDetailPage() {
 
   const gallery = item.images && item.images.length > 0 ? item.images : [item.image];
 
-  function nextImage() {
+  const nextImage = useCallback(() => {
     setCurrentImageIdx((prev) => (prev + 1) % gallery.length);
-  }
+  }, [gallery.length]);
 
-  function prevImage() {
+  const prevImage = useCallback(() => {
     setCurrentImageIdx((prev) => (prev - 1 + gallery.length) % gallery.length);
-  }
+  }, [gallery.length]);
+
+  const closeLightbox = useCallback(() => setLightboxOpen(false), []);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowRight') nextImage();
+      else if (e.key === 'ArrowLeft') prevImage();
+    };
+    window.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen, nextImage, prevImage, closeLightbox]);
 
   const typeLabels: Record<string, string> = {
     hotel: 'Hôtel', appartement: 'Appartement', villa: 'Villa', auberge: 'Auberge', residence: 'Résidence',
@@ -81,7 +99,7 @@ export default function HebergementDetailPage() {
       <main className="flex-grow">
         {/* Galerie d'images */}
         <section className="relative h-[50vh] min-h-[350px] bg-muted">
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full cursor-pointer" onClick={() => setLightboxOpen(true)}>
             <Image
               src={gallery[currentImageIdx]}
               alt={item.titre}
@@ -240,6 +258,64 @@ export default function HebergementDetailPage() {
         </section>
       </main>
       <Footer />
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={closeLightbox}
+        >
+          <button
+            className="absolute top-4 right-4 text-white hover:text-white/70 transition-colors z-10"
+            onClick={closeLightbox}
+          >
+            <X className="h-8 w-8" />
+          </button>
+
+          {gallery.length > 1 && (
+            <>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2"
+                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+              >
+                <ChevronLeft className="h-10 w-10" />
+              </button>
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2"
+                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+              >
+                <ChevronRight className="h-10 w-10" />
+              </button>
+            </>
+          )}
+
+          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={gallery[currentImageIdx]}
+              alt={`${item.titre} - Photo ${currentImageIdx + 1}`}
+              fill
+              className="object-contain"
+            />
+          </div>
+
+          {gallery.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+              <span className="text-white text-sm font-medium">
+                {currentImageIdx + 1} / {gallery.length}
+              </span>
+              <div className="flex gap-2">
+                {gallery.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={`w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/40'}`}
+                    onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(idx); }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
