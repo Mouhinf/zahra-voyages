@@ -32,11 +32,12 @@ export default function Header() {
             <Image
               src="/logo-slaac.png"
               alt="SLAAC Voyages"
-              width={120}
+              width={40}
               height={40}
               priority
-              className="h-9 w-auto"
+              className="h-9 w-9 object-contain"
             />
+            <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
           </Link>
 
         <nav className="hidden md:flex gap-6">
@@ -77,10 +78,11 @@ export default function Header() {
                    <Image
                      src="/logo-slaac.png"
                      alt="SLAAC Voyages"
-                     width={120}
+                     width={40}
                      height={40}
-                     className="h-9 w-auto"
+                     className="h-9 w-9 object-contain"
                    />
+                  <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
                 </Link>
                 <nav className="grid gap-4">
                   {navLinks.map((link) => (
