@@ -33,7 +33,7 @@ export default function TransportPage() {
                 Des solutions de transport adaptées à tous vos besoins, avec ou sans chauffeur, pour vos déplacements urbains ou longue distance.
               </p>
             </div>
-            <OffresGrid collectionName="transports" emptyMessage="Aucune offre de transport disponible pour le moment. Contactez-nous pour une demande personnalisée." />
+            <OffresGrid collectionName="transports" emptyMessage="Aucune offre de transport disponible pour le moment. Contactez-nous pour une demande personnalisée." detailBasePath="/transport" />
           </div>
         </section>
 
