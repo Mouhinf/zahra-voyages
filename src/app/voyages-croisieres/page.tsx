@@ -4,6 +4,9 @@ import OffresGrid from '@/components/sections/offres-grid';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
+import Image from 'next/image';
+
+const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504520/hero-section-voyages.jpg';
 
 export const metadata = {
   title: 'Voyages & Croisières - SLAAC Voyages',
@@ -15,7 +18,8 @@ export default function VoyagesCroisieresPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
-        <section className="relative h-[40vh] min-h-[300px] flex items-center justify-center text-white">
+        <section className="relative h-[40vh] min-h-[300px] flex items-center justify-center text-white overflow-hidden">
+          <Image src={HERO_IMG} alt="Voyages & Croisières" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-primary/70 z-10" />
           <div className="relative z-20 text-center p-4">
             <h1 className="text-4xl md:text-5xl font-bold drop-shadow-md">Voyages & Croisières</h1>
