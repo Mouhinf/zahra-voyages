@@ -74,21 +74,22 @@ export default async function HomeFeatured() {
         </div>
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {offres.map((offre) => (
-            <Card key={`${offre.section}-${offre.id}`} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-              <Link href={`${offre.basePath}/${offre.id}`}>
-                <div className="relative h-64">
+            <Card key={`${offre.section}-${offre.id}`} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col p-0">
+              <Link href={`${offre.basePath}/${offre.id}`} className="block">
+                <div className="relative h-72 overflow-hidden">
                   <Image
                     src={offre.image}
                     alt={offre.titre}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground">{offre.section}</Badge>
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h3 className="text-lg font-semibold drop-shadow-lg">{offre.titre}</h3>
+                    <p className="text-sm font-medium text-accent drop-shadow mt-1">{offre.prix}</p>
+                  </div>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-semibold text-primary">{offre.titre}</h3>
-                  <p className="text-sm font-medium text-accent-foreground mt-1">{offre.prix}</p>
-                </CardContent>
               </Link>
             </Card>
           ))}

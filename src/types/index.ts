@@ -80,6 +80,7 @@ export type Temoignage = {
   date: string;
   visible: boolean;
   ordre: number;
+  avatarUrl?: string;
 };
 
 export type ChiffreCle = {

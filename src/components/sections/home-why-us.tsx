@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 import { MapPin, Users, Headset, Clock } from 'lucide-react';
 
 const argumentsList = [
@@ -6,21 +7,25 @@ const argumentsList = [
     icon: MapPin,
     title: 'Expertise Locale',
     description: "Basés à Dakar, nous connaissons parfaitement le Sénégal et l'Afrique de l'Ouest. Nous vous ouvrons les portes des meilleures adresses et des expériences les plus authentiques.",
+    image: 'https://images.unsplash.com/photo-1524661135-423995f22d68?w=600&h=400&fit=crop',
   },
   {
     icon: Users,
     title: 'Réseau de Partenaires',
     description: "Hôtels, compagnies aériennes, transporteurs et guides locaux : notre réseau étendu nous permet de négocier les meilleurs tarifs et de garantir la qualité de vos services.",
+    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&h=400&fit=crop',
   },
   {
     icon: Headset,
     title: 'Accompagnement Personnalisé',
     description: "Un interlocuteur dédié à votre écoute, de la conception à votre retour. Chaque itinéraire est pensé sur mesure selon vos envies, votre rythme et votre budget.",
+    image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&h=400&fit=crop',
   },
   {
     icon: Clock,
     title: 'Réactivité Garantie',
     description: "Une question, un imprévu ? Notre équipe répond sous 24h, 7j/7. Vous voyagez en toute sérénité, où que vous soyez dans le monde.",
+    image: 'https://images.unsplash.com/photo-1501139081373-635b7ae4d5b8?w=600&h=400&fit=crop',
   },
 ];
 
@@ -38,13 +43,22 @@ export default function HomeWhyUs() {
           {argumentsList.map((arg) => {
             const Icon = arg.icon;
             return (
-              <Card key={arg.title} className="flex flex-col items-center text-center p-6 h-full shadow-sm hover:shadow-md transition-shadow">
-                <div className="bg-primary/10 rounded-full p-4 mb-4">
-                  <Icon className="h-8 w-8 text-primary" />
+              <Card key={arg.title} className="overflow-hidden flex flex-col h-full shadow-sm hover:shadow-lg transition-shadow p-0">
+                <div className="relative h-40 overflow-hidden">
+                  <Image
+                    src={arg.image}
+                    alt={arg.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+                  <div className="absolute bottom-3 left-3 w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                    <Icon className="h-5 w-5 text-primary-foreground" />
+                  </div>
                 </div>
-                <CardContent className="p-0">
+                <CardContent className="p-5 flex flex-col flex-grow">
                   <h3 className="text-lg font-semibold text-primary mb-2">{arg.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{arg.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-grow">{arg.description}</p>
                 </CardContent>
               </Card>
             );

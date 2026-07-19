@@ -60,6 +60,11 @@ const temoignages: Temoignage[] = [
   },
 ];
 
+function getDiceBearAvatarUrl(nom: string): string {
+  const seed = encodeURIComponent(nom);
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=0f4c81,f59e0b,1e3a5f&backgroundType=gradientLinear&radius=50`;
+}
+
 function renderStars(note: number) {
   return (
     <div className="flex gap-1">
@@ -100,9 +105,12 @@ export default function HomeTestimonials() {
                       <p className="text-muted-foreground leading-relaxed italic flex-grow">"{t.texte}"</p>
                       <div className="mt-4 pt-4 border-t">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                            {t.nom.charAt(0)}
-                          </div>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={t.avatarUrl || getDiceBearAvatarUrl(t.nom)}
+                            alt={t.nom}
+                            className="w-12 h-12 rounded-full border-2 border-primary/20 bg-primary/5"
+                          />
                           <div>
                             <p className="font-semibold text-primary">{t.nom}</p>
                             <p className="text-xs text-muted-foreground">{t.ville}</p>

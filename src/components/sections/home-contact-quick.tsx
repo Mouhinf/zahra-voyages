@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -10,7 +11,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Mail, Send, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 import Link from 'next/link';
+import { getDbInstance } from '@/lib/firebase';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+
+const FALLBACK_AGENCY = 'https://images.unsplash.com/photo-1568992687947-8680f2285c88?w=800&h=600&fit=crop';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -27,6 +33,25 @@ const formSchema = z.object({
 
 export default function HomeContactQuick() {
   const { toast } = useToast();
+  const [agenceImg, setAgenceImg] = useState<string>(FALLBACK_AGENCY);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const db = getDbInstance();
+        const q = query(collection(db, 'hebergements'), orderBy('ordre', 'asc'), limit(1));
+        const snap = await getDocs(q);
+        snap.forEach((docSnap) => {
+          const d = docSnap.data() as { image?: string; disponible?: boolean };
+          if (d.disponible !== false && d.image && mounted) setAgenceImg(d.image);
+        });
+      } catch (e) {
+        console.error('Erreur fetch agence img:', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,6 +78,16 @@ export default function HomeContactQuick() {
         </div>
         <div className="mt-12 grid lg:grid-cols-2 gap-8 items-start">
           <div className="space-y-6">
+            <div className="relative h-56 rounded-lg overflow-hidden shadow-md">
+              <Image src={agenceImg} alt="SLAAC Voyages — Dakar" fill className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <p className="font-semibold text-lg drop-shadow-lg">SLAAC Voyages</p>
+                <p className="text-sm drop-shadow flex items-center gap-1">
+                  <MapPin className="h-4 w-4" /> Dakar, Sénégal
+                </p>
+              </div>
+            </div>
             <div className="flex items-start gap-4">
               <div className="p-3 bg-primary/10 rounded-full"><MapPin className="h-6 w-6 text-primary" /></div>
               <div>
