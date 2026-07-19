@@ -33,7 +33,7 @@ export default function ExcursionsPage() {
                 Découvrez les sites incontournables et les trésors cachés du Sénégal avec nos excursions guidées, de la demi-journée au séjour de plusieurs jours.
               </p>
             </div>
-            <OffresGrid collectionName="excursions" emptyMessage="Aucune excursion disponible pour le moment. Contactez-nous pour une excursion sur mesure." />
+            <OffresGrid collectionName="excursions" emptyMessage="Aucune excursion disponible pour le moment. Contactez-nous pour une excursion sur mesure." detailBasePath="/excursions" />
           </div>
         </section>
 

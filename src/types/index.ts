@@ -56,6 +56,8 @@ export type Excursion = OffreBase & {
   pointDepart: string;
   inclus: string[];
   difficulte: 'facile' | 'moyenne' | 'sportive';
+  descriptionComplete: string;
+  images: string[];
 };
 
 export type OffreAffaires = OffreBase & {
