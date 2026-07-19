@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-const SLAAC_LOGO = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784498575/slaac-logo.jpg';
+const SLAAC_LOGO = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_png,q_auto/v1784498932/slaac-logo-png.png';
 
 export default function HomeAbout() {
   return (
@@ -11,7 +11,7 @@ export default function HomeAbout() {
       <div className="container mx-auto max-w-7xl px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative h-80 lg:h-full min-h-[400px] w-full rounded-lg overflow-hidden shadow-lg bg-gradient-to-br from-primary/10 via-primary/5 to-background flex items-center justify-center">
-            <div className="relative w-3/4 max-w-sm aspect-square">
+            <div className="relative w-3/4 max-w-sm aspect-square animate-float drop-shadow-2xl">
               <Image
                 src={SLAAC_LOGO}
                 alt="SLAAC Voyages — Logo officiel"
