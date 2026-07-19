@@ -23,6 +23,7 @@ import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
+import { ImagePreview } from '@/components/admin/image-preview';
 
 const formSchema = z.object({
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
@@ -51,6 +52,7 @@ export default function TransportsManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Transport | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
@@ -76,6 +78,7 @@ export default function TransportsManager() {
   function openAddDialog() {
     setEditingItem(null);
     setGalleryFiles([]);
+    setMainImageFile(null);
     form.reset({
       titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'location_voiture',
       vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
@@ -87,6 +90,7 @@ export default function TransportsManager() {
   function openEditDialog(item: Transport) {
     setEditingItem(item);
     setGalleryFiles([]);
+    setMainImageFile(null);
     form.reset({
       titre: item.titre,
       description: item.description,
@@ -159,6 +163,7 @@ export default function TransportsManager() {
 
       form.reset();
       setGalleryFiles([]);
+      setMainImageFile(null);
       setEditingItem(null);
       setIsDialogOpen(false);
     } catch (error) {
@@ -279,8 +284,20 @@ export default function TransportsManager() {
                 <FormField control={form.control} name="image" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Image principale {editingItem && "(laisser vide pour garder l'actuelle)"}</FormLabel>
-                    <FormControl><Input type="file" accept="image/*" {...form.register('image')} /></FormControl>
+                    <FormControl><Input type="file" accept="image/*" {...form.register('image', {
+                      onChange: (e) => setMainImageFile(e.target.files?.[0] || null)
+                    })} /></FormControl>
                     <FormMessage />
+                    {(mainImageFile || editingItem?.image) && (
+                      <div className="mt-2">
+                        <ImagePreview
+                          file={mainImageFile || undefined}
+                          url={!mainImageFile ? editingItem?.image : undefined}
+                          alt="Apercu image principale"
+                          size={120}
+                        />
+                      </div>
+                    )}
                   </FormItem>
                 )} />
                 <div>
@@ -290,7 +307,17 @@ export default function TransportsManager() {
                     setGalleryFiles((prev) => [...prev, ...files]);
                   }} />
                   {galleryFiles.length > 0 && (
-                    <p className="text-sm text-muted-foreground mt-1">{galleryFiles.length} nouvelle(s) image(s) à ajouter</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {galleryFiles.map((file, idx) => (
+                        <ImagePreview
+                          key={idx}
+                          file={file}
+                          alt={`Nouvelle image ${idx + 1}`}
+                          size={64}
+                          onRemove={() => setGalleryFiles((prev) => prev.filter((_, i) => i !== idx))}
+                        />
+                      ))}
+                    </div>
                   )}
                   {editingItem && editingItem.images && editingItem.images.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
