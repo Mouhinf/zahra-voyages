@@ -91,3 +91,11 @@ export type ChiffreCle = {
   icone: string;
   ordre: number;
 };
+
+export type Partenaire = {
+  id: string;
+  nom: string;
+  logo: string;
+  public_id: string;
+  ordre: number;
+};

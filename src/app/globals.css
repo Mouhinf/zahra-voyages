@@ -70,3 +70,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .marquee-pause:hover {
+    animation-play-state: paused;
+  }
+}

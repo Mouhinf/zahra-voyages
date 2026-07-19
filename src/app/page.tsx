@@ -1,5 +1,6 @@
 import Header from '@/components/layout/header';
 import Hero from '@/components/sections/hero';
+import HomePartenaires from '@/components/sections/home-partenaires';
 import HomeAbout from '@/components/sections/home-about';
 import HomeServicesGrid from '@/components/sections/home-services-grid';
 import HomeFeatured from '@/components/sections/home-featured';
@@ -15,6 +16,7 @@ export default function Home() {
       <Header />
       <main className="flex-grow">
         <Hero />
+        <HomePartenaires />
         <HomeAbout />
         <HomeServicesGrid />
         <HomeFeatured />

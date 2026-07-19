@@ -13,6 +13,7 @@ import TransportsManager from '@/components/admin/transports-manager';
 import VoyagesCroisieresManager from '@/components/admin/voyages-croisieres-manager';
 import ExcursionsManager from '@/components/admin/excursions-manager';
 import OffresAffairesManager from '@/components/admin/offres-affaires-manager';
+import PartenairesManager from '@/components/admin/partenaires-manager';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -71,6 +72,7 @@ export default function AdminDashboard() {
                 <TabsTrigger value="voyages">Voyages & Croisières</TabsTrigger>
                 <TabsTrigger value="excursions">Excursions</TabsTrigger>
                 <TabsTrigger value="affaires">Tourisme d'Affaires</TabsTrigger>
+                <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
               </TabsList>
               <TabsContent value="destinations"><DestinationsManager /></TabsContent>
               <TabsContent value="hebergements"><HebergementsManager /></TabsContent>
@@ -78,6 +80,7 @@ export default function AdminDashboard() {
               <TabsContent value="voyages"><VoyagesCroisieresManager /></TabsContent>
               <TabsContent value="excursions"><ExcursionsManager /></TabsContent>
               <TabsContent value="affaires"><OffresAffairesManager /></TabsContent>
+              <TabsContent value="partenaires"><PartenairesManager /></TabsContent>
             </Tabs>
         </main>
       </div>
