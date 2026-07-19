@@ -37,6 +37,33 @@ export default function HebergementDetailPage() {
     })();
   }, [params?.id]);
 
+  const gallery = item?.images && item.images.length > 0 ? item.images : (item ? [item.image] : []);
+
+  const nextImage = useCallback(() => {
+    setCurrentImageIdx((prev) => (prev + 1) % Math.max(gallery.length, 1));
+  }, [gallery.length]);
+
+  const prevImage = useCallback(() => {
+    setCurrentImageIdx((prev) => (prev - 1 + Math.max(gallery.length, 1)) % Math.max(gallery.length, 1));
+  }, [gallery.length]);
+
+  const closeLightbox = useCallback(() => setLightboxOpen(false), []);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowRight') nextImage();
+      else if (e.key === 'ArrowLeft') prevImage();
+    };
+    window.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen, nextImage, prevImage, closeLightbox]);
+
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -61,33 +88,6 @@ export default function HebergementDetailPage() {
       </div>
     );
   }
-
-  const gallery = item.images && item.images.length > 0 ? item.images : [item.image];
-
-  const nextImage = useCallback(() => {
-    setCurrentImageIdx((prev) => (prev + 1) % gallery.length);
-  }, [gallery.length]);
-
-  const prevImage = useCallback(() => {
-    setCurrentImageIdx((prev) => (prev - 1 + gallery.length) % gallery.length);
-  }, [gallery.length]);
-
-  const closeLightbox = useCallback(() => setLightboxOpen(false), []);
-
-  useEffect(() => {
-    if (!lightboxOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox();
-      else if (e.key === 'ArrowRight') nextImage();
-      else if (e.key === 'ArrowLeft') prevImage();
-    };
-    window.addEventListener('keydown', handleKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-      document.body.style.overflow = '';
-    };
-  }, [lightboxOpen, nextImage, prevImage, closeLightbox]);
 
   const typeLabels: Record<string, string> = {
     hotel: 'Hôtel', appartement: 'Appartement', villa: 'Villa', auberge: 'Auberge', residence: 'Résidence',
