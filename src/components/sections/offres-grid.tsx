@@ -56,8 +56,8 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
 
   return (
     <>
-      <Alert className="mb-8 bg-blue-50 border-blue-200 text-blue-800">
-        <Info className="h-5 w-5 text-blue-600" />
+      <Alert className="mb-8 bg-primary/5 border-primary/20 text-primary">
+        <Info className="h-5 w-5" />
         <AlertDescription>
           Les tarifs affichés sont des estimations de départ et peuvent varier selon la saison, la disponibilité et le moment de la réservation. Pour un devis précis, veuillez nous contacter.
         </AlertDescription>

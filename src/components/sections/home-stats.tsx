@@ -45,13 +45,13 @@ function StatItem({ stat, started }: { stat: Stat; started: boolean }) {
   const value = useCountUp(stat.valeur, 2000, started);
   return (
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/15 backdrop-blur-sm mb-4 border border-white/20">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 backdrop-blur-sm mb-4 border border-primary-foreground/20">
         <Icon className="h-7 w-7" />
       </div>
       <div className="text-4xl md:text-5xl font-bold font-headline">
         {value.toLocaleString('fr-FR')}{stat.suffixe}
       </div>
-      <p className="mt-2 text-sm md:text-base text-white/85">{stat.label}</p>
+      <p className="mt-2 text-sm md:text-base text-primary-foreground/70">{stat.label}</p>
     </div>
   );
 }

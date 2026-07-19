@@ -139,8 +139,8 @@ export default function DestinationsPage() {
 
         <section id="destinations" className="py-16 sm:py-24 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
-            <Alert className="mb-8 bg-blue-50 border-blue-200 text-blue-800">
-                <Info className="h-5 w-5 text-blue-600" />
+            <Alert className="mb-8 bg-primary/5 border-primary/20 text-primary">
+                <Info className="h-5 w-5" />
                 <AlertDescription>
                 Les tarifs affichés sont des estimations de départ et peuvent varier en fonction de la saison, de la disponibilité et du moment de la réservation. Pour un devis précis, veuillez nous contacter.
                 </AlertDescription>
