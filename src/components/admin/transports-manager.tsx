@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { Transport } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
@@ -22,22 +22,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Loader2, Trash2 } from 'lucide-react';
+import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
 
 const formSchema = z.object({
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
   description: z.string().min(10, 'La description doit contenir au moins 10 caractères.'),
+  descriptionComplete: z.string().optional(),
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
   type: z.enum(['location_voiture', 'vtc', 'transfert_aeroport', 'bus_prive']),
-  vehicule: z.string(),
-  capacitePassagers: z.coerce.number().min(1),
+  vehicule: z.string().min(2, 'Veuillez entrer le véhicule/modèle.'),
+  capacitePassagers: z.coerce.number().min(1).max(500),
   avecChauffeur: z.boolean().default(false),
   carburantInclus: z.boolean().default(false),
   disponible: z.boolean().default(true),
   ordre: z.coerce.number().default(0),
-  image: z.instanceof(FileList).refine((files) => files?.length === 1, 'Une image est requise.'),
+  image: z.instanceof(FileList).optional(),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function TransportsManager() {
   const { toast } = useToast();
@@ -46,13 +49,15 @@ export default function TransportsManager() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<Transport | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      titre: '', description: '', prix: '', tag: '', type: 'location_voiture',
-      vehicule: '', capacitePassagers: 1, avecChauffeur: false, carburantInclus: false,
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'location_voiture',
+      vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
       disponible: true, ordre: 0,
     },
   });
@@ -68,35 +73,114 @@ export default function TransportsManager() {
     return () => unsubscribe();
   }, []);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function openAddDialog() {
+    setEditingItem(null);
+    setGalleryFiles([]);
+    form.reset({
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'location_voiture',
+      vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
+      disponible: true, ordre: 0,
+    });
+    setIsDialogOpen(true);
+  }
+
+  function openEditDialog(item: Transport) {
+    setEditingItem(item);
+    setGalleryFiles([]);
+    form.reset({
+      titre: item.titre,
+      description: item.description,
+      descriptionComplete: item.descriptionComplete || '',
+      prix: item.prix,
+      tag: item.tag,
+      type: item.type,
+      vehicule: item.vehicule,
+      capacitePassagers: item.capacitePassagers,
+      avecChauffeur: item.avecChauffeur,
+      carburantInclus: item.carburantInclus,
+      disponible: item.disponible,
+      ordre: item.ordre,
+    });
+    setIsDialogOpen(true);
+  }
+
+  async function onSubmit(values: FormValues) {
     setIsUploading(true);
     setUploadProgress(0);
     try {
-      setUploadProgress(50);
-      const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
-      setUploadProgress(100);
-      await addDoc(collection(getDbInstance(), 'transports'), {
-        titre: values.titre, description: values.description, prix: values.prix, tag: values.tag,
-        type: values.type, vehicule: values.vehicule, capacitePassagers: values.capacitePassagers,
-        avecChauffeur: values.avecChauffeur, carburantInclus: values.carburantInclus,
-        disponible: values.disponible, ordre: values.ordre, image: secure_url, public_id,
-      });
-      toast({ title: 'Succès !', description: 'Le transport a été ajouté.' });
+      let imageUrl = editingItem?.image || '';
+      let publicId = editingItem?.public_id || '';
+      let galleryImages = editingItem?.images || [];
+
+      if (values.image && values.image.length > 0) {
+        setUploadProgress(30);
+        const uploaded = await uploadImageToCloudinary(values.image[0]);
+        imageUrl = uploaded.secure_url;
+        publicId = uploaded.public_id;
+      }
+
+      if (galleryFiles.length > 0) {
+        setUploadProgress(50);
+        const uploadedImages: string[] = [];
+        for (let i = 0; i < galleryFiles.length; i++) {
+          const { secure_url } = await uploadImageToCloudinary(galleryFiles[i]);
+          uploadedImages.push(secure_url);
+          setUploadProgress(50 + Math.round(((i + 1) / galleryFiles.length) * 40));
+        }
+        galleryImages = [...galleryImages, ...uploadedImages];
+      }
+
+      setUploadProgress(95);
+      const dataToSave = {
+        titre: values.titre,
+        description: values.description,
+        descriptionComplete: values.descriptionComplete || '',
+        prix: values.prix,
+        tag: values.tag,
+        type: values.type,
+        vehicule: values.vehicule,
+        capacitePassagers: values.capacitePassagers,
+        avecChauffeur: values.avecChauffeur,
+        carburantInclus: values.carburantInclus,
+        disponible: values.disponible,
+        ordre: values.ordre,
+        image: imageUrl,
+        public_id: publicId,
+        images: galleryImages,
+      };
+
+      if (editingItem) {
+        await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
+        toast({ title: 'Succès !', description: 'Le transport a été modifié.' });
+      } else {
+        await addDoc(collection(getDbInstance(), 'transports'), dataToSave);
+        toast({ title: 'Succès !', description: 'Le transport a été ajouté.' });
+      }
+
       form.reset();
+      setGalleryFiles([]);
+      setEditingItem(null);
       setIsDialogOpen(false);
     } catch (error) {
       console.error('Erreur :', error);
-      toast({ title: 'Erreur', description: "Une erreur est survenue lors de l'ajout.", variant: 'destructive' });
+      toast({ title: 'Erreur', description: 'Une erreur est survenue.', variant: 'destructive' });
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
     }
   }
 
+  async function handleDeleteImage(idx: number) {
+    if (!editingItem?.images) return;
+    const newImages = editingItem.images.filter((_, i) => i !== idx);
+    setEditingItem({ ...editingItem, images: newImages });
+    await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), { images: newImages });
+  }
+
   async function handleDelete(id: string, public_id: string) {
     setDeletingId(id);
     try {
-      await deleteImageFromCloudinary(public_id);
+      if (public_id) await deleteImageFromCloudinary(public_id);
       await deleteDoc(doc(getDbInstance(), 'transports', id));
       toast({ title: 'Supprimé', description: 'Le transport a été supprimé.' });
     } catch (error) {
@@ -107,92 +191,126 @@ export default function TransportsManager() {
     }
   }
 
+  const typeLabels: Record<string, string> = {
+    location_voiture: 'Location voiture', vtc: 'VTC / Chauffeur', transfert_aeroport: 'Transfert aéroport', bus_prive: 'Bus privé',
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Gérer les Transports</h2>
-          <p className="text-muted-foreground">Ajoutez les offres de transport de votre site.</p>
+          <p className="text-muted-foreground">Ajoutez et modifiez les offres de transport.</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un transport</Button>
+            <Button onClick={openAddDialog}><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un transport</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Nouveau Transport</DialogTitle>
+              <DialogTitle>{editingItem ? 'Modifier' : 'Nouvel'} Transport</DialogTitle>
               <DialogDescription>Remplissez les informations ci-dessous.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField control={form.control} name="titre" render={({ field }) => (
-                  <FormItem><FormLabel>Titre</FormLabel><FormControl><Input placeholder="Location Toyota RAV4" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Titre</FormLabel><FormControl><Input placeholder="Toyota Corolla - Berline économique" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem><FormLabel>Description courte</FormLabel><FormControl><Textarea placeholder="Véhicule tout terrain, idéal pour..." {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Description courte</FormLabel><FormControl><Textarea placeholder="Berline compacte idéale pour..." {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="descriptionComplete" render={({ field }) => (
+                  <FormItem><FormLabel>Description complète</FormLabel><FormControl><Textarea className="min-h-[120px]" placeholder="Description détaillée affichée sur la page du transport..." {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="prix" render={({ field }) => (
-                    <FormItem><FormLabel>Prix</FormLabel><FormControl><Input placeholder="À partir de 25 000 XOF/jour" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Prix</FormLabel><FormControl><Input placeholder="Dès 25 000 FCFA/jour" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
                   <FormField control={form.control} name="tag" render={({ field }) => (
-                    <FormItem><FormLabel>Catégorie</FormLabel><FormControl><Input placeholder="Location" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Catégorie</FormLabel><FormControl><Input placeholder="Économique" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
                 </div>
-                <FormField control={form.control} name="type" render={({ field }) => (
-                  <FormItem><FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="location_voiture">Location de voiture</SelectItem>
-                        <SelectItem value="vtc">VTC</SelectItem>
-                        <SelectItem value="transfert_aeroport">Transfert aéroport</SelectItem>
-                        <SelectItem value="bus_prive">Bus privé</SelectItem>
-                      </SelectContent>
-                    </Select><FormMessage />
-                  </FormItem>
-                )} />
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="vehicule" render={({ field }) => (
-                    <FormItem><FormLabel>Véhicule</FormLabel><FormControl><Input placeholder="Toyota RAV4" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormField control={form.control} name="type" render={({ field }) => (
+                    <FormItem><FormLabel>Type</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="location_voiture">Location voiture</SelectItem>
+                          <SelectItem value="vtc">VTC / Chauffeur</SelectItem>
+                          <SelectItem value="transfert_aeroport">Transfert aéroport</SelectItem>
+                          <SelectItem value="bus_prive">Bus privé</SelectItem>
+                        </SelectContent>
+                      </Select><FormMessage />
+                    </FormItem>
                   )} />
-                  <FormField control={form.control} name="capacitePassagers" render={({ field }) => (
-                    <FormItem><FormLabel>Capacité passagers</FormLabel><FormControl><Input type="number" min={1} {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormField control={form.control} name="vehicule" render={({ field }) => (
+                    <FormItem><FormLabel>Véhicule / Modèle</FormLabel><FormControl><Input placeholder="Toyota Corolla" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
                 </div>
-                <div className="flex gap-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="capacitePassagers" render={({ field }) => (
+                    <FormItem><FormLabel>Capacité passagers</FormLabel><FormControl><Input type="number" min={1} max={500} {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="ordre" render={({ field }) => (
+                    <FormItem><FormLabel>Ordre d'affichage</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="avecChauffeur" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3">
+                    <FormItem className="flex flex-row items-center gap-3 pt-6">
                       <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                       <FormLabel className="!mt-0">Avec chauffeur</FormLabel>
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="carburantInclus" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3">
+                    <FormItem className="flex flex-row items-center gap-3 pt-6">
                       <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                       <FormLabel className="!mt-0">Carburant inclus</FormLabel>
                     </FormItem>
                   )} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="ordre" render={({ field }) => (
-                    <FormItem><FormLabel>Ordre d'affichage</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="disponible" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3 pt-6">
-                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                      <FormLabel className="!mt-0">Disponible</FormLabel>
-                    </FormItem>
-                  )} />
-                </div>
-                <FormField control={form.control} name="image" render={({ field }) => (
-                  <FormItem><FormLabel>Image</FormLabel><FormControl><Input type="file" accept="image/*" {...form.register('image')} /></FormControl><FormMessage /></FormItem>
+                <FormField control={form.control} name="disponible" render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-3">
+                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                    <FormLabel className="!mt-0">Disponible</FormLabel>
+                  </FormItem>
                 )} />
+                <FormField control={form.control} name="image" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image principale {editingItem && "(laisser vide pour garder l'actuelle)"}</FormLabel>
+                    <FormControl><Input type="file" accept="image/*" {...form.register('image')} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <div>
+                  <FormLabel>Images galerie (optionnel)</FormLabel>
+                  <Input type="file" accept="image/*" multiple className="mt-1" onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    setGalleryFiles((prev) => [...prev, ...files]);
+                  }} />
+                  {galleryFiles.length > 0 && (
+                    <p className="text-sm text-muted-foreground mt-1">{galleryFiles.length} nouvelle(s) image(s) à ajouter</p>
+                  )}
+                  {editingItem && editingItem.images && editingItem.images.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {editingItem.images.map((img, idx) => (
+                        <div key={idx} className="relative w-16 h-16">
+                          <Image src={img} alt={`Galerie ${idx + 1}`} fill className="rounded-md object-cover" />
+                          <button type="button" onClick={() => handleDeleteImage(idx)} className="absolute -top-1 -right-1 bg-destructive text-white rounded-full p-0.5">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {isUploading && <Progress value={uploadProgress} className="w-full" />}
                 <DialogFooter>
                   <DialogClose asChild><Button type="button" variant="secondary">Annuler</Button></DialogClose>
                   <Button type="submit" disabled={isUploading}>
-                    {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Ajouter
+                    {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {editingItem ? 'Modifier' : 'Ajouter'}
                   </Button>
                 </DialogFooter>
               </form>
@@ -210,7 +328,7 @@ export default function TransportsManager() {
               <TableHead>Type</TableHead>
               <TableHead>Véhicule</TableHead>
               <TableHead>Prix</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -221,13 +339,18 @@ export default function TransportsManager() {
                 <TableRow key={item.id}>
                   <TableCell><Image src={item.image} alt={item.titre} width={64} height={64} className="rounded-md object-cover h-16 w-16" /></TableCell>
                   <TableCell className="font-medium">{item.titre}</TableCell>
-                  <TableCell>{item.type}</TableCell>
-                  <TableCell>{item.vehicule || '-'}</TableCell>
+                  <TableCell>{typeLabels[item.type] || item.type}</TableCell>
+                  <TableCell>{item.vehicule}</TableCell>
                   <TableCell>{item.prix}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, item.public_id)} disabled={deletingId === item.id}>
-                      {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, item.public_id)} disabled={deletingId === item.id}>
+                        {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

@@ -35,6 +35,8 @@ export type Transport = OffreBase & {
   capacitePassagers: number;
   avecChauffeur: boolean;
   carburantInclus: boolean;
+  descriptionComplete: string;
+  images: string[];
 };
 
 export type VoyageCroisiere = OffreBase & {
