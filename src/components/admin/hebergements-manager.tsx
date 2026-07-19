@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { Hebergement } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
@@ -22,11 +22,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Loader2, Trash2 } from 'lucide-react';
+import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
 
 const formSchema = z.object({
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
   description: z.string().min(10, 'La description doit contenir au moins 10 caractères.'),
+  descriptionComplete: z.string().optional(),
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
   type: z.enum(['hotel', 'appartement', 'villa', 'auberge', 'residence']),
@@ -36,8 +37,10 @@ const formSchema = z.object({
   equipements: z.string(),
   disponible: z.boolean().default(true),
   ordre: z.coerce.number().default(0),
-  image: z.instanceof(FileList).refine((files) => files?.length === 1, 'Une image est requise.'),
+  image: z.instanceof(FileList).optional(),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function HebergementsManager() {
   const { toast } = useToast();
@@ -46,12 +49,14 @@ export default function HebergementsManager() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<Hebergement | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      titre: '', description: '', prix: '', tag: '', type: 'hotel',
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'hotel',
       localisation: '', nombreEtoiles: 0, capacite: '', equipements: '',
       disponible: true, ordre: 0,
     },
@@ -68,16 +73,68 @@ export default function HebergementsManager() {
     return () => unsubscribe();
   }, []);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function openAddDialog() {
+    setEditingItem(null);
+    setGalleryFiles([]);
+    form.reset({
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'hotel',
+      localisation: '', nombreEtoiles: 0, capacite: '', equipements: '',
+      disponible: true, ordre: 0,
+    });
+    setIsDialogOpen(true);
+  }
+
+  function openEditDialog(item: Hebergement) {
+    setEditingItem(item);
+    setGalleryFiles([]);
+    form.reset({
+      titre: item.titre,
+      description: item.description,
+      descriptionComplete: item.descriptionComplete || '',
+      prix: item.prix,
+      tag: item.tag,
+      type: item.type,
+      localisation: item.localisation,
+      nombreEtoiles: item.nombreEtoiles,
+      capacite: item.capacite,
+      equipements: (item.equipements || []).join(', '),
+      disponible: item.disponible,
+      ordre: item.ordre,
+    });
+    setIsDialogOpen(true);
+  }
+
+  async function onSubmit(values: FormValues) {
     setIsUploading(true);
     setUploadProgress(0);
     try {
-      setUploadProgress(50);
-      const { secure_url, public_id } = await uploadImageToCloudinary(values.image[0]);
-      setUploadProgress(100);
-      await addDoc(collection(getDbInstance(), 'hebergements'), {
+      let imageUrl = editingItem?.image || '';
+      let publicId = editingItem?.public_id || '';
+      let galleryImages = editingItem?.images || [];
+
+      if (values.image && values.image.length > 0) {
+        setUploadProgress(30);
+        const uploaded = await uploadImageToCloudinary(values.image[0]);
+        imageUrl = uploaded.secure_url;
+        publicId = uploaded.public_id;
+      }
+
+      if (galleryFiles.length > 0) {
+        setUploadProgress(50);
+        const uploadedImages: string[] = [];
+        for (let i = 0; i < galleryFiles.length; i++) {
+          const { secure_url } = await uploadImageToCloudinary(galleryFiles[i]);
+          uploadedImages.push(secure_url);
+          setUploadProgress(50 + Math.round(((i + 1) / galleryFiles.length) * 40));
+        }
+        galleryImages = [...galleryImages, ...uploadedImages];
+      }
+
+      setUploadProgress(95);
+      const dataToSave = {
         titre: values.titre,
         description: values.description,
+        descriptionComplete: values.descriptionComplete || '',
         prix: values.prix,
         tag: values.tag,
         type: values.type,
@@ -87,25 +144,43 @@ export default function HebergementsManager() {
         equipements: values.equipements.split(',').map((s) => s.trim()).filter(Boolean),
         disponible: values.disponible,
         ordre: values.ordre,
-        image: secure_url,
-        public_id,
-      });
-      toast({ title: 'Succès !', description: "L'hébergement a été ajouté." });
+        image: imageUrl,
+        public_id: publicId,
+        images: galleryImages,
+      };
+
+      if (editingItem) {
+        await updateDoc(doc(getDbInstance(), 'hebergements', editingItem.id), dataToSave);
+        toast({ title: 'Succès !', description: "L'hébergement a été modifié." });
+      } else {
+        await addDoc(collection(getDbInstance(), 'hebergements'), dataToSave);
+        toast({ title: 'Succès !', description: "L'hébergement a été ajouté." });
+      }
+
       form.reset();
+      setGalleryFiles([]);
+      setEditingItem(null);
       setIsDialogOpen(false);
     } catch (error) {
       console.error('Erreur :', error);
-      toast({ title: 'Erreur', description: "Une erreur est survenue lors de l'ajout.", variant: 'destructive' });
+      toast({ title: 'Erreur', description: "Une erreur est survenue.", variant: 'destructive' });
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
     }
   }
 
+  async function handleDeleteImage(idx: number) {
+    if (!editingItem?.images) return;
+    const newImages = editingItem.images.filter((_, i) => i !== idx);
+    setEditingItem({ ...editingItem, images: newImages });
+    await updateDoc(doc(getDbInstance(), 'hebergements', editingItem.id), { images: newImages });
+  }
+
   async function handleDelete(id: string, public_id: string) {
     setDeletingId(id);
     try {
-      await deleteImageFromCloudinary(public_id);
+      if (public_id) await deleteImageFromCloudinary(public_id);
       await deleteDoc(doc(getDbInstance(), 'hebergements', id));
       toast({ title: 'Supprimé', description: "L'hébergement a été supprimé." });
     } catch (error) {
@@ -121,15 +196,15 @@ export default function HebergementsManager() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Gérer les Hébergements</h2>
-          <p className="text-muted-foreground">Ajoutez les hébergements de votre site.</p>
+          <p className="text-muted-foreground">Ajoutez et modifiez les hébergements de votre site.</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un hébergement</Button>
+            <Button onClick={openAddDialog}><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un hébergement</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Nouvel Hébergement</DialogTitle>
+              <DialogTitle>{editingItem ? 'Modifier' : 'Nouvel'} Hébergement</DialogTitle>
               <DialogDescription>Remplissez les informations ci-dessous.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -139,6 +214,9 @@ export default function HebergementsManager() {
                 )} />
                 <FormField control={form.control} name="description" render={({ field }) => (
                   <FormItem><FormLabel>Description courte</FormLabel><FormControl><Textarea placeholder="Hôtel 5 étoiles face à l'océan..." {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="descriptionComplete" render={({ field }) => (
+                  <FormItem><FormLabel>Description complète</FormLabel><FormControl><Textarea className="min-h-[120px]" placeholder="Description détaillée affichée sur la page de l'hébergement..." {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="prix" render={({ field }) => (
@@ -151,7 +229,7 @@ export default function HebergementsManager() {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="type" render={({ field }) => (
                     <FormItem><FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="hotel">Hôtel</SelectItem>
@@ -190,13 +268,40 @@ export default function HebergementsManager() {
                   )} />
                 </div>
                 <FormField control={form.control} name="image" render={({ field }) => (
-                  <FormItem><FormLabel>Image</FormLabel><FormControl><Input type="file" accept="image/*" {...form.register('image')} /></FormControl><FormMessage /></FormItem>
+                  <FormItem>
+                    <FormLabel>Image principale {editingItem && "(laisser vide pour garder l'actuelle)"}</FormLabel>
+                    <FormControl><Input type="file" accept="image/*" {...form.register('image')} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )} />
+                <div>
+                  <FormLabel>Images galerie (optionnel)</FormLabel>
+                  <Input type="file" accept="image/*" multiple className="mt-1" onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    setGalleryFiles((prev) => [...prev, ...files]);
+                  }} />
+                  {galleryFiles.length > 0 && (
+                    <p className="text-sm text-muted-foreground mt-1">{galleryFiles.length} nouvelle(s) image(s) à ajouter</p>
+                  )}
+                  {editingItem && editingItem.images && editingItem.images.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {editingItem.images.map((img, idx) => (
+                        <div key={idx} className="relative w-16 h-16">
+                          <Image src={img} alt={`Galerie ${idx + 1}`} fill className="rounded-md object-cover" />
+                          <button type="button" onClick={() => handleDeleteImage(idx)} className="absolute -top-1 -right-1 bg-destructive text-white rounded-full p-0.5">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {isUploading && <Progress value={uploadProgress} className="w-full" />}
                 <DialogFooter>
                   <DialogClose asChild><Button type="button" variant="secondary">Annuler</Button></DialogClose>
                   <Button type="submit" disabled={isUploading}>
-                    {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Ajouter
+                    {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {editingItem ? 'Modifier' : 'Ajouter'}
                   </Button>
                 </DialogFooter>
               </form>
@@ -214,7 +319,7 @@ export default function HebergementsManager() {
               <TableHead>Type</TableHead>
               <TableHead>Localisation</TableHead>
               <TableHead>Prix</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -229,9 +334,14 @@ export default function HebergementsManager() {
                   <TableCell>{item.localisation}</TableCell>
                   <TableCell>{item.prix}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, item.public_id)} disabled={deletingId === item.id}>
-                      {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, item.public_id)} disabled={deletingId === item.id}>
+                        {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

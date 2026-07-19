@@ -53,7 +53,7 @@ export default function HebergementPage() {
                 SLAAC Voyages vous ouvre les portes des plus beaux hébergements du Sénégal et d'ailleurs. Grâce à notre réseau de partenaires hôteliers soigneusement sélectionnés, nous négocions pour vous les meilleurs tarifs dans une gamme allant des établissements économiques aux résidences de luxe. Hôtel en centre-ville, resort bord de mer, riad traditionnel ou appartement en résidence privée : nous trouvons l'hébergement qui correspond à vos attentes et à votre budget.
               </p>
             </div>
-            <OffresGrid collectionName="hebergements" emptyMessage="Aucun hébergement disponible pour le moment. Contactez-nous pour une recherche personnalisée." />
+            <OffresGrid collectionName="hebergements" emptyMessage="Aucun hébergement disponible pour le moment. Contactez-nous pour une recherche personnalisée." detailBasePath="/hebergement" />
           </div>
         </section>
 

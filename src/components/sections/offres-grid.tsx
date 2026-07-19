@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Loader2, Info } from 'lucide-react';
+import { ArrowRight, Loader2, Info, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -24,9 +25,10 @@ type Offre = {
 type OffresGridProps = {
   collectionName: string;
   emptyMessage: string;
+  detailBasePath?: string;
 };
 
-export default function OffresGrid({ collectionName, emptyMessage }: OffresGridProps) {
+export default function OffresGrid({ collectionName, emptyMessage, detailBasePath }: OffresGridProps) {
   const [items, setItems] = useState<Offre[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -77,11 +79,20 @@ export default function OffresGrid({ collectionName, emptyMessage }: OffresGridP
                 <h3 className="text-lg font-semibold text-primary">{item.titre}</h3>
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
                 <p className="text-sm font-medium text-primary mt-2">{item.prix}</p>
-                <QuoteRequestDialog defaultDestination={`${item.titre} (${item.tag})`}>
-                  <Button variant="link" className="p-0 mt-2 text-primary self-start">
-                    Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </QuoteRequestDialog>
+                <div className="flex items-center gap-2 mt-2">
+                  {detailBasePath && (
+                    <Link href={`${detailBasePath}/${item.id}`}>
+                      <Button variant="outline" size="sm">
+                        <Eye className="mr-2 h-4 w-4" /> Voir les détails
+                      </Button>
+                    </Link>
+                  )}
+                  <QuoteRequestDialog defaultDestination={`${item.titre} (${item.tag})`}>
+                    <Button variant="link" className="p-0 text-primary">
+                      Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </QuoteRequestDialog>
+                </div>
               </CardContent>
             </Card>
           ))}

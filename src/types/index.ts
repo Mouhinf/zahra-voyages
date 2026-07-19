@@ -25,6 +25,8 @@ export type Hebergement = OffreBase & {
   nombreEtoiles: number;
   capacite: string;
   equipements: string[];
+  descriptionComplete: string;
+  images: string[];
 };
 
 export type Transport = OffreBase & {

@@ -1,0 +1,245 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { getDbInstance } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { Hebergement } from '@/types';
+import Header from '@/components/layout/header';
+import Footer from '@/components/layout/footer';
+import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
+import { ArrowLeft, MapPin, Star, Users, Loader2, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+
+export default function HebergementDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const [item, setItem] = useState<Hebergement | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      if (!params?.id) return;
+      try {
+        const snap = await getDoc(doc(getDbInstance(), 'hebergements', params.id as string));
+        if (snap.exists()) {
+          setItem({ id: snap.id, ...snap.data() } as Hebergement);
+        }
+      } catch (e) {
+        console.error('Erreur:', e);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [params?.id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <div className="flex-grow flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!item) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <div className="flex-grow flex items-center justify-center flex-col gap-4">
+          <p className="text-xl text-muted-foreground">Hébergement introuvable</p>
+          <Button onClick={() => router.push('/hebergement')}>Retour aux hébergements</Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const gallery = item.images && item.images.length > 0 ? item.images : [item.image];
+
+  function nextImage() {
+    setCurrentImageIdx((prev) => (prev + 1) % gallery.length);
+  }
+
+  function prevImage() {
+    setCurrentImageIdx((prev) => (prev - 1 + gallery.length) % gallery.length);
+  }
+
+  const typeLabels: Record<string, string> = {
+    hotel: 'Hôtel', appartement: 'Appartement', villa: 'Villa', auberge: 'Auberge', residence: 'Résidence',
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      <Header />
+      <main className="flex-grow">
+        {/* Galerie d'images */}
+        <section className="relative h-[50vh] min-h-[350px] bg-muted">
+          <div className="relative w-full h-full">
+            <Image
+              src={gallery[currentImageIdx]}
+              alt={item.titre}
+              fill
+              className="object-cover"
+              priority
+            />
+            {gallery.length > 1 && (
+              <>
+                <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              </>
+            )}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              {gallery.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImageIdx(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/50'}`}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="absolute top-4 left-4">
+            <Button variant="secondary" size="sm" onClick={() => router.push('/hebergement')}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+            </Button>
+          </div>
+          <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground">{item.tag}</Badge>
+        </section>
+
+        {/* Détails */}
+        <section className="py-12">
+          <div className="container mx-auto max-w-5xl px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Colonne principale */}
+              <div className="lg:col-span-2">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary">{item.titre}</h1>
+                    <div className="flex flex-wrap items-center gap-4 mt-2 text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4" /> {item.localisation}
+                      </span>
+                      {item.nombreEtoiles > 0 && (
+                        <span className="flex items-center gap-1">
+                          {Array.from({ length: item.nombreEtoiles }).map((_, i) => (
+                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Users className="h-4 w-4" /> {item.capacite}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <Badge variant="outline" className="mb-6">{typeLabels[item.type] || item.type}</Badge>
+
+                <div className="prose prose-lg max-w-none mb-8">
+                  <p className="text-lg text-muted-foreground leading-relaxed">{item.description}</p>
+                </div>
+
+                {item.descriptionComplete && (
+                  <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-primary mb-3">À propos de cet hébergement</h2>
+                    <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {item.descriptionComplete}
+                    </div>
+                  </div>
+                )}
+
+                {item.equipements && item.equipements.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-primary mb-4">Équipements & Services</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {item.equipements.map((eq, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Check className="h-3 w-3 text-primary" />
+                          </div>
+                          <span className="text-sm">{eq}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Mini-galerie */}
+                {gallery.length > 1 && (
+                  <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-primary mb-4">Galerie photos</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {gallery.map((img, idx) => (
+                        <div
+                          key={idx}
+                          className={`relative h-24 sm:h-32 rounded-lg overflow-hidden cursor-pointer border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`}
+                          onClick={() => setCurrentImageIdx(idx)}
+                        >
+                          <Image src={img} alt={`Photo ${idx + 1}`} fill className="object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Colonne latérale - Carte de réservation */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-6 border rounded-xl p-6 shadow-lg bg-card">
+                  <p className="text-3xl font-bold text-primary">{item.prix}</p>
+                  <p className="text-sm text-muted-foreground mb-6">Tarif indicatif</p>
+
+                  <div className="space-y-2 mb-6 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Type</span>
+                      <span className="font-medium">{typeLabels[item.type] || item.type}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Localisation</span>
+                      <span className="font-medium">{item.localisation}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Capacité</span>
+                      <span className="font-medium">{item.capacite}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Catégorie</span>
+                      <span className="font-medium">{item.tag}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Disponibilité</span>
+                      <span className={`font-medium ${item.disponible ? 'text-green-600' : 'text-red-500'}`}>
+                        {item.disponible ? 'Disponible' : 'Sur demande'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <QuoteRequestDialog defaultDestination={item.titre}>
+                    <Button className="w-full" size="lg" disabled={!item.disponible}>
+                      Demander un devis
+                    </Button>
+                  </QuoteRequestDialog>
+                  <p className="text-xs text-center text-muted-foreground mt-3">
+                    Réponse sous 24h · Devis gratuit et sans engagement
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}
