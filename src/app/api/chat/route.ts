@@ -41,29 +41,46 @@ export async function POST(req: NextRequest) {
       ...messages,
     ];
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://slaac-voyages.vercel.app',
-        'X-Title': 'SLAAC Voyages Assistant',
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-3.3-70b-instruct:free',
-        messages: apiMessages,
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
-    });
+    const models = ['openai/gpt-oss-20b:free', 'tencent/hy3:free', 'nvidia/nemotron-nano-9b-v2:free'];
+    let data: any = null;
+    let lastError = '';
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('OpenRouter error:', response.status, errText);
+    for (const model of models) {
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://slaac-voyages.vercel.app',
+            'X-Title': 'SLAAC Voyages Assistant',
+          },
+          body: JSON.stringify({
+            model,
+            messages: apiMessages,
+            temperature: 0.7,
+            max_tokens: 500,
+          }),
+        });
+
+        if (response.ok) {
+          data = await response.json();
+          break;
+        } else {
+          const err = await response.text();
+          lastError = `${model}: ${response.status}`;
+          console.error('OpenRouter error:', lastError, err);
+        }
+      } catch (e: any) {
+        lastError = `${model}: ${e.message}`;
+        console.error('Fetch error:', lastError);
+      }
+    }
+
+    if (!data) {
       return NextResponse.json({ error: 'Erreur du service IA' }, { status: 502 });
     }
 
-    const data = await response.json();
     const reply = data.choices?.[0]?.message?.content || "Désolé, je n'ai pas pu générer de réponse.";
 
     return NextResponse.json({ reply });
