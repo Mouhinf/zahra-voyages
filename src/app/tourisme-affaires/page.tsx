@@ -33,7 +33,7 @@ export default function TourismeAffairesPage() {
                 De l'organisation de séminaires aux missions sur mesure, nous mettons notre expertise au service de vos événements professionnels : salles équipées, hébergement, transferts et activités de team building.
               </p>
             </div>
-            <OffresGrid collectionName="offresAffaires" emptyMessage="Aucune offre d'affaires disponible pour le moment. Contactez-nous pour une mission sur mesure." />
+            <OffresGrid collectionName="offresAffaires" emptyMessage="Aucune offre d'affaires disponible pour le moment. Contactez-nous pour une mission sur mesure." detailBasePath="/tourisme-affaires" />
           </div>
         </section>
 

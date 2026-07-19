@@ -66,4 +66,6 @@ export type OffreAffaires = OffreBase & {
   lieu: string;
   duree: string;
   services: string[];
+  descriptionComplete: string;
+  images: string[];
 };
