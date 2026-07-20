@@ -20,7 +20,7 @@ const stats: Stat[] = [
   { valeur: 120, suffixe: '+', label: 'Partenaires de confiance', icone: Handshake },
 ];
 
-const FALLBACK_BG = 'https://images.unsplash.com/photo-1436491865332-7a61d1096790?w=1920&h=600&fit=crop';
+const FALLBACK_BG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png';
 
 function useCountUp(target: number, duration: number, start: boolean) {
   const [count, setCount] = React.useState(0);
@@ -104,6 +104,7 @@ export default function HomeStats() {
           src={bgImage}
           alt=""
           fill
+          sizes="100vw"
           className="object-cover"
           priority={false}
         />

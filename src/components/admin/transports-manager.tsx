@@ -32,8 +32,8 @@ const formSchema = z.object({
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
   type: z.enum(['billet_avion', 'transfert_aeroport', 'transfert_plage', 'location_voiture']),
-  vehicule: z.string().min(2, 'Veuillez entrer le véhicule/modèle.'),
-  capacitePassagers: z.coerce.number().min(1).max(500),
+  vehicule: z.string().optional(),
+  capacitePassagers: z.coerce.number().min(1).max(500).optional(),
   avecChauffeur: z.boolean().default(false),
   carburantInclus: z.boolean().default(false),
   disponible: z.boolean().default(true),
@@ -42,6 +42,13 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  billet_avion: 'Billet d\'avion',
+  transfert_aeroport: 'Transfert aéroport',
+  transfert_plage: 'Transfert par la plage',
+  location_voiture: 'Location voiture (avec chauffeur)',
+};
 
 export default function TransportsManager() {
   const { toast } = useToast();
@@ -63,6 +70,8 @@ export default function TransportsManager() {
       disponible: true, ordre: 0,
     },
   });
+
+  const watchedType = form.watch('type');
 
   useEffect(() => {
     const q = query(collection(getDbInstance(), 'transports'), orderBy('ordre', 'asc'));
@@ -98,10 +107,10 @@ export default function TransportsManager() {
       prix: item.prix,
       tag: item.tag,
       type: item.type,
-      vehicule: item.vehicule,
-      capacitePassagers: item.capacitePassagers,
-      avecChauffeur: item.avecChauffeur,
-      carburantInclus: item.carburantInclus,
+      vehicule: item.vehicule || '',
+      capacitePassagers: item.capacitePassagers || 4,
+      avecChauffeur: item.avecChauffeur || false,
+      carburantInclus: item.carburantInclus || false,
       disponible: item.disponible,
       ordre: item.ordre,
     });
@@ -135,23 +144,33 @@ export default function TransportsManager() {
       }
 
       setUploadProgress(95);
-      const dataToSave = {
+
+      // Champs communs à toutes les catégories
+      const dataToSave: Record<string, unknown> = {
         titre: values.titre,
         description: values.description,
         descriptionComplete: values.descriptionComplete || '',
         prix: values.prix,
         tag: values.tag,
         type: values.type,
-        vehicule: values.vehicule,
-        capacitePassagers: values.capacitePassagers,
-        avecChauffeur: values.avecChauffeur,
-        carburantInclus: values.carburantInclus,
         disponible: values.disponible,
         ordre: values.ordre,
         image: imageUrl,
         public_id: publicId,
         images: galleryImages,
       };
+
+      // Champs spécifiques aux catégories véhicule (transfert_aeroport, transfert_plage, location_voiture)
+      if (values.type !== 'billet_avion') {
+        dataToSave.vehicule = values.vehicule || '';
+        dataToSave.capacitePassagers = values.capacitePassagers || 4;
+      }
+
+      // Champs spécifiques à location_voiture
+      if (values.type === 'location_voiture') {
+        dataToSave.avecChauffeur = values.avecChauffeur;
+        dataToSave.carburantInclus = values.carburantInclus;
+      }
 
       if (editingItem) {
         await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
@@ -196,16 +215,15 @@ export default function TransportsManager() {
     }
   }
 
-  const typeLabels: Record<string, string> = {
-    billet_avion: 'Billet d\'avion', transfert_aeroport: 'Transfert aéroport', transfert_plage: 'Transfert par la plage', location_voiture: 'Location voiture (avec chauffeur)',
-  };
+  const showVehicleFields = watchedType !== 'billet_avion';
+  const showLocationFields = watchedType === 'location_voiture';
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Gérer les Transports</h2>
-          <p className="text-muted-foreground">Ajoutez et modifiez les offres de transport.</p>
+          <p className="text-muted-foreground">Ajoutez et modifiez les offres de transport par catégorie.</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -214,73 +232,162 @@ export default function TransportsManager() {
           <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? 'Modifier' : 'Nouvel'} Transport</DialogTitle>
-              <DialogDescription>Remplissez les informations ci-dessous.</DialogDescription>
+              <DialogDescription>Le formulaire s'adapte à la catégorie sélectionnée.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+                {/* Type — en premier pour conditionner les champs */}
+                <FormField control={form.control} name="type" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Catégorie de transport</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner une catégorie" /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        <SelectItem value="billet_avion">Billet d'avion</SelectItem>
+                        <SelectItem value="transfert_aeroport">Transfert aéroport</SelectItem>
+                        <SelectItem value="transfert_plage">Transfert par la plage</SelectItem>
+                        <SelectItem value="location_voiture">Location voiture (avec chauffeur)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* Badge indiquant la catégorie active */}
+                <div className="rounded-lg bg-primary/5 border border-primary/20 px-4 py-2.5 text-sm text-primary font-medium">
+                  Catégorie active : {CATEGORY_LABELS[watchedType]}
+                </div>
+
+                {/* Champs communs */}
                 <FormField control={form.control} name="titre" render={({ field }) => (
-                  <FormItem><FormLabel>Titre</FormLabel><FormControl><Input placeholder="Toyota Corolla - Berline économique" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem>
+                    <FormLabel>
+                      {watchedType === 'billet_avion' ? 'Titre du vol / compagnie' : 'Titre'}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={watchedType === 'billet_avion' ? 'Vol Dakar-Paris Air France' : 'Transfert aéroport Dakar'}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )} />
+
                 <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem><FormLabel>Description courte</FormLabel><FormControl><Textarea placeholder="Berline compacte idéale pour..." {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem>
+                    <FormLabel>Description courte</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder={watchedType === 'billet_avion'
+                          ? 'Vol direct vers Paris, classe économique...'
+                          : 'Service de transfert confortable et ponctuel...'}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )} />
+
                 <FormField control={form.control} name="descriptionComplete" render={({ field }) => (
-                  <FormItem><FormLabel>Description complète</FormLabel><FormControl><Textarea className="min-h-[120px]" placeholder="Description détaillée affichée sur la page du transport..." {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem>
+                    <FormLabel>Description complète</FormLabel>
+                    <FormControl><Textarea className="min-h-[120px]" placeholder="Description détaillée affichée sur la page du transport..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )} />
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="prix" render={({ field }) => (
-                    <FormItem><FormLabel>Prix</FormLabel><FormControl><Input placeholder="Dès 25 000 FCFA/jour" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="tag" render={({ field }) => (
-                    <FormItem><FormLabel>Catégorie</FormLabel><FormControl><Input placeholder="Économique" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="type" render={({ field }) => (
-                    <FormItem><FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          <SelectItem value="billet_avion">Billet d'avion</SelectItem>
-                          <SelectItem value="transfert_aeroport">Transfert aéroport</SelectItem>
-                          <SelectItem value="transfert_plage">Transfert par la plage</SelectItem>
-                          <SelectItem value="location_voiture">Location voiture (avec chauffeur)</SelectItem>
-                        </SelectContent>
-                      </Select><FormMessage />
+                    <FormItem>
+                      <FormLabel>Prix</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={watchedType === 'billet_avion' ? 'Dès 300 000 FCFA' : 'Dès 15 000 FCFA'}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )} />
-                  <FormField control={form.control} name="vehicule" render={({ field }) => (
-                    <FormItem><FormLabel>Véhicule / Modèle</FormLabel><FormControl><Input placeholder="Toyota Corolla" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormField control={form.control} name="tag" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Catégorie / Étiquette</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={watchedType === 'billet_avion' ? 'Classe économique' : 'Confort'}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )} />
                 </div>
+
+                {/* Champs spécifiques aux véhicules (transferts + location) */}
+                {showVehicleFields && (
+                  <div className="space-y-4 border-t pt-4">
+                    <p className="text-sm font-semibold text-primary">Informations véhicule</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="vehicule" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Véhicule / Modèle</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={watchedType === 'location_voiture' ? 'Toyota Corolla, 4x4...' : 'Berline, Van, Minibus...'}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="capacitePassagers" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Capacité passagers</FormLabel>
+                          <FormControl><Input type="number" min={1} max={500} {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Champs spécifiques à la location de voiture */}
+                {showLocationFields && (
+                  <div className="space-y-4 border-t pt-4">
+                    <p className="text-sm font-semibold text-primary">Options location</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="avecChauffeur" render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-3 pt-2">
+                          <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                          <FormLabel className="!mt-0">Avec chauffeur</FormLabel>
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="carburantInclus" render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-3 pt-2">
+                          <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                          <FormLabel className="!mt-0">Carburant inclus</FormLabel>
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Ordre + disponibilité */}
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="capacitePassagers" render={({ field }) => (
-                    <FormItem><FormLabel>Capacité passagers</FormLabel><FormControl><Input type="number" min={1} max={500} {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
                   <FormField control={form.control} name="ordre" render={({ field }) => (
                     <FormItem><FormLabel>Ordre d'affichage</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="avecChauffeur" render={({ field }) => (
+                  <FormField control={form.control} name="disponible" render={({ field }) => (
                     <FormItem className="flex flex-row items-center gap-3 pt-6">
                       <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                      <FormLabel className="!mt-0">Avec chauffeur</FormLabel>
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="carburantInclus" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3 pt-6">
-                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                      <FormLabel className="!mt-0">Carburant inclus</FormLabel>
+                      <FormLabel className="!mt-0">Disponible</FormLabel>
                     </FormItem>
                   )} />
                 </div>
-                <FormField control={form.control} name="disponible" render={({ field }) => (
-                  <FormItem className="flex flex-row items-center gap-3">
-                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                    <FormLabel className="!mt-0">Disponible</FormLabel>
-                  </FormItem>
-                )} />
+
+                {/* Image principale */}
                 <FormField control={form.control} name="image" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Image principale {editingItem && "(laisser vide pour garder l'actuelle)"}</FormLabel>
@@ -300,6 +407,8 @@ export default function TransportsManager() {
                     )}
                   </FormItem>
                 )} />
+
+                {/* Galerie */}
                 <div>
                   <FormLabel>Images galerie (optionnel)</FormLabel>
                   <Input type="file" accept="image/*" multiple className="mt-1" onChange={(e) => {
@@ -332,6 +441,7 @@ export default function TransportsManager() {
                     </div>
                   )}
                 </div>
+
                 {isUploading && <Progress value={uploadProgress} className="w-full" />}
                 <DialogFooter>
                   <DialogClose asChild><Button type="button" variant="secondary">Annuler</Button></DialogClose>
@@ -352,22 +462,24 @@ export default function TransportsManager() {
             <TableRow>
               <TableHead className="w-[80px]">Image</TableHead>
               <TableHead>Titre</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Véhicule</TableHead>
+              <TableHead>Catégorie</TableHead>
               <TableHead>Prix</TableHead>
               <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={6} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
             ) : items.length > 0 ? (
               items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell><Image src={item.image} alt={item.titre} width={64} height={64} className="rounded-md object-cover h-16 w-16" /></TableCell>
                   <TableCell className="font-medium">{item.titre}</TableCell>
-                  <TableCell>{typeLabels[item.type] || item.type}</TableCell>
-                  <TableCell>{item.vehicule}</TableCell>
+                  <TableCell>
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {CATEGORY_LABELS[item.type] || item.type}
+                    </span>
+                  </TableCell>
                   <TableCell>{item.prix}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -382,7 +494,7 @@ export default function TransportsManager() {
                 </TableRow>
               ))
             ) : (
-              <TableRow><TableCell colSpan={6} className="text-center h-24">Aucun transport trouvé.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center h-24">Aucun transport trouvé.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>

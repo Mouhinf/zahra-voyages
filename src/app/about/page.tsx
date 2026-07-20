@@ -47,7 +47,7 @@ export default function AboutPage() {
       <main className="flex-grow">
         <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">À propos de nous</span>
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary">À propos de nous</span>
             <h1 className="mt-2 text-4xl md:text-5xl font-bold text-primary font-headline">Qui Sommes-Nous ?</h1>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg text-secondary-foreground max-w-3xl mx-auto text-balance">
@@ -98,7 +98,7 @@ export default function AboutPage() {
         <section className="py-20 sm:py-28 bg-secondary">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="text-center mb-14">
-                    <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Nos atouts</span>
+                    <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos atouts</span>
                     <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Pourquoi nous choisir ?</h2>
                     <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
                 </div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
         <section className="py-20 sm:py-28 bg-background">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="text-center mb-14">
-                    <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Notre identité</span>
+                    <span className="text-sm font-semibold uppercase tracking-widest text-primary">Notre identité</span>
                     <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Plus sur SLAAC Voyages</h2>
                     <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
                 </div>

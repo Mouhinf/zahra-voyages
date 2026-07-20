@@ -7,7 +7,7 @@ const argumentsList = [
     icon: MapPin,
     title: 'Expertise Locale',
     description: "Basés à Dakar, nous connaissons parfaitement le Sénégal et l'Afrique de l'Ouest. Nous vous ouvrons les portes des meilleures adresses et des expériences les plus authentiques.",
-    image: 'https://images.unsplash.com/photo-1524661135-423995f22d68?w=600&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=600&h=400&fit=crop',
   },
   {
     icon: Users,
@@ -25,7 +25,7 @@ const argumentsList = [
     icon: Clock,
     title: 'Réactivité Garantie',
     description: "Une question, un imprévu ? Notre équipe répond sous 24h, 7j/7. Vous voyagez en toute sérénité, où que vous soyez dans le monde.",
-    image: 'https://images.unsplash.com/photo-1501139081373-635b7ae4d5b8?w=600&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
   },
 ];
 
@@ -34,7 +34,7 @@ export default function HomeWhyUs() {
     <section id="why-us" className="py-16 sm:py-24 bg-background">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Nos atouts</span>
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos atouts</span>
           <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Pourquoi Choisir SLAAC Voyages ?</h2>
           <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
@@ -51,6 +51,7 @@ export default function HomeWhyUs() {
                     src={arg.image}
                     alt={arg.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />

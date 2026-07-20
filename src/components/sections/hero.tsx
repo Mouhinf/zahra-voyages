@@ -120,10 +120,12 @@ export default function Hero() {
             key={idx}
             onClick={() => goTo(idx)}
             aria-label={`Aller au slide ${idx + 1}`}
-            className={`h-2.5 rounded-full transition-all ${
-              idx === current ? 'w-8 bg-white' : 'w-2.5 bg-white/50 hover:bg-white/70'
-            }`}
-          />
+            className="p-1.5 flex items-center"
+          >
+            <span className={`block rounded-full transition-all ${
+              idx === current ? 'w-8 h-2.5 bg-white' : 'w-2.5 h-2.5 bg-white/50 hover:bg-white/70'
+            }`} />
+          </button>
         ))}
       </div>
     </section>

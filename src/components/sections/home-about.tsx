@@ -17,14 +17,13 @@ export default function HomeAbout() {
                 alt="SLAAC Voyages — Logo officiel"
                 fill
                 className="object-contain"
-                priority
                 sizes="(max-width: 1024px) 70vw, 30vw"
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none" />
           </div>
           <div>
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">À propos</span>
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary">À propos</span>
             <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Votre Partenaire de Confiance pour des Voyages Inoubliables</h2>
             <div className="w-12 h-0.5 bg-accent my-5" />
             <p className="mt-4 text-lg text-muted-foreground">

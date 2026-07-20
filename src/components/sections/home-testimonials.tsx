@@ -83,7 +83,7 @@ export default function HomeTestimonials() {
     <section id="testimonials" className="py-16 sm:py-24 bg-background">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Témoignages</span>
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Témoignages</span>
           <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Ils Nous Font Confiance</h2>
           <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">

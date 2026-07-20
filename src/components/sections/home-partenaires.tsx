@@ -65,8 +65,9 @@ export default function HomePartenaires() {
               <div className="relative h-16 w-24 sm:h-20 sm:w-28 grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100">
                 <Image
                   src={p.logo}
-                  alt={p.nom}
+                  alt={p.nom?.trim() || 'Logo partenaire'}
                   fill
+                  sizes="(max-width: 640px) 96px, 112px"
                   className="object-contain"
                 />
               </div>

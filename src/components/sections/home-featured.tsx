@@ -67,7 +67,7 @@ export default async function HomeFeatured() {
     <section id="featured" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Sélection</span>
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Sélection</span>
           <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos Offres Phares</h2>
           <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
@@ -83,6 +83,7 @@ export default async function HomeFeatured() {
                     src={offre.image}
                     alt={offre.titre}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

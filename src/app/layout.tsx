@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   description: "Découvrez le monde avec SLAAC Voyages, votre agence de confiance à Dakar. Billets d'avion, séjours sur mesure, et assistance visa. L'aventure vous attend.",
   keywords: "agence de voyage Dakar, billets d’avion Sénégal, SLAAC Voyages Dakar, packages touristiques Sénégal, Merveille Voyage Dakar, voyage sur mesure",
   icons: {
-    icon: '/slaaclogo.jpg',
+    icon: [
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
 };
 

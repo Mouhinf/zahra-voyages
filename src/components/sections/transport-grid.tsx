@@ -97,7 +97,7 @@ export default function TransportGrid() {
                 {cat.label}
               </h3>
               <p className="text-sm text-muted-foreground mt-1">{cat.description}</p>
-              <p className="text-xs font-medium text-primary/60 mt-3">{count} offre{count > 1 ? 's' : ''} disponible{count > 1 ? 's' : ''}</p>
+              <p className="text-xs font-medium text-primary mt-3">{count} offre{count > 1 ? 's' : ''} disponible{count > 1 ? 's' : ''}</p>
             </button>
           );
         })}

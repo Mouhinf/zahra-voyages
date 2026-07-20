@@ -16,10 +16,10 @@ import Link from 'next/link';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
-const FALLBACK_AGENCY = 'https://images.unsplash.com/photo-1568992687947-8680f2285c88?w=800&h=600&fit=crop';
+const FALLBACK_AGENCY = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.204-1.634a11.86 11.86 0 005.79 1.499h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" fill="currentColor" />
   </svg>
 );
@@ -71,7 +71,7 @@ export default function HomeContactQuick() {
     <section id="contact-quick" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Contact</span>
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Contact</span>
           <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Parlons de Votre Projet</h2>
           <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
@@ -81,7 +81,7 @@ export default function HomeContactQuick() {
         <div className="mt-12 grid lg:grid-cols-2 gap-8 items-start">
           <div className="space-y-6">
             <div className="relative h-56 rounded-lg overflow-hidden shadow-md">
-              <Image src={agenceImg} alt="SLAAC Voyages — Dakar" fill className="object-cover" />
+              <Image src={agenceImg} alt="SLAAC Voyages — Dakar" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent" />
               <div className="absolute bottom-4 left-4 text-white">
                 <p className="font-semibold text-lg drop-shadow-lg">SLAAC Voyages</p>
@@ -101,7 +101,7 @@ export default function HomeContactQuick() {
               <div className="p-3 bg-primary/10 rounded-full"><WhatsAppIcon className="h-6 w-6 text-primary" /></div>
               <div>
                 <h3 className="text-lg font-semibold text-primary">WhatsApp</h3>
-                <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2">
+                <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2" aria-label="Contacter SLAAC Voyages sur WhatsApp">
                   <WhatsAppIcon className="h-4 w-4 fill-current" /> +221 77 539 63 25
                 </a>
               </div>
@@ -118,14 +118,16 @@ export default function HomeContactQuick() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-4"
+              aria-label="Discuter avec SLAAC Voyages sur WhatsApp"
             >
-              <Button size="lg" className="bg-green-600 hover:bg-green-700">
+              <Button size="lg" className="bg-green-700 hover:bg-green-800">
                 <MessageCircle className="mr-2 h-5 w-5" /> Discuter sur WhatsApp
               </Button>
             </a>
             <div className="pt-2">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d913.4299840693265!2d-17.4343981!3d14.668668499999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec173b82ee767bd%3A0x95a2e5d20c75be4a!2sDjolof%20Chicken%20Dakar-Plateau!5e1!3m2!1sfr!2ssn!4v1784546169277!5m2!1sfr!2ssn"
+                title="Localisation SLAAC Voyages à Dakar"
                 width="100%"
                 height="200"
                 style={{ border: 0 }}

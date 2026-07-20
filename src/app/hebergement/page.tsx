@@ -56,7 +56,7 @@ export default function HebergementPage() {
         <section className="py-20 sm:py-28 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Notre sélection</span>
+              <span className="text-sm font-semibold uppercase tracking-widest text-primary">Notre sélection</span>
               <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos Hébergements</h2>
               <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">

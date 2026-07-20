@@ -11,11 +11,11 @@ import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const FALLBACK_IMAGES: Record<string, string> = {
-  hebergements: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&h=400&fit=crop',
-  transports: 'https://images.unsplash.com/photo-1436491865332-7a61d1096790?w=600&h=400&fit=crop',
-  voyagesCroisieres: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?w=600&h=400&fit=crop',
-  excursions: 'https://images.unsplash.com/photo-1573152958734-1922c188fba3?w=600&h=400&fit=crop',
-  offresAffaires: 'https://images.unsplash.com/photo-1540571336861-4d5f4dc1b544?w=600&h=400&fit=crop',
+  hebergements: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-hebergement.png',
+  transports: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-transport.png',
+  voyagesCroisieres: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png',
+  excursions: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-excursions.png',
+  offresAffaires: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-affaires.png',
 };
 
 type ServiceDef = {
@@ -95,7 +95,7 @@ export default function HomeServicesGrid() {
     <section id="services" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Nos prestations</span>
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos prestations</span>
           <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos 6 Services pour Voyager Serein</h2>
           <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">
@@ -114,6 +114,7 @@ export default function HomeServicesGrid() {
                       src={img}
                       alt={service.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -135,12 +136,14 @@ export default function HomeServicesGrid() {
 
           {/* 6e carte : Réservation express */}
           <QuoteRequestDialog>
-            <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-accent/5 border-accent/30 cursor-pointer flex flex-col p-0">
+            <button type="button" className="text-left w-full h-full cursor-pointer">
+            <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-accent/5 border-accent/30 flex flex-col p-0">
               <div className="relative h-48 overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop"
                   alt="Réservation express"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-accent/80 to-transparent" />
@@ -158,6 +161,7 @@ export default function HomeServicesGrid() {
                 </div>
               </div>
             </Card>
+            </button>
           </QuoteRequestDialog>
         </div>
       </div>

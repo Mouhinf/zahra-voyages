@@ -81,7 +81,7 @@ export default function ServicesPage() {
       <main className="flex-grow">
         <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Nos prestations</span>
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos prestations</span>
             <h1 className="mt-2 text-4xl md:text-5xl font-bold text-primary font-headline">Nos Services</h1>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg text-secondary-foreground max-w-3xl mx-auto text-balance">
