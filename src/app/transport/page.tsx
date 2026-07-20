@@ -23,12 +23,12 @@ export default function TransportPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/65 to-primary/85 z-10" />
           <div className="relative z-20 text-center px-4 max-w-3xl">
             <span className="inline-block glass-dark px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-4">
-              Billets · Transferts Aéroport · Transferts Plage
+              Billets · Transferts · Location
             </span>
             <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg font-headline">Transport</h1>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md text-balance">
-              Billets d'avion, transferts aéroport et transferts par la plage. Déplacez-vous en toute liberté.
+              Billets d'avion, transferts aéroport, transferts par la plage et location de voiture avec chauffeur. Déplacez-vous en toute liberté.
             </p>
           </div>
         </section>

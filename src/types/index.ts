@@ -30,7 +30,7 @@ export type Hebergement = OffreBase & {
 };
 
 export type Transport = OffreBase & {
-  type: 'billet_avion' | 'transfert_aeroport' | 'transfert_plage';
+  type: 'billet_avion' | 'transfert_aeroport' | 'transfert_plage' | 'location_voiture';
   vehicule: string;
   capacitePassagers: number;
   avecChauffeur: boolean;

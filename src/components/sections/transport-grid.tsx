@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Loader2, Eye, Info, Plane, PlaneTakeoff, Waves } from 'lucide-react';
+import { ArrowRight, Loader2, Eye, Info, Plane, PlaneTakeoff, Waves, Car } from 'lucide-react';
 import Image from 'next/image';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -28,6 +28,7 @@ const CATEGORIES = [
   { key: 'billet_avion', label: 'Billets d\'avion', icon: Plane, description: 'Vols vers toutes les destinations du monde' },
   { key: 'transfert_aeroport', label: 'Transfert Aéroport', icon: PlaneTakeoff, description: 'Transferts aller-retour vers l\'aéroport' },
   { key: 'transfert_plage', label: 'Transfert par la plage', icon: Waves, description: 'Transferts côtiers et balnéaires' },
+  { key: 'location_voiture', label: 'Location de voiture (avec chauffeur)', icon: Car, description: 'Véhicules avec chauffeur professionnel' },
 ];
 
 export default function TransportGrid() {
@@ -70,7 +71,7 @@ export default function TransportGrid() {
   return (
     <>
       {/* Cartes catégories */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
           const count = items.filter((d) => d.type === cat.key).length;

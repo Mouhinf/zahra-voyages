@@ -31,7 +31,7 @@ const formSchema = z.object({
   descriptionComplete: z.string().optional(),
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
-  type: z.enum(['billet_avion', 'transfert_aeroport', 'transfert_plage']),
+  type: z.enum(['billet_avion', 'transfert_aeroport', 'transfert_plage', 'location_voiture']),
   vehicule: z.string().min(2, 'Veuillez entrer le véhicule/modèle.'),
   capacitePassagers: z.coerce.number().min(1).max(500),
   avecChauffeur: z.boolean().default(false),
@@ -197,7 +197,7 @@ export default function TransportsManager() {
   }
 
   const typeLabels: Record<string, string> = {
-    billet_avion: 'Billet d\'avion', transfert_aeroport: 'Transfert aéroport', transfert_plage: 'Transfert par la plage',
+    billet_avion: 'Billet d\'avion', transfert_aeroport: 'Transfert aéroport', transfert_plage: 'Transfert par la plage', location_voiture: 'Location voiture (avec chauffeur)',
   };
 
   return (
@@ -244,6 +244,7 @@ export default function TransportsManager() {
                           <SelectItem value="billet_avion">Billet d'avion</SelectItem>
                           <SelectItem value="transfert_aeroport">Transfert aéroport</SelectItem>
                           <SelectItem value="transfert_plage">Transfert par la plage</SelectItem>
+                          <SelectItem value="location_voiture">Location voiture (avec chauffeur)</SelectItem>
                         </SelectContent>
                       </Select><FormMessage />
                     </FormItem>
