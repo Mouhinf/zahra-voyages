@@ -116,6 +116,7 @@ export default function HomeServicesGrid() {
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => { const t = e.currentTarget as HTMLImageElement; if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = FALLBACK_IMAGES[service.collectionName]; } }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-3 left-3 w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-lg">

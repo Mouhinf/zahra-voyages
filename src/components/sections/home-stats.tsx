@@ -107,6 +107,7 @@ export default function HomeStats() {
           sizes="100vw"
           className="object-cover"
           priority={false}
+          onError={(e) => { const t = e.currentTarget as HTMLImageElement; if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = FALLBACK_BG; } }}
         />
         <div className="absolute inset-0 bg-primary/85" />
       </div>
