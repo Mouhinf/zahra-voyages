@@ -31,7 +31,7 @@ const formSchema = z.object({
   descriptionComplete: z.string().optional(),
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
-  type: z.enum(['location_voiture', 'vtc', 'transfert_aeroport', 'bus_prive']),
+  type: z.enum(['billet_avion', 'transfert_aeroport', 'transfert_plage']),
   vehicule: z.string().min(2, 'Veuillez entrer le véhicule/modèle.'),
   capacitePassagers: z.coerce.number().min(1).max(500),
   avecChauffeur: z.boolean().default(false),
@@ -58,7 +58,7 @@ export default function TransportsManager() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'location_voiture',
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'billet_avion',
       vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
       disponible: true, ordre: 0,
     },
@@ -80,7 +80,7 @@ export default function TransportsManager() {
     setGalleryFiles([]);
     setMainImageFile(null);
     form.reset({
-      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'location_voiture',
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'billet_avion',
       vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
       disponible: true, ordre: 0,
     });
@@ -197,7 +197,7 @@ export default function TransportsManager() {
   }
 
   const typeLabels: Record<string, string> = {
-    location_voiture: 'Location voiture', vtc: 'VTC / Chauffeur', transfert_aeroport: 'Transfert aéroport', bus_prive: 'Bus privé',
+    billet_avion: 'Billet d\'avion', transfert_aeroport: 'Transfert aéroport', transfert_plage: 'Transfert par la plage',
   };
 
   return (
@@ -241,10 +241,9 @@ export default function TransportsManager() {
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
                         <SelectContent>
-                          <SelectItem value="location_voiture">Location voiture</SelectItem>
-                          <SelectItem value="vtc">VTC / Chauffeur</SelectItem>
+                          <SelectItem value="billet_avion">Billet d'avion</SelectItem>
                           <SelectItem value="transfert_aeroport">Transfert aéroport</SelectItem>
-                          <SelectItem value="bus_prive">Bus privé</SelectItem>
+                          <SelectItem value="transfert_plage">Transfert par la plage</SelectItem>
                         </SelectContent>
                       </Select><FormMessage />
                     </FormItem>

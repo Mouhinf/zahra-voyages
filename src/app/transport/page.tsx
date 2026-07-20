@@ -1,6 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import OffresGrid from '@/components/sections/offres-grid';
+import TransportGrid from '@/components/sections/transport-grid';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
@@ -23,12 +23,12 @@ export default function TransportPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/65 to-primary/85 z-10" />
           <div className="relative z-20 text-center px-4 max-w-3xl">
             <span className="inline-block glass-dark px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-4">
-              Billetterie & Location
+              Billets · Transferts Aéroport · Transferts Plage
             </span>
             <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg font-headline">Transport</h1>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md text-balance">
-              Location de voiture, VTC, transferts aéroport et bus privé. Déplacez-vous en toute liberté.
+              Billets d'avion, transferts aéroport et transferts par la plage. Déplacez-vous en toute liberté.
             </p>
           </div>
         </section>
@@ -40,10 +40,10 @@ export default function TransportPage() {
               <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos Offres de Transport</h2>
               <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">
-                Des solutions de transport adaptées à tous vos besoins, avec ou sans chauffeur, pour vos déplacements urbains ou longue distance.
+                Trois solutions de transport adaptées à vos besoins : billets d'avion vers toutes destinations, transferts aéroport confortables et transferts par la plage pour vos escapades balnéaires.
               </p>
             </div>
-            <OffresGrid collectionName="transports" emptyMessage="Aucune offre de transport disponible pour le moment. Contactez-nous pour une demande personnalisée." detailBasePath="/transport" />
+            <TransportGrid />
           </div>
         </section>
 
