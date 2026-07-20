@@ -79,7 +79,7 @@ export default function HomeServicesGrid() {
           snap.forEach((docSnap) => {
             const d = docSnap.data() as { image?: string; disponible?: boolean };
             if (d.disponible !== false && d.image) {
-              result[service.collectionName] = d.image;
+              result[service.collectionName] = d.image.includes('unsplash') ? FALLBACK_IMAGES[service.collectionName] : d.image;
             }
           });
         } catch (e) {

@@ -19,7 +19,7 @@ export default function HomePartenaires() {
         const snap = await getDocs(q);
         const data: Partenaire[] = [];
         snap.forEach((docSnap) => {
-          data.push({ id: docSnap.id, ...docSnap.data() } as Partenaire);
+          data.push({ id: docSnap.id, ...docSnap.data(), logo: (docSnap.data().logo || '').includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/slaac-logo-png.png' : docSnap.data().logo } as Partenaire);
         });
         if (mounted) setPartenaires(data);
       } catch (e) {

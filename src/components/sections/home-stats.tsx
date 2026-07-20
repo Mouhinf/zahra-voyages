@@ -87,7 +87,7 @@ export default function HomeStats() {
         snap.forEach((docSnap) => {
           const d = docSnap.data() as { image?: string; disponible?: boolean };
           if (d.disponible !== false && d.image && mounted) {
-            setBgImage(d.image);
+            setBgImage(d.image.includes('unsplash') ? FALLBACK_BG : d.image);
           }
         });
       } catch (e) {

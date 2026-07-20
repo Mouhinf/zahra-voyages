@@ -44,7 +44,7 @@ export default function HomeContactQuick() {
         const snap = await getDocs(q);
         snap.forEach((docSnap) => {
           const d = docSnap.data() as { image?: string; disponible?: boolean };
-          if (d.disponible !== false && d.image && mounted) setAgenceImg(d.image);
+          if (d.disponible !== false && d.image && mounted) setAgenceImg(d.image.includes('unsplash') ? FALLBACK_AGENCY : d.image);
         });
       } catch (e) {
         console.error('Erreur fetch agence img:', e);

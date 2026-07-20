@@ -33,11 +33,12 @@ async function fetchFeatured(): Promise<OffrePhare[]> {
       snap.forEach((docSnap) => {
         const d = docSnap.data() as { titre: string; prix: string; image: string; tag: string; disponible?: boolean };
         if (d.disponible !== false && d.image) {
+          const img = d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image;
           offres.push({
             id: docSnap.id,
             titre: d.titre,
             prix: d.prix,
-            image: d.image,
+            image: img,
             tag: d.tag,
             section: cfg.section,
             basePath: cfg.basePath,

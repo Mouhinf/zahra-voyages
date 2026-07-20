@@ -41,7 +41,10 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
         const data: Offre[] = [];
         snap.forEach((doc) => {
           const d = doc.data() as Omit<Offre, 'id'>;
-          if ((d as Offre).disponible !== false) data.push({ id: doc.id, ...d });
+          if ((d as Offre).disponible !== false) {
+            const sanitized = { ...d, image: d.image && d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image };
+            data.push({ id: doc.id, ...sanitized });
+          }
         });
         setItems(data);
         setIsLoading(false);
