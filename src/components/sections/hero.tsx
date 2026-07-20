@@ -88,7 +88,7 @@ export default function Hero() {
               Explorer les Destinations
             </Button>
           </Link>
-          <a href="/brochure-slaac-voyages.pdf" download>
+          <a href="/brochure-slaac-voyages.pdf" target="_blank" rel="noopener noreferrer">
             <Button size="lg" variant="secondary" className="w-full sm:w-auto">
               <Download className="mr-2 h-5 w-5" />
               Notre Brochure
