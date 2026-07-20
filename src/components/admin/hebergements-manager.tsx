@@ -31,7 +31,7 @@ const formSchema = z.object({
   descriptionComplete: z.string().optional(),
   prix: z.string().optional(),
   tag: z.string().optional(),
-  type: z.enum(['hotel', 'appartement', 'villa', 'auberge', 'residence']).optional(),
+  type: z.enum(['hotel', 'lodge', 'campement']).optional(),
   localisation: z.string().optional(),
   nombreEtoiles: z.coerce.number().min(0).max(5).optional(),
   capacite: z.string().optional(),
@@ -238,10 +238,8 @@ export default function HebergementsManager() {
                         <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="hotel">Hôtel</SelectItem>
-                          <SelectItem value="appartement">Appartement</SelectItem>
-                          <SelectItem value="villa">Villa</SelectItem>
-                          <SelectItem value="auberge">Auberge</SelectItem>
-                          <SelectItem value="residence">Résidence</SelectItem>
+                          <SelectItem value="lodge">Lodge</SelectItem>
+                          <SelectItem value="campement">Campement</SelectItem>
                         </SelectContent>
                       </Select><FormMessage />
                     </FormItem>

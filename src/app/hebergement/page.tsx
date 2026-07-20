@@ -1,6 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import OffresGrid from '@/components/sections/offres-grid';
+import HebergementGrid from '@/components/sections/hebergement-grid';
 import FaqSection from '@/components/sections/faq-section';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
@@ -43,12 +43,12 @@ export default function HebergementPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/65 to-primary/85 z-10" />
           <div className="relative z-20 text-center px-4 max-w-3xl">
             <span className="inline-block glass-dark px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-4">
-              Hôtels & Résidences
+              Hôtels · Lodges · Campements
             </span>
             <h1 className="text-4xl md:text-6xl font-bold drop-shadow-lg font-headline">Hébergement</h1>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md text-balance">
-              Hôtels, résidences et appartements au Sénégal et à l'international.
+              Hôtels de standing, lodges nature et campements authentiques au Sénégal et à l'international.
             </p>
           </div>
         </section>
@@ -60,10 +60,10 @@ export default function HebergementPage() {
               <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos Hébergements</h2>
               <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">
-                SLAAC Voyages vous ouvre les portes des plus beaux hébergements du Sénégal et d'ailleurs. Grâce à notre réseau de partenaires hôteliers soigneusement sélectionnés, nous négocions pour vous les meilleurs tarifs dans une gamme allant des établissements économiques aux résidences de luxe.
+                Découvrez nos trois catégories d'hébergements soigneusement sélectionnés. Que vous cherchiez le confort d'un hôtel, l'immersion d'un lodge ou l'authenticité d'un campement, nous avons l'offre parfaite pour votre séjour.
               </p>
             </div>
-            <OffresGrid collectionName="hebergements" emptyMessage="Aucun hébergement disponible pour le moment. Contactez-nous pour une recherche personnalisée." detailBasePath="/hebergement" />
+            <HebergementGrid />
           </div>
         </section>
 

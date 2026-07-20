@@ -20,7 +20,7 @@ type OffreBase = {
 };
 
 export type Hebergement = OffreBase & {
-  type: 'hotel' | 'appartement' | 'villa' | 'auberge' | 'residence';
+  type: 'hotel' | 'lodge' | 'campement';
   localisation: string;
   nombreEtoiles: number;
   capacite: string;
