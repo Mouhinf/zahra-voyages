@@ -1,10 +1,11 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import Chatbot from '@/components/chatbot';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
 export const metadata: Metadata = {
   title: 'SLAAC Voyages - Votre Passeport pour le Monde',
@@ -22,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body className={`${inter.variable} font-body antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-body antialiased`}>
         {children}
         <Toaster />
         <Chatbot />

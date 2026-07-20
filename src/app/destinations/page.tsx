@@ -128,18 +128,20 @@ export default function DestinationsPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
-        <section className="py-16 sm:py-24 bg-secondary">
+        <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary">Nos Destinations</h1>
-            <p className="mt-4 text-lg text-secondary-foreground max-w-3xl mx-auto">
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Inspiration</span>
+            <h1 className="mt-2 text-4xl md:text-5xl font-bold text-primary font-headline">Nos Destinations</h1>
+            <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
+            <p className="text-lg text-secondary-foreground max-w-3xl mx-auto text-balance">
               Le monde est à votre portée. Explorez notre sélection de destinations et trouvez l'inspiration pour votre prochaine aventure.
             </p>
           </div>
         </section>
 
-        <section id="destinations" className="py-16 sm:py-24 bg-background">
+        <section id="destinations" className="py-20 sm:py-28 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
-            <Alert className="mb-8 bg-primary/5 border-primary/20 text-primary">
+            <Alert className="mb-10 bg-primary/5 border-primary/20 text-primary">
                 <Info className="h-5 w-5" />
                 <AlertDescription>
                 Les tarifs affichés sont des estimations de départ et peuvent varier en fonction de la saison, de la disponibilité et du moment de la réservation. Pour un devis précis, veuillez nous contacter.
@@ -147,20 +149,20 @@ export default function DestinationsPage() {
             </Alert>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {destinations.map((dest) => (
-                <Card key={dest.name} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                  <div className="relative h-64">
+                <Card key={dest.name} className="overflow-hidden group shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col rounded-2xl border-border/50">
+                  <div className="relative h-64 overflow-hidden">
                     <Image
                       src={dest.image}
                       alt={dest.name}
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                       data-ai-hint={dest.hint}
                     />
-                    <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground">{dest.tag}</Badge>
+                    <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground shadow-md">{dest.tag}</Badge>
                   </div>
-                  <CardContent className="p-4 flex flex-col flex-grow">
-                    <h3 className="text-lg font-semibold text-primary">{dest.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1 flex-grow">{dest.price}</p>
+                  <CardContent className="p-5 flex flex-col flex-grow">
+                    <h3 className="text-lg font-semibold text-primary font-headline">{dest.name}</h3>
+                    <p className="text-sm font-medium text-accent-foreground mt-1 flex-grow">{dest.price}</p>
                     <QuoteRequestDialog>
                       <Button variant="link" className="p-0 mt-2 text-primary self-start">
                         Obtenir un devis <ArrowRight className="ml-2 h-4 w-4" />

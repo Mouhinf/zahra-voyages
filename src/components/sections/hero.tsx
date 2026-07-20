@@ -71,14 +71,18 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/60 z-10" />
 
       {/* Contenu */}
-      <div className="relative z-20 text-center p-4">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight drop-shadow-md font-headline">
+      <div className="relative z-20 text-center px-4 max-w-4xl">
+        <span className="inline-block glass-dark px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-6 text-white">
+          Agence de voyage premium · Dakar
+        </span>
+        <h1 className="text-4xl md:text-7xl font-bold tracking-tight drop-shadow-lg font-headline text-white">
           Votre Passeport pour le Monde
         </h1>
-        <p className="mt-4 text-xl md:text-2xl max-w-3xl mx-auto drop-shadow-md">
+        <div className="w-20 h-0.5 bg-accent mx-auto my-6" />
+        <p className="text-lg md:text-2xl max-w-2xl mx-auto drop-shadow-md text-white/90 text-balance">
           Découvrez des destinations incroyables et vivez des expériences uniques avec SLAAC Voyages.
         </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link href="/destinations">
             <Button size="lg" variant="default" className="w-full sm:w-auto">
               Explorer les Destinations

@@ -79,28 +79,31 @@ export default function ServicesPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
-        <section className="py-16 sm:py-24 bg-secondary">
+        <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary">Nos Services</h1>
-            <p className="mt-4 text-lg text-secondary-foreground max-w-3xl mx-auto">
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Nos prestations</span>
+            <h1 className="mt-2 text-4xl md:text-5xl font-bold text-primary font-headline">Nos Services</h1>
+            <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
+            <p className="text-lg text-secondary-foreground max-w-3xl mx-auto text-balance">
               De la simple réservation de billet à l'organisation complète de votre séjour de rêve, découvrez tout ce que nous pouvons faire pour vous.
             </p>
           </div>
         </section>
 
-        <section className="py-16 sm:py-24 bg-background">
+        <section className="py-20 sm:py-28 bg-background">
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h2 className="text-3xl md:text-4xl font-bold text-primary">Un Service Complet pour un Voyage Serein</h2>
-                        <p className="mt-4 text-lg text-muted-foreground">
+                        <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Un Service Complet pour un Voyage Serein</h2>
+                        <div className="w-12 h-0.5 bg-accent my-5" />
+                        <p className="text-lg text-muted-foreground">
                             Chez SLAAC Voyages, notre mission est de rendre votre expérience de voyage aussi simple et agréable que possible. Nous comprenons que chaque voyageur est unique, c'est pourquoi nous offrons une gamme de services entièrement personnalisables pour répondre à vos moindres désirs.
                         </p>
                         <p className="mt-4 text-muted-foreground">
                             Grâce à notre expertise et à notre réseau de partenaires mondiaux, nous nous occupons de tous les détails, des plus simples aux plus complexes. Vous n'avez qu'à faire vos valises et vous préparer à créer des souvenirs inoubliables.
                         </p>
                     </div>
-                    <div className="relative h-80 lg:h-full min-h-[300px] w-full rounded-lg overflow-hidden shadow-lg">
+                    <div className="relative h-80 lg:h-full min-h-[300px] w-full rounded-2xl overflow-hidden shadow-xl">
                         <Image
                             src="/passport.jpg"
                             alt="Service client de l'agence de voyage"
@@ -113,30 +116,31 @@ export default function ServicesPage() {
             </div>
         </section>
 
-        <section id="services" className="py-16 sm:py-24 bg-secondary/50">
+        <section id="services" className="py-20 sm:py-28 bg-secondary/50">
             <div className="container mx-auto max-w-7xl px-4 text-center">
-                <Button onClick={() => setShowTourismServices(!showTourismServices)} size="lg">
-                    {showTourismServices ? 'Masquer les Services Tourisme' : 'Découvrir nos Services Tourisme'}
-                </Button>
-                <Button onClick={() => setShowImportExportServices(!showImportExportServices)} size="lg" className="ml-4">
-                    {showImportExportServices ? 'Masquer l\'Assistance importation et exportation' : 'Assistance importation et exportation'}
-                </Button>
-                {/* Removed button for Vehicle Services */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button onClick={() => setShowTourismServices(!showTourismServices)} size="lg">
+                      {showTourismServices ? 'Masquer les Services Tourisme' : 'Découvrir nos Services Tourisme'}
+                  </Button>
+                  <Button onClick={() => setShowImportExportServices(!showImportExportServices)} size="lg">
+                      {showImportExportServices ? "Masquer l'Assistance importation et exportation" : 'Assistance importation et exportation'}
+                  </Button>
+                </div>
 
                 {showTourismServices && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-14">
                       {services.map((service) => (
-                        <Card key={service.title} className="text-center flex flex-col items-center p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 bg-background">
-                            <div className="bg-primary/10 rounded-full p-4 mb-4">
+                        <Card key={service.title} className="text-center flex flex-col items-center p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-background rounded-2xl border-border/50">
+                            <div className="bg-primary/10 rounded-full p-4 mb-5">
                               {service.icon}
                             </div>
                             <CardHeader className="p-0">
-                              <CardTitle className="text-xl font-semibold text-primary">{service.title}</CardTitle>
+                              <CardTitle className="text-xl font-semibold text-primary font-headline">{service.title}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0 mt-2 flex-grow">
-                              <p className="text-muted-foreground">{service.description}</p>
+                              <p className="text-muted-foreground leading-relaxed">{service.description}</p>
                             </CardContent>
-                            <div className="mt-4">
+                            <div className="mt-5">
                               <QuoteRequestDialog>
                                 <Button variant="link">Demander un devis</Button>
                               </QuoteRequestDialog>
@@ -147,19 +151,19 @@ export default function ServicesPage() {
                 )}
 
                 {showImportExportServices && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-14">
                       {importExportServices.map((service) => (
-                        <Card key={service.title} className="text-center flex flex-col items-center p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 bg-background">
-                            <div className="bg-primary/10 rounded-full p-4 mb-4">
+                        <Card key={service.title} className="text-center flex flex-col items-center p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-background rounded-2xl border-border/50">
+                            <div className="bg-primary/10 rounded-full p-4 mb-5">
                               {service.icon}
                             </div>
                             <CardHeader className="p-0">
-                              <CardTitle className="text-xl font-semibold text-primary">{service.title}</CardTitle>
+                              <CardTitle className="text-xl font-semibold text-primary font-headline">{service.title}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0 mt-2 flex-grow">
-                              <p className="text-muted-foreground">{service.description}</p>
+                              <p className="text-muted-foreground leading-relaxed">{service.description}</p>
                             </CardContent>
-                            <div className="mt-4">
+                            <div className="mt-5">
                               <QuoteRequestDialog>
                                 <Button variant="link">Demander un devis</Button>
                               </QuoteRequestDialog>
@@ -168,8 +172,6 @@ export default function ServicesPage() {
                       ))}
                     </div>
                 )}
-
-                {/* Removed conditional rendering for Vehicle Services */}
             </div>
         </section>
       </main>

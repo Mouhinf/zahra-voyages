@@ -24,7 +24,9 @@ export default function HomeAbout() {
             <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none" />
           </div>
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Votre Partenaire de Confiance pour des Voyages Inoubliables</h2>
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">À propos</span>
+            <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Votre Partenaire de Confiance pour des Voyages Inoubliables</h2>
+            <div className="w-12 h-0.5 bg-accent my-5" />
             <p className="mt-4 text-lg text-muted-foreground">
               Fondée à Dakar, SLAAC Voyages est une agence de voyage passionnée qui transforme vos rêves d'évasion en réalités. Depuis plus de 15 ans, nous accompagnons les voyageurs sénégalais et internationaux vers les plus belles destinations.
             </p>

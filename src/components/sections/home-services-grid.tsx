@@ -95,8 +95,10 @@ export default function HomeServicesGrid() {
     <section id="services" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Nos 6 Services pour Voyager Serein</h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Nos prestations</span>
+          <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos 6 Services pour Voyager Serein</h2>
+          <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">
             SLAAC Voyages couvre l'ensemble de vos besoins de voyage, du billet d'avion à l'organisation complète de votre séjour.
           </p>
         </div>

@@ -52,15 +52,17 @@ export default function ContactPage() {
     <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow">
-            <section className="py-16 sm:py-24 bg-secondary">
+            <section className="py-20 sm:py-28 bg-secondary">
                 <div className="container mx-auto max-w-7xl px-4 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-primary">Contactez-Nous</h1>
-                    <p className="mt-4 text-lg text-secondary-foreground max-w-3xl mx-auto">
+                    <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Restons en contact</span>
+                    <h1 className="mt-2 text-4xl md:text-5xl font-bold text-primary font-headline">Contactez-Nous</h1>
+                    <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
+                    <p className="text-lg text-secondary-foreground max-w-3xl mx-auto text-balance">
                     Une question ? Un projet de voyage ? N'hésitez pas à nous contacter. Notre équipe est à votre écoute pour vous aider à concrétiser vos envies d'évasion.
                     </p>
                 </div>
             </section>
-            <section id="contact" className="py-16 sm:py-24 bg-background">
+            <section id="contact" className="py-20 sm:py-28 bg-background">
                 <div className="container mx-auto max-w-7xl px-4">
                     <div className="grid lg:grid-cols-2 gap-8 items-start">
                     <div className="space-y-6">

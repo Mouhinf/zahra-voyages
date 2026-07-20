@@ -65,21 +65,21 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
       {items.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item) => (
-            <Card key={item.id} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-              <div className="relative h-64">
+            <Card key={item.id} className="overflow-hidden group shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col rounded-2xl border-border/50">
+              <div className="relative h-64 overflow-hidden">
                 <Image
                   src={item.image}
                   alt={item.titre}
                   fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground">{item.tag}</Badge>
+                <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground shadow-md">{item.tag}</Badge>
               </div>
-              <CardContent className="p-4 flex flex-col flex-grow">
-                <h3 className="text-lg font-semibold text-primary">{item.titre}</h3>
+              <CardContent className="p-5 flex flex-col flex-grow">
+                <h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3>
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
-                <p className="text-sm font-medium text-primary mt-2">{item.prix}</p>
-                <div className="flex items-center gap-2 mt-2">
+                <p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p>
+                <div className="flex items-center gap-2 mt-4">
                   {detailBasePath && (
                     <Link href={`${detailBasePath}/${item.id}`}>
                       <Button variant="outline" size="sm">

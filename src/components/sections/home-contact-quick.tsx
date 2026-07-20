@@ -71,8 +71,10 @@ export default function HomeContactQuick() {
     <section id="contact-quick" className="py-16 sm:py-24 bg-white">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Parlons de Votre Projet</h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary/60">Contact</span>
+          <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Parlons de Votre Projet</h2>
+          <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
             Une question, un devis, une envie d'évasion ? Écrivez-nous ou contactez-nous directement sur WhatsApp.
           </p>
         </div>
