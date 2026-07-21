@@ -6,14 +6,58 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Send } from 'lucide-react';
 import { QuoteRequestDialog } from './quote-request-dialog';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
+import { cn } from '@/lib/utils';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
-  { href: '/hebergement', label: 'Hébergement' },
-  { href: '/transport', label: 'Transport' },
-  { href: '/voyages-croisieres', label: 'Voyages & Croisières' },
-  { href: '/excursions', label: 'Excursions' },
-  { href: '/tourisme-affaires', label: "Tourisme d'Affaires" },
+  {
+    href: '/hebergement',
+    label: 'Hébergement',
+    subItems: [
+      { href: '/hebergement?categorie=hotel', label: 'Hôtels', description: 'Confort et service haut de gamme' },
+      { href: '/hebergement?categorie=lodge', label: 'Lodges', description: 'Nature et immersions authentiques' },
+      { href: '/hebergement?categorie=campement', label: 'Campements', description: 'Aventure et traditions locales' },
+    ],
+  },
+  {
+    href: '/transport',
+    label: 'Transport',
+    subItems: [
+      { href: '/transport?categorie=billet', label: 'Billets d\'avion', description: 'Vers toutes les destinations' },
+      { href: '/transport?categorie=transfert', label: 'Transferts', description: 'Aéroport et plage' },
+      { href: '/transport?categorie=location', label: 'Location', description: 'Voiture avec chauffeur' },
+    ],
+  },
+  {
+    href: '/voyages-croisieres',
+    label: 'Voyages & Croisières',
+    subItems: [
+      { href: '/voyages-croisieres', label: 'Circuits', description: 'Voyages sur mesure' },
+      { href: '/voyages-croisieres', label: 'Croisières', description: 'Vers les plus belles destinations' },
+    ],
+  },
+  {
+    href: '/excursions',
+    label: 'Excursions',
+    subItems: [
+      { href: '/excursions', label: 'Visites Guidées', description: 'Au cœur du Sénégal et au-delà' },
+    ],
+  },
+  {
+    href: '/tourisme-affaires',
+    label: "Tourisme d'Affaires",
+    subItems: [
+      { href: '/tourisme-affaires', label: 'MICE & Événementiel', description: 'Séminaires, incentives, congrès' },
+    ],
+  },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -23,12 +67,39 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
+function ListItem({
+  href,
+  label,
+  description,
+}: {
+  href: string;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <NavigationMenuLink asChild>
+      <Link
+        href={href}
+        className={cn(
+          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        )}
+      >
+        <div className="text-sm font-medium leading-none">{label}</div>
+        {description && (
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {description}
+          </p>
+        )}
+      </Link>
+    </NavigationMenuLink>
+  );
+}
 
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
               src="/logo-slaac.png"
               alt="SLAAC Voyages"
@@ -40,19 +111,47 @@ export default function Header() {
             <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
           </Link>
 
-        <nav className="hidden md:flex gap-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList>
+            {navLinks.map((link) => {
+              if ('subItems' in link && link.subItems) {
+                return (
+                  <NavigationMenuItem key={link.href}>
+                    <NavigationMenuTrigger className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary data-[state=open]:text-primary">
+                      {link.label}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[280px] gap-1 p-3">
+                        {link.subItems.map((sub) => (
+                          <li key={sub.label}>
+                            <ListItem href={sub.href} label={sub.label} description={sub.description} />
+                          </li>
+                        ))}
+                        <li className="border-t pt-2 mt-1">
+                          <ListItem href={link.href} label={`Tout voir →`} description={`Tous les ${link.label.toLowerCase()}`} />
+                        </li>
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                );
+              }
+              return (
+                <NavigationMenuItem key={link.href}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={link.href}
+                      className="inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary focus:text-primary"
+                    >
+                      {link.label}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              );
+            })}
+          </NavigationMenuList>
+        </NavigationMenu>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
             <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp">
                 <Button variant="outline" size="icon" className="hidden sm:flex">
                     <WhatsAppIcon className="h-5 w-5 fill-current" />
