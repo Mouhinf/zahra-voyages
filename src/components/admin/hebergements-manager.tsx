@@ -24,6 +24,7 @@ import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
+import { hebergementEnrichments } from '@/data/hebergement-enrichments';
 
 const formSchema = z.object({
   titre: z.string().optional(),
@@ -68,7 +69,7 @@ export default function HebergementsManager() {
     const q = query(collection(getDbInstance(), 'hebergements'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: Hebergement[] = [];
-      snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Hebergement));
+      snap.forEach((doc) => data.push({ id: doc.id, ...doc.data(), ...hebergementEnrichments[doc.id] } as Hebergement));
       setItems(data);
       setIsLoading(false);
     });
