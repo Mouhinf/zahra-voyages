@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { getDbInstance } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Excursion } from '@/types';
+import { getFeaturedExcursion } from '@/data/featured-excursions';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
@@ -26,11 +27,11 @@ export default function ExcursionDetailPage() {
       if (!params?.id) return;
       try {
         const snap = await getDoc(doc(getDbInstance(), 'excursions', params.id as string));
-        if (snap.exists()) {
-          setItem({ id: snap.id, ...snap.data() } as Excursion);
-        }
+        if (snap.exists()) setItem({ id: snap.id, ...snap.data() } as Excursion);
+        else setItem(getFeaturedExcursion(params.id as string) || null);
       } catch (e) {
         console.error('Erreur:', e);
+        setItem(getFeaturedExcursion(params.id as string) || null);
       } finally {
         setIsLoading(false);
       }
@@ -183,8 +184,7 @@ export default function ExcursionDetailPage() {
 
               <div className="lg:col-span-1">
                 <div className="sticky top-6 border rounded-xl p-6 shadow-lg bg-card">
-                  <p className="text-3xl font-bold text-primary">{item.prix}</p>
-                  <p className="text-sm text-muted-foreground mb-6">Tarif indicatif</p>
+                  {item.prix && <><p className="text-3xl font-bold text-primary">{item.prix}</p><p className="text-sm text-muted-foreground mb-6">Tarif indicatif</p></>}
 
                   <div className="space-y-2 mb-6 text-sm">
                     <div className="flex justify-between">

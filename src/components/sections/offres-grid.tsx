@@ -26,28 +26,35 @@ type OffresGridProps = {
   collectionName: string;
   emptyMessage: string;
   detailBasePath?: string;
+  staticItems?: Offre[];
 };
 
-export default function OffresGrid({ collectionName, emptyMessage, detailBasePath }: OffresGridProps) {
+export default function OffresGrid({ collectionName, emptyMessage, detailBasePath, staticItems = [] }: OffresGridProps) {
   const [items, setItems] = useState<Offre[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const q = query(collection(getDbInstance(), collectionName), orderBy('ordre', 'asc'));
-      const snap = await getDocs(q);
-      if (mounted) {
-        const data: Offre[] = [];
-        snap.forEach((doc) => {
-          const d = doc.data() as Omit<Offre, 'id'>;
-          if ((d as Offre).disponible !== false) {
-            const sanitized = { ...d, image: d.image && d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image };
-            data.push({ id: doc.id, ...sanitized });
-          }
-        });
-        setItems(data);
-        setIsLoading(false);
+      try {
+        const q = query(collection(getDbInstance(), collectionName), orderBy('ordre', 'asc'));
+        const snap = await getDocs(q);
+        if (mounted) {
+          const data: Offre[] = [];
+          snap.forEach((doc) => {
+            const d = doc.data() as Omit<Offre, 'id'>;
+            if ((d as Offre).disponible !== false) {
+              const sanitized = { ...d, image: d.image && d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image };
+              data.push({ id: doc.id, ...sanitized });
+            }
+          });
+          setItems([...data, ...staticItems]);
+        }
+      } catch (error) {
+        console.error(`Erreur fetch ${collectionName}:`, error);
+        if (mounted) setItems(staticItems);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
     })();
     return () => { mounted = false; };
@@ -83,7 +90,7 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
               <CardContent className="p-5 flex flex-col flex-grow">
                 <h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3>
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
-                <p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p>
+                {item.prix && <p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p>}
                 <div className="flex items-center gap-2 mt-4">
                   {detailBasePath && (
                     <Link href={`${detailBasePath}/${item.id}`}>
