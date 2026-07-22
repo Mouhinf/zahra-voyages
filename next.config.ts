@@ -36,6 +36,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'www.au-senegal.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.laresidencedakar.com',
       }
     ],
   },

@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
+import { hebergementEnrichments } from '@/data/hebergement-enrichments';
 
 type Offre = {
   id: string;
@@ -44,13 +45,18 @@ export default function HebergementGrid() {
         const data: Offre[] = [];
         snap.forEach((docSnap) => {
           const d = docSnap.data() as Omit<Offre, 'id'>;
-          if (d.disponible !== false) data.push({ id: docSnap.id, ...d });
+          if (d.disponible !== false) data.push({ id: docSnap.id, ...d, ...hebergementEnrichments[docSnap.id] });
         });
         if (mounted) {
           setItems(data);
-          // Auto-select first non-empty category
-          const firstWithItems = CATEGORIES.find((c) => data.some((d) => d.type === c.key));
-          if (firstWithItems) setActiveCategory(firstWithItems.key);
+          const params = new URLSearchParams(window.location.search);
+          const catParam = params.get('cat');
+          if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
+            setActiveCategory(catParam);
+          } else {
+            const firstWithItems = CATEGORIES.find((c) => data.some((d) => d.type === c.key));
+            if (firstWithItems) setActiveCategory(firstWithItems.key);
+          }
         }
       } catch (e) {
         console.error('Erreur fetch hebergements:', e);

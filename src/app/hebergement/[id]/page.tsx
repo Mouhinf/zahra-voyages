@@ -5,13 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import { getDbInstance } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Hebergement } from '@/types';
+import { getHebergementEnrichment } from '@/data/hebergement-enrichments';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, Star, Users, Loader2, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Users, Loader2, ChevronLeft, ChevronRight, Check, X, MessageCircle } from 'lucide-react';
 
 export default function HebergementDetailPage() {
   const params = useParams();
@@ -27,7 +28,8 @@ export default function HebergementDetailPage() {
       try {
         const snap = await getDoc(doc(getDbInstance(), 'hebergements', params.id as string));
         if (snap.exists()) {
-          setItem({ id: snap.id, ...snap.data() } as Hebergement);
+          const storedItem = { id: snap.id, ...snap.data() } as Hebergement;
+          setItem({ ...storedItem, ...getHebergementEnrichment(snap.id) });
         }
       } catch (e) {
         console.error('Erreur:', e);
@@ -248,6 +250,14 @@ export default function HebergementDetailPage() {
                       Demander un devis
                     </Button>
                   </QuoteRequestDialog>
+                  <a
+                    href={`https://wa.me/221775396325?text=${encodeURIComponent(`Bonjour, je souhaite des informations sur ${item.titre}.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-green-600 bg-green-600/10 px-4 text-sm font-medium text-green-700 transition-colors hover:bg-green-600 hover:text-white"
+                  >
+                    <MessageCircle className="h-4 w-4" /> Contacter sur WhatsApp
+                  </a>
                   <p className="text-xs text-center text-muted-foreground mt-3">
                     Réponse sous 24h · Devis gratuit et sans engagement
                   </p>
