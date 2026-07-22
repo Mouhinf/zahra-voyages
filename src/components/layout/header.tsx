@@ -13,7 +13,7 @@ const navLinks = [
   { href: '/transport', label: 'Transport' },
   { href: '/voyages-croisieres', label: 'Voyages & Croisières' },
   { href: '/excursions', label: 'Excursions' },
-  { href: '/tourisme-affaires', label: "Tourisme d'Affaires" },
+  { href: '/tourisme-affaires', label: 'Tourisme' },
   { href: '/contact', label: 'Contact' },
 ];
 
