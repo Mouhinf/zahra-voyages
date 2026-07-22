@@ -27,9 +27,11 @@ type OffresGridProps = {
   emptyMessage: string;
   detailBasePath?: string;
   staticItems?: Offre[];
+  hidePrices?: boolean;
+  enrichments?: Record<string, Partial<Offre>>;
 };
 
-export default function OffresGrid({ collectionName, emptyMessage, detailBasePath, staticItems = [] }: OffresGridProps) {
+export default function OffresGrid({ collectionName, emptyMessage, detailBasePath, staticItems = [], hidePrices = false, enrichments = {} }: OffresGridProps) {
   const [items, setItems] = useState<Offre[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,7 +47,7 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
             const d = doc.data() as Omit<Offre, 'id'>;
             if ((d as Offre).disponible !== false) {
               const sanitized = { ...d, image: d.image && d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image };
-              data.push({ id: doc.id, ...sanitized });
+              data.push({ id: doc.id, ...sanitized, ...enrichments[doc.id] });
             }
           });
           setItems([...data, ...staticItems]);
@@ -69,7 +71,7 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
       <Alert className="mb-8 bg-primary/5 border-primary/20 text-primary">
         <Info className="h-5 w-5" />
         <AlertDescription>
-          Les tarifs affichés sont des estimations de départ et peuvent varier selon la saison, la disponibilité et le moment de la réservation. Pour un devis précis, veuillez nous contacter.
+          {hidePrices ? 'Toutes nos excursions sont proposées sur devis, selon vos dates et vos besoins.' : 'Les tarifs affichés sont des estimations de départ et peuvent varier selon la saison, la disponibilité et le moment de la réservation. Pour un devis précis, veuillez nous contacter.'}
         </AlertDescription>
       </Alert>
       {items.length > 0 ? (
@@ -90,7 +92,7 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
               <CardContent className="p-5 flex flex-col flex-grow">
                 <h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3>
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
-                {item.prix && <p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p>}
+                {!hidePrices && item.prix && <p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p>}
                 <div className="flex items-center gap-2 mt-4">
                   {detailBasePath && (
                     <Link href={`${detailBasePath}/${item.id}`}>

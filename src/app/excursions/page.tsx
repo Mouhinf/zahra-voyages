@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
 import { featuredExcursions } from '@/data/featured-excursions';
+import { excursionEnrichments } from '@/data/excursion-enrichments';
 
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504521/hero-section-excursions.jpg';
 
@@ -44,7 +45,7 @@ export default function ExcursionsPage() {
                 Découvrez les sites incontournables et les trésors cachés du Sénégal avec nos excursions guidées, de la demi-journée au séjour de plusieurs jours.
               </p>
             </div>
-            <OffresGrid collectionName="excursions" emptyMessage="Aucune excursion disponible pour le moment. Contactez-nous pour une excursion sur mesure." detailBasePath="/excursions" staticItems={featuredExcursions} />
+            <OffresGrid collectionName="excursions" emptyMessage="Aucune excursion disponible pour le moment. Contactez-nous pour une excursion sur mesure." detailBasePath="/excursions" staticItems={featuredExcursions} hidePrices enrichments={excursionEnrichments} />
           </div>
         </section>
 
