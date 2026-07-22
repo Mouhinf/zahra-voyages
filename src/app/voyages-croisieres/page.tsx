@@ -1,6 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import OffresGrid from '@/components/sections/offres-grid';
+import VoyagesCroisieresGrid from '@/components/sections/voyages-croisieres-grid';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
@@ -42,7 +42,7 @@ export default function VoyagesCroisieresPage() {
                 Explorez le monde avec nos packages de voyage et nos croisières soigneusement sélectionnés. Vol, hôtel, transferts et activités inclus.
               </p>
             </div>
-            <OffresGrid collectionName="voyagesCroisieres" emptyMessage="Aucun voyage ou croisière disponible pour le moment. Contactez-nous pour un voyage sur mesure." detailBasePath="/voyages-croisieres" />
+            <VoyagesCroisieresGrid />
           </div>
         </section>
 
