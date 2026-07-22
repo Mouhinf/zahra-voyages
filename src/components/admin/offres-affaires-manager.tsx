@@ -31,7 +31,7 @@ const formSchema = z.object({
   descriptionComplete: z.string().optional(),
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
-  type: z.enum(['seminaire', 'incentive', 'mice', 'mission_sur_mesure']),
+  type: z.enum(['tourisme_religieux', 'tourisme_local', 'tourisme_linguistique', 'tourisme_affaires']),
   capacite: z.string().min(2, 'Veuillez entrer une capacité.'),
   lieu: z.string().min(2, 'Veuillez entrer un lieu.'),
   duree: z.string().min(2, 'Veuillez entrer une durée.'),
@@ -58,7 +58,7 @@ export default function OffresAffairesManager() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'seminaire',
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'tourisme_affaires',
       capacite: '', lieu: '', duree: '', services: '',
       disponible: true, ordre: 0,
     },
@@ -80,7 +80,7 @@ export default function OffresAffairesManager() {
     setGalleryFiles([]);
     setMainImageFile(null);
     form.reset({
-      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'seminaire',
+      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'tourisme_affaires',
       capacite: '', lieu: '', duree: '', services: '',
       disponible: true, ordre: 0,
     });
@@ -97,7 +97,7 @@ export default function OffresAffairesManager() {
       descriptionComplete: item.descriptionComplete || '',
       prix: item.prix,
       tag: item.tag,
-      type: item.type,
+      type: ['seminaire', 'incentive', 'mice', 'mission_sur_mesure'].includes(item.type) ? 'tourisme_affaires' : item.type,
       capacite: item.capacite,
       lieu: item.lieu,
       duree: item.duree,
@@ -197,15 +197,16 @@ export default function OffresAffairesManager() {
   }
 
   const typeLabels: Record<string, string> = {
-    seminaire: 'Séminaire', incentive: 'Incentive', mice: 'MICE', mission_sur_mesure: 'Mission sur mesure',
+    tourisme_religieux: 'Tourisme religieux', tourisme_local: 'Tourisme local', tourisme_linguistique: 'Tourisme linguistique', tourisme_affaires: "Tourisme d'affaires",
+    seminaire: 'Tourisme d’affaires', incentive: 'Tourisme d’affaires', mice: 'Tourisme d’affaires', mission_sur_mesure: 'Tourisme d’affaires',
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-semibold">Gérer le Tourisme d'Affaires</h2>
-          <p className="text-muted-foreground">Ajoutez et modifiez les offres MICE.</p>
+          <h2 className="text-2xl font-semibold">Gérer le Tourisme</h2>
+          <p className="text-muted-foreground">Ajoutez et modifiez les offres par catégorie.</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -213,7 +214,7 @@ export default function OffresAffairesManager() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingItem ? 'Modifier' : 'Nouvelle'} Offre d'Affaires</DialogTitle>
+              <DialogTitle>{editingItem ? 'Modifier' : 'Nouvelle'} offre de tourisme</DialogTitle>
               <DialogDescription>Remplissez les informations ci-dessous.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -241,10 +242,10 @@ export default function OffresAffairesManager() {
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
                         <SelectContent>
-                          <SelectItem value="seminaire">Séminaire</SelectItem>
-                          <SelectItem value="incentive">Incentive</SelectItem>
-                          <SelectItem value="mice">MICE</SelectItem>
-                          <SelectItem value="mission_sur_mesure">Mission sur mesure</SelectItem>
+                          <SelectItem value="tourisme_religieux">Tourisme religieux</SelectItem>
+                          <SelectItem value="tourisme_local">Tourisme local</SelectItem>
+                          <SelectItem value="tourisme_linguistique">Tourisme linguistique</SelectItem>
+                          <SelectItem value="tourisme_affaires">Tourisme d'affaires</SelectItem>
                         </SelectContent>
                       </Select><FormMessage />
                     </FormItem>

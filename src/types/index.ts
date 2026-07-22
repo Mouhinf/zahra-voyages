@@ -61,7 +61,7 @@ export type Excursion = OffreBase & {
 };
 
 export type OffreAffaires = OffreBase & {
-  type: 'seminaire' | 'incentive' | 'mice' | 'mission_sur_mesure';
+  type: 'tourisme_religieux' | 'tourisme_local' | 'tourisme_linguistique' | 'tourisme_affaires' | 'seminaire' | 'incentive' | 'mice' | 'mission_sur_mesure';
   capacite: string;
   lieu: string;
   duree: string;
