@@ -6,6 +6,7 @@ import { getDbInstance } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Hebergement } from '@/types';
 import { getHebergementEnrichment } from '@/data/hebergement-enrichments';
+import { getFeaturedHebergement } from '@/data/featured-hebergements';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
@@ -30,9 +31,10 @@ export default function HebergementDetailPage() {
         if (snap.exists()) {
           const storedItem = { id: snap.id, ...snap.data() } as Hebergement;
           setItem({ ...storedItem, ...getHebergementEnrichment(snap.id) });
-        }
+        } else setItem((getFeaturedHebergement(params.id as string) as Hebergement) || null);
       } catch (e) {
         console.error('Erreur:', e);
+        setItem((getFeaturedHebergement(params.id as string) as Hebergement) || null);
       } finally {
         setIsLoading(false);
       }
@@ -92,7 +94,7 @@ export default function HebergementDetailPage() {
   }
 
   const typeLabels: Record<string, string> = {
-    hotel: 'Hôtel', appartement: 'Appartement', villa: 'Villa', auberge: 'Auberge', residence: 'Résidence',
+    hotel: 'Hôtel', lodge: 'Lodge', campement: 'Campement', appartement: 'Appartement', villa: 'Villa', auberge: 'Auberge', residence: 'Résidence',
   };
 
   return (

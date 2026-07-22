@@ -13,6 +13,7 @@ import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { hebergementEnrichments } from '@/data/hebergement-enrichments';
+import { featuredHebergements } from '@/data/featured-hebergements';
 
 type Offre = {
   id: string;
@@ -48,13 +49,18 @@ export default function HebergementGrid() {
           if (d.disponible !== false) data.push({ id: docSnap.id, ...d, ...hebergementEnrichments[docSnap.id] });
         });
         if (mounted) {
-          setItems(data);
+          const existingIds = new Set(data.map((item) => item.id));
+          const combinedItems = [
+            ...data,
+            ...featuredHebergements.filter((item) => !existingIds.has(item.id)),
+          ];
+          setItems(combinedItems);
           const params = new URLSearchParams(window.location.search);
           const catParam = params.get('cat');
           if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
             setActiveCategory(catParam);
           } else {
-            const firstWithItems = CATEGORIES.find((c) => data.some((d) => d.type === c.key));
+            const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
             if (firstWithItems) setActiveCategory(firstWithItems.key);
           }
         }
