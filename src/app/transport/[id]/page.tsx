@@ -11,8 +11,12 @@ import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User } from 'lucide-react';
+import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User, MessageCircle } from 'lucide-react';
 import { featuredDestinations } from '@/data/featured-destinations';
+import { featuredTransfertsAeroport } from '@/data/featured-transferts';
+
+const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport];
+const WHATSAPP_NUMBER = '221775396325';
 
 export default function TransportDetailPage() {
   const params = useParams();
@@ -30,12 +34,12 @@ export default function TransportDetailPage() {
         if (snap.exists()) {
           setItem({ id: snap.id, ...snap.data() } as Transport);
         } else {
-          const featured = featuredDestinations.find((destination) => destination.id === params.id);
+          const featured = featuredTransportOffers.find((destination) => destination.id === params.id);
           if (featured) setItem(featured);
         }
       } catch (e) {
         console.error('Erreur:', e);
-        const featured = featuredDestinations.find((destination) => destination.id === params.id);
+        const featured = featuredTransportOffers.find((destination) => destination.id === params.id);
         if (featured) setItem(featured);
       } finally {
         setIsLoading(false);
@@ -250,6 +254,16 @@ export default function TransportDetailPage() {
                       Demander un devis
                     </Button>
                   </QuoteRequestDialog>
+                  <a
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Bonjour, je souhaiterais obtenir un devis pour ${item.titre}.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mt-3"
+                  >
+                    <Button variant="outline" size="lg" className="w-full border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800">
+                      <MessageCircle className="mr-2 h-5 w-5" /> WhatsApp
+                    </Button>
+                  </a>
                   <p className="text-xs text-center text-muted-foreground mt-3">
                     Réponse sous 24h · Devis gratuit et sans engagement
                   </p>

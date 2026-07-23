@@ -13,8 +13,10 @@ import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { featuredDestinations, allWorldDestinationsMessage } from '@/data/featured-destinations';
+import { featuredTransfertsAeroport } from '@/data/featured-transferts';
 
 const WHATSAPP_NUMBER = '221775396325';
+const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport];
 
 type Offre = {
   id: string;
@@ -54,7 +56,7 @@ export default function TransportGrid() {
           const existingIds = new Set(data.map((item) => item.id));
           const combinedItems = [
             ...data,
-            ...featuredDestinations.filter((item) => !existingIds.has(item.id)),
+            ...featuredTransportOffers.filter((item) => !existingIds.has(item.id)),
           ];
           setItems(combinedItems);
           const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
@@ -63,7 +65,7 @@ export default function TransportGrid() {
       } catch (e) {
         console.error('Erreur fetch transports:', e);
         if (mounted) {
-          setItems(featuredDestinations);
+          setItems(featuredTransportOffers);
           setActiveCategory('billet_avion');
         }
       } finally {
@@ -146,20 +148,20 @@ export default function TransportGrid() {
               <CardContent className="p-5 flex flex-col flex-grow">
                 <h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3>
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
-                {activeCategory === 'location_voiture' ? (
+                {activeCategory === 'location_voiture' || activeCategory === 'transfert_aeroport' ? (
                   <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-border/50">
                     <Link href={`/transport/${item.id}`}>
                       <Button variant="outline" size="sm" className="w-full">
                         <Eye className="mr-2 h-4 w-4" /> Voir les détails
                       </Button>
                     </Link>
-                    <QuoteRequestDialog defaultDestination={`Location ${item.titre} avec chauffeur`}>
+                    <QuoteRequestDialog defaultDestination={`${activeCategory === 'transfert_aeroport' ? 'Transfert aéroport' : 'Location'} ${item.titre}`}>
                       <Button variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
                         Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </QuoteRequestDialog>
                     <a
-                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Bonjour, je souhaiterais obtenir un devis pour la location d'un ${item.titre} avec chauffeur.`)}`}
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(activeCategory === 'transfert_aeroport' ? `Bonjour, je souhaiterais obtenir un devis pour un transfert aéroport avec ${item.titre}.` : `Bonjour, je souhaiterais obtenir un devis pour la location d'un ${item.titre} avec chauffeur.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full"
