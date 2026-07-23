@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User } from 'lucide-react';
+import { featuredDestinations } from '@/data/featured-destinations';
 
 export default function TransportDetailPage() {
   const params = useParams();
@@ -28,9 +29,14 @@ export default function TransportDetailPage() {
         const snap = await getDoc(doc(getDbInstance(), 'transports', params.id as string));
         if (snap.exists()) {
           setItem({ id: snap.id, ...snap.data() } as Transport);
+        } else {
+          const featured = featuredDestinations.find((destination) => destination.id === params.id);
+          if (featured) setItem(featured);
         }
       } catch (e) {
         console.error('Erreur:', e);
+        const featured = featuredDestinations.find((destination) => destination.id === params.id);
+        if (featured) setItem(featured);
       } finally {
         setIsLoading(false);
       }
@@ -90,7 +96,7 @@ export default function TransportDetailPage() {
   }
 
   const typeLabels: Record<string, string> = {
-    location_voiture: 'Location voiture', vtc: 'VTC / Chauffeur', transfert_aeroport: 'Transfert aéroport', bus_prive: 'Bus privé',
+    billet_avion: 'Billet d’avion', location_voiture: 'Location voiture', vtc: 'VTC / Chauffeur', transfert_aeroport: 'Transfert aéroport', bus_prive: 'Bus privé',
   };
 
   return (
