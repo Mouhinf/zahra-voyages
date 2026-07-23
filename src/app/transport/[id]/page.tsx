@@ -14,8 +14,9 @@ import Image from 'next/image';
 import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User, MessageCircle } from 'lucide-react';
 import { featuredDestinations } from '@/data/featured-destinations';
 import { featuredTransfertsAeroport } from '@/data/featured-transferts';
+import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
 
-const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport];
+const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport, ...featuredTransfertsPlage];
 const WHATSAPP_NUMBER = '221775396325';
 
 export default function TransportDetailPage() {

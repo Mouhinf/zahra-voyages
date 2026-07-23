@@ -14,9 +14,10 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { featuredDestinations, allWorldDestinationsMessage } from '@/data/featured-destinations';
 import { featuredTransfertsAeroport } from '@/data/featured-transferts';
+import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
 
 const WHATSAPP_NUMBER = '221775396325';
-const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport];
+const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport, ...featuredTransfertsPlage];
 
 type Offre = {
   id: string;
@@ -148,20 +149,20 @@ export default function TransportGrid() {
               <CardContent className="p-5 flex flex-col flex-grow">
                 <h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3>
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
-                {activeCategory === 'location_voiture' || activeCategory === 'transfert_aeroport' ? (
+                {activeCategory === 'location_voiture' || activeCategory === 'transfert_aeroport' || activeCategory === 'transfert_plage' ? (
                   <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-border/50">
                     <Link href={`/transport/${item.id}`}>
                       <Button variant="outline" size="sm" className="w-full">
                         <Eye className="mr-2 h-4 w-4" /> Voir les détails
                       </Button>
                     </Link>
-                    <QuoteRequestDialog defaultDestination={`${activeCategory === 'transfert_aeroport' ? 'Transfert aéroport' : 'Location'} ${item.titre}`}>
+                    <QuoteRequestDialog defaultDestination={`${activeCategory === 'transfert_aeroport' ? 'Transfert aéroport' : activeCategory === 'transfert_plage' ? 'Transfert par la plage en 4×4' : 'Location'} ${item.titre}`}>
                       <Button variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
                         Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </QuoteRequestDialog>
                     <a
-                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(activeCategory === 'transfert_aeroport' ? `Bonjour, je souhaiterais obtenir un devis pour un transfert aéroport avec ${item.titre}.` : `Bonjour, je souhaiterais obtenir un devis pour la location d'un ${item.titre} avec chauffeur.`)}`}
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(activeCategory === 'transfert_aeroport' ? `Bonjour, je souhaiterais obtenir un devis pour un transfert aéroport avec ${item.titre}.` : activeCategory === 'transfert_plage' ? `Bonjour, je souhaiterais obtenir un devis pour un transfert par la plage en véhicule 4×4 avec ${item.titre}.` : `Bonjour, je souhaiterais obtenir un devis pour la location d'un ${item.titre} avec chauffeur.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full"
