@@ -11,7 +11,7 @@ import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User, MessageCircle, Plane } from 'lucide-react';
 import { featuredDestinations } from '@/data/featured-destinations';
 import { featuredTransfertsAeroport } from '@/data/featured-transferts';
 import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
@@ -152,15 +152,19 @@ export default function TransportDetailPage() {
                 <div className="mb-4">
                   <h1 className="text-3xl md:text-4xl font-bold text-primary">{item.titre}</h1>
                   <div className="flex flex-wrap items-center gap-4 mt-2 text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Users className="h-4 w-4" /> {item.capacitePassagers} passagers
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User className="h-4 w-4" /> {item.avecChauffeur ? 'Avec chauffeur' : 'Sans chauffeur'}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Fuel className="h-4 w-4" /> {item.carburantInclus ? 'Carburant inclus' : 'Carburant non inclus'}
-                    </span>
+                    {item.type === 'billet_avion' ? (
+                      <>
+                        <span className="flex items-center gap-1"><Plane className="h-4 w-4" /> Destination : {item.destination || item.titre}</span>
+                        <span>Classe : {item.classe || 'Selon disponibilité'}</span>
+                        <span>{item.allerRetour === false ? 'Aller simple' : 'Aller-retour disponible'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="flex items-center gap-1"><Users className="h-4 w-4" /> {item.capacitePassagers} passagers</span>
+                        <span className="flex items-center gap-1"><User className="h-4 w-4" /> {item.avecChauffeur ? 'Avec chauffeur' : 'Sans chauffeur'}</span>
+                        <span className="flex items-center gap-1"><Fuel className="h-4 w-4" /> {item.carburantInclus ? 'Carburant inclus' : 'Carburant non inclus'}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -180,22 +184,21 @@ export default function TransportDetailPage() {
                 )}
 
                 <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Véhicule / Modèle</p>
-                    <p className="font-semibold">{item.vehicule}</p>
-                  </div>
-                  <div className="border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Capacité</p>
-                    <p className="font-semibold">{item.capacitePassagers} passagers</p>
-                  </div>
-                  <div className="border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Chauffeur</p>
-                    <p className="font-semibold">{item.avecChauffeur ? 'Inclus' : 'Non inclus'}</p>
-                  </div>
-                  <div className="border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Carburant</p>
-                    <p className="font-semibold">{item.carburantInclus ? 'Inclus' : 'Non inclus'}</p>
-                  </div>
+                  {item.type === 'billet_avion' ? (
+                    <>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Destination</p><p className="font-semibold">{item.destination || item.titre}</p></div>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Classe de voyage</p><p className="font-semibold">{item.classe || 'Selon disponibilité'}</p></div>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Escales</p><p className="font-semibold">{item.escales || 'Selon l’itinéraire choisi'}</p></div>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Type de trajet</p><p className="font-semibold">{item.allerRetour === false ? 'Aller simple' : 'Aller-retour disponible'}</p></div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Véhicule / Modèle</p><p className="font-semibold">{item.vehicule}</p></div>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Capacité</p><p className="font-semibold">{item.capacitePassagers} passagers</p></div>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Chauffeur</p><p className="font-semibold">{item.avecChauffeur ? 'Inclus' : 'Non inclus'}</p></div>
+                      <div className="border rounded-lg p-4"><p className="text-sm text-muted-foreground mb-1">Carburant</p><p className="font-semibold">{item.carburantInclus ? 'Inclus' : 'Non inclus'}</p></div>
+                    </>
+                  )}
                 </div>
 
                 {gallery.length > 1 && (
@@ -226,22 +229,21 @@ export default function TransportDetailPage() {
                       <span className="text-muted-foreground">Type</span>
                       <span className="font-medium">{typeLabels[item.type] || item.type}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Véhicule</span>
-                      <span className="font-medium">{item.vehicule}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Passagers</span>
-                      <span className="font-medium">{item.capacitePassagers}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Chauffeur</span>
-                      <span className="font-medium">{item.avecChauffeur ? 'Oui' : 'Non'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Carburant</span>
-                      <span className="font-medium">{item.carburantInclus ? 'Inclus' : 'Non inclus'}</span>
-                    </div>
+                    {item.type === 'billet_avion' ? (
+                      <>
+                        <div className="flex justify-between gap-4"><span className="text-muted-foreground">Destination</span><span className="font-medium text-right">{item.destination || item.titre}</span></div>
+                        <div className="flex justify-between gap-4"><span className="text-muted-foreground">Classe</span><span className="font-medium text-right">{item.classe || 'Selon disponibilité'}</span></div>
+                        <div className="flex justify-between gap-4"><span className="text-muted-foreground">Escales</span><span className="font-medium text-right">{item.escales || 'Selon itinéraire'}</span></div>
+                        <div className="flex justify-between gap-4"><span className="text-muted-foreground">Trajet</span><span className="font-medium text-right">{item.allerRetour === false ? 'Aller simple' : 'Aller-retour'}</span></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Véhicule</span><span className="font-medium">{item.vehicule}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Passagers</span><span className="font-medium">{item.capacitePassagers}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Chauffeur</span><span className="font-medium">{item.avecChauffeur ? 'Oui' : 'Non'}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Carburant</span><span className="font-medium">{item.carburantInclus ? 'Inclus' : 'Non inclus'}</span></div>
+                      </>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Disponibilité</span>
                       <span className={`font-medium ${item.disponible ? 'text-green-600' : 'text-red-500'}`}>

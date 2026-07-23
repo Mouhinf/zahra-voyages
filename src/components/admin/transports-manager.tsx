@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, setDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where } from 'firebase/firestore';
 import { Transport } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
@@ -24,6 +24,7 @@ import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X, Car } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
+import { featuredDestinations } from '@/data/featured-destinations';
 
 const formSchema = z.object({
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
@@ -32,6 +33,10 @@ const formSchema = z.object({
   prix: z.string().min(3, 'Veuillez entrer un prix.'),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
   type: z.enum(['billet_avion', 'transfert_aeroport', 'transfert_plage', 'location_voiture']),
+  destination: z.string().optional(),
+  classe: z.string().optional(),
+  escales: z.string().optional(),
+  allerRetour: z.boolean().default(true),
   vehicule: z.string().optional(),
   capacitePassagers: z.coerce.number().min(1).max(500).optional(),
   avecChauffeur: z.boolean().default(false),
@@ -50,6 +55,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   location_voiture: 'Location voiture (avec chauffeur)',
 };
 
+const featuredDestinationIds = new Set(featuredDestinations.map((destination) => destination.id));
+
 export default function TransportsManager() {
   const { toast } = useToast();
   const [items, setItems] = useState<Transport[]>([]);
@@ -61,11 +68,13 @@ export default function TransportsManager() {
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [persistedIds, setPersistedIds] = useState<Set<string>>(new Set());
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'billet_avion',
+      destination: '', classe: 'Économique', escales: 'Selon disponibilité', allerRetour: true,
       vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
       disponible: true, ordre: 0,
     },
@@ -78,7 +87,14 @@ export default function TransportsManager() {
     const unsubscribe = onSnapshot(q, (snap) => {
       const data: Transport[] = [];
       snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Transport));
-      setItems(data);
+      setPersistedIds(new Set(data.map((item) => item.id)));
+      const existingIds = new Set(data.map((item) => item.id));
+      setItems([...data, ...featuredDestinations.filter((item) => !existingIds.has(item.id))]);
+      setIsLoading(false);
+    }, (error) => {
+      console.error('Erreur chargement transports admin:', error);
+      setPersistedIds(new Set());
+      setItems(featuredDestinations);
       setIsLoading(false);
     });
     return () => unsubscribe();
@@ -90,6 +106,7 @@ export default function TransportsManager() {
     setMainImageFile(null);
     form.reset({
       titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'billet_avion',
+      destination: '', classe: 'Économique', escales: 'Selon disponibilité', allerRetour: true,
       vehicule: '', capacitePassagers: 4, avecChauffeur: false, carburantInclus: false,
       disponible: true, ordre: 0,
     });
@@ -107,6 +124,10 @@ export default function TransportsManager() {
       prix: item.prix,
       tag: item.tag,
       type: item.type,
+      destination: item.destination || item.titre,
+      classe: item.classe || 'Économique',
+      escales: item.escales || 'Selon disponibilité',
+      allerRetour: item.allerRetour ?? true,
       vehicule: item.vehicule || '',
       capacitePassagers: item.capacitePassagers || 4,
       avecChauffeur: item.avecChauffeur || false,
@@ -153,6 +174,10 @@ export default function TransportsManager() {
         prix: values.prix,
         tag: values.tag,
         type: values.type,
+        destination: values.type === 'billet_avion' ? values.destination || values.titre : '',
+        classe: values.type === 'billet_avion' ? values.classe || 'Selon disponibilité' : '',
+        escales: values.type === 'billet_avion' ? values.escales || 'Selon disponibilité' : '',
+        allerRetour: values.type === 'billet_avion' ? values.allerRetour : false,
         disponible: values.disponible,
         ordre: values.ordre,
         image: imageUrl,
@@ -173,7 +198,11 @@ export default function TransportsManager() {
       }
 
       if (editingItem) {
-        await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
+        if (featuredDestinationIds.has(editingItem.id) && !persistedIds.has(editingItem.id)) {
+          await setDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
+        } else {
+          await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
+        }
         toast({ title: 'Succès !', description: 'Le transport a été modifié.' });
       } else {
         await addDoc(collection(getDbInstance(), 'transports'), dataToSave);
@@ -397,6 +426,33 @@ export default function TransportsManager() {
                   )} />
                 </div>
 
+                {watchedType === 'billet_avion' && (
+                  <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <p className="text-sm font-semibold text-primary">Informations du billet d’avion</p>
+                    <FormField control={form.control} name="destination" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Destination</FormLabel>
+                        <FormControl><Input placeholder="Paris, Dubaï, New York…" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField control={form.control} name="classe" render={({ field }) => (
+                        <FormItem><FormLabel>Classe</FormLabel><FormControl><Input placeholder="Économique, Affaires…" {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name="escales" render={({ field }) => (
+                        <FormItem><FormLabel>Escales</FormLabel><FormControl><Input placeholder="Direct ou 1 escale" {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                    </div>
+                    <FormField control={form.control} name="allerRetour" render={({ field }) => (
+                      <FormItem className="flex flex-row items-center gap-3 pt-1">
+                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                        <FormLabel className="!mt-0">Aller-retour disponible</FormLabel>
+                      </FormItem>
+                    )} />
+                  </div>
+                )}
+
                 {/* Champs spécifiques aux véhicules (transferts + location) */}
                 {showVehicleFields && (
                   <div className="space-y-4 border-t pt-4">
@@ -559,7 +615,13 @@ export default function TransportsManager() {
                       <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, item.public_id)} disabled={deletingId === item.id}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(item.id, item.public_id)}
+                        disabled={deletingId === item.id || (featuredDestinationIds.has(item.id) && !persistedIds.has(item.id))}
+                        title={featuredDestinationIds.has(item.id) && !persistedIds.has(item.id) ? 'Enregistrez cette destination avant de la supprimer' : 'Supprimer'}
+                      >
                         {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
                       </Button>
                     </div>
