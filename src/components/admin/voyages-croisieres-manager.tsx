@@ -39,7 +39,7 @@ const formSchema = z.object({
   nonInclus: z.string(),
   disponible: z.boolean().default(true),
   ordre: z.coerce.number().default(0),
-  image: z.instanceof(FileList).optional(),
+  image: z.custom<FileList>((value) => typeof FileList !== 'undefined' && value instanceof FileList).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;

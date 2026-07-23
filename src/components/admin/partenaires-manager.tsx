@@ -31,7 +31,7 @@ import { PlusCircle, Loader2, Trash2, Pencil } from 'lucide-react';
 const formSchema = z.object({
   nom: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
   ordre: z.coerce.number().int().min(0).default(0),
-  logo: z.instanceof(FileList).refine((files) => files?.length === 1, 'Un logo est requis.'),
+  logo: z.custom<FileList>((value) => typeof FileList !== 'undefined' && value instanceof FileList).refine((files) => files?.length === 1, 'Un logo est requis.'),
 });
 
 export default function PartenairesManager() {

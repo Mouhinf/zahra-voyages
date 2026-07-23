@@ -31,7 +31,7 @@ const formSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
   price: z.string().min(5, { message: 'Veuillez entrer un prix valide.' }),
   tag: z.string().min(2, { message: 'Veuillez entrer une catégorie.' }),
-  image: z.instanceof(FileList).refine((files) => files?.length === 1, 'Une image est requise.'),
+  image: z.custom<FileList>((value) => typeof FileList !== 'undefined' && value instanceof FileList).refine((files) => files?.length === 1, 'Une image est requise.'),
 });
 
 export default function DestinationsManager() {
