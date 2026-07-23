@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
+import { featuredDestinations, allWorldDestinationsMessage } from '@/data/featured-destinations';
 
 const WHATSAPP_NUMBER = '221775396325';
 
@@ -50,12 +51,21 @@ export default function TransportGrid() {
           if (d.disponible !== false) data.push({ id: docSnap.id, ...d });
         });
         if (mounted) {
-          setItems(data);
-          const firstWithItems = CATEGORIES.find((c) => data.some((d) => d.type === c.key));
+          const existingIds = new Set(data.map((item) => item.id));
+          const combinedItems = [
+            ...data,
+            ...featuredDestinations.filter((item) => !existingIds.has(item.id)),
+          ];
+          setItems(combinedItems);
+          const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
           if (firstWithItems) setActiveCategory(firstWithItems.key);
         }
       } catch (e) {
         console.error('Erreur fetch transports:', e);
+        if (mounted) {
+          setItems(featuredDestinations);
+          setActiveCategory('billet_avion');
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -104,6 +114,13 @@ export default function TransportGrid() {
           );
         })}
       </div>
+
+      {activeCategory === 'billet_avion' && (
+        <Alert className="mb-8 bg-accent/10 border-accent/30 text-primary">
+          <Plane className="h-5 w-5" />
+          <AlertDescription className="font-medium">{allWorldDestinationsMessage}</AlertDescription>
+        </Alert>
+      )}
 
       <Alert className="mb-8 bg-primary/5 border-primary/20 text-primary">
         <Info className="h-5 w-5" />
