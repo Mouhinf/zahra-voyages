@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { featuredTourismeOffers } from '@/data/featured-tourisme';
 
 type Offre = { id: string; titre: string; description: string; prix: string; image: string; tag: string; type: string; disponible?: boolean };
 
@@ -41,16 +42,25 @@ export default function TourismeGrid() {
           if (offer.disponible !== false) data.push({ id: doc.id, ...offer });
         });
         if (mounted) {
-          setItems(data);
+          const existingIds = new Set(data.map((item) => item.id));
+          const combinedItems = [
+            ...data,
+            ...featuredTourismeOffers.filter((item) => !existingIds.has(item.id)),
+          ];
+          setItems(combinedItems);
           const categoryParam = new URLSearchParams(window.location.search).get('cat');
           if (categoryParam && CATEGORIES.some((category) => category.key === categoryParam)) setActiveCategory(categoryParam);
           else {
-            const firstWithItems = CATEGORIES.find((category) => data.some((item) => categoryFor(item) === category.key));
+            const firstWithItems = CATEGORIES.find((category) => combinedItems.some((item) => categoryFor(item) === category.key));
             if (firstWithItems) setActiveCategory(firstWithItems.key);
           }
         }
       } catch (error) {
         console.error('Erreur fetch offres tourisme:', error);
+        if (mounted) {
+          setItems(featuredTourismeOffers);
+          setActiveCategory('tourisme_religieux');
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }

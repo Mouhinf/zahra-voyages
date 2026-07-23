@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { ArrowLeft, MapPin, Users, Clock, Loader2, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
+import { featuredTourismeOffers } from '@/data/featured-tourisme';
 
 export default function OffreAffairesDetailPage() {
   const params = useParams();
@@ -28,9 +29,14 @@ export default function OffreAffairesDetailPage() {
         const snap = await getDoc(doc(getDbInstance(), 'offresAffaires', params.id as string));
         if (snap.exists()) {
           setItem({ id: snap.id, ...snap.data() } as OffreAffaires);
+        } else {
+          const featured = featuredTourismeOffers.find((offer) => offer.id === params.id);
+          if (featured) setItem(featured);
         }
       } catch (e) {
         console.error('Erreur:', e);
+        const featured = featuredTourismeOffers.find((offer) => offer.id === params.id);
+        if (featured) setItem(featured);
       } finally {
         setIsLoading(false);
       }
@@ -90,7 +96,7 @@ export default function OffreAffairesDetailPage() {
   }
 
   const typeLabels: Record<string, string> = {
-    seminaire: 'Séminaire', incentive: 'Incentive', mice: 'MICE', mission_sur_mesure: 'Mission sur mesure',
+    tourisme_religieux: 'Tourisme religieux', tourisme_local: 'Tourisme local', tourisme_linguistique: 'Tourisme linguistique', tourisme_affaires: "Tourisme d'affaires", seminaire: 'Séminaire', incentive: 'Incentive', mice: 'MICE', mission_sur_mesure: 'Mission sur mesure',
   };
 
   return (
