@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { ArrowLeft, MapPin, Users, Clock, Loader2, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
 import { featuredTourismeOffers } from '@/data/featured-tourisme';
+import { withBusinessOfferImage } from '@/data/business-offer-images';
 
 export default function OffreAffairesDetailPage() {
   const params = useParams();
@@ -28,7 +29,8 @@ export default function OffreAffairesDetailPage() {
       try {
         const snap = await getDoc(doc(getDbInstance(), 'offresAffaires', params.id as string));
         if (snap.exists()) {
-          setItem({ id: snap.id, ...snap.data() } as OffreAffaires);
+          const offer = { id: snap.id, ...snap.data() } as OffreAffaires;
+          setItem(withBusinessOfferImage(offer) as OffreAffaires);
         } else {
           const featured = featuredTourismeOffers.find((offer) => offer.id === params.id);
           if (featured) setItem(featured);

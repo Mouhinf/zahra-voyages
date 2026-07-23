@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
 import { featuredTourismeOffers } from '@/data/featured-tourisme';
+import { withBusinessOfferImage } from '@/data/business-offer-images';
 
 type Offre = { id: string; titre: string; description: string; prix: string; image: string; tag: string; type: string; disponible?: boolean };
 
@@ -38,8 +39,13 @@ export default function TourismeGrid() {
         const snapshot = await getDocs(query(collection(getDbInstance(), 'offresAffaires'), orderBy('ordre', 'asc')));
         const data: Offre[] = [];
         snapshot.forEach((doc) => {
-          const offer = doc.data() as Omit<Offre, 'id'>;
-          if (offer.disponible !== false) data.push({ id: doc.id, ...offer });
+          const offer = doc.data() as Omit<Offre, 'id'> & { images?: string[] };
+          if (offer.disponible !== false) {
+            const normalized = legacyBusinessTypes.has(offer.type) || offer.type === 'tourisme_affaires'
+              ? withBusinessOfferImage(offer)
+              : offer;
+            data.push({ id: doc.id, ...normalized });
+          }
         });
         if (mounted) {
           const existingIds = new Set(data.map((item) => item.id));
