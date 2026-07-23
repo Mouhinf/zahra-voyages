@@ -215,6 +215,26 @@ export default function TransportsManager() {
     }
   }
 
+  async function seedVehicules() {
+    const { addDoc, collection } = await import('firebase/firestore');
+    const db = getDbInstance();
+    const seedData = [
+      { titre: 'Berline', description: 'Véhicule élégant et confortable, idéal pour vos déplacements professionnels et urbains. Climatisation, sièges cuir, espace généreux.', image: '/mercedese.avif', tag: 'Berline', type: 'location_voiture', ordre: 1, disponible: true, vehicule: 'berline', capacitePassagers: 4, avecChauffeur: true, carburantInclus: true },
+      { titre: 'Minibus', description: 'Minibus spacieux et climatisé pour vos voyages en groupe. Confort optimal pour les trajets interurbains et les excursions familiales.', image: '/toyotahiace.webp', tag: 'Minibus', type: 'location_voiture', ordre: 2, disponible: true, vehicule: 'minibus', capacitePassagers: 14, avecChauffeur: true, carburantInclus: true },
+      { titre: 'Bus', description: 'Bus grand confort pour le transport de groupes nombreux. Climatisation, sièges inclinables et coffre à bagages spacieux.', image: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar', tag: 'Bus', type: 'location_voiture', ordre: 3, disponible: true, vehicule: 'bus', capacitePassagers: 40, avecChauffeur: true, carburantInclus: true },
+      { titre: '4x4', description: "Véhicule tout-terrain robuste et puissant pour l'aventure sénégalaise. Parfait pour explorer les régions les plus reculées en toute sécurité.", image: '/fortuner.png', tag: '4x4', type: 'location_voiture', ordre: 4, disponible: true, vehicule: '4x4', capacitePassagers: 6, avecChauffeur: true, carburantInclus: true },
+      { titre: 'SUV', description: "SUV moderne et polyvalent alliant confort et prestance. Véhicule premium pour des déplacements en tous genres avec une touche d'élégance.", image: '/toyotarav4.webp', tag: 'SUV', type: 'location_voiture', ordre: 5, disponible: true, vehicule: 'suv', capacitePassagers: 5, avecChauffeur: true, carburantInclus: true },
+    ];
+    try {
+      for (const v of seedData) {
+        await addDoc(collection(db, 'transports'), v);
+      }
+      toast({ title: 'Succès !', description: '5 véhicules ajoutés à la catégorie Location de voiture.' });
+    } catch (e) {
+      toast({ title: 'Erreur', description: e instanceof Error ? e.message : "Échec de l'ajout", variant: 'destructive' });
+    }
+  }
+
   const showVehicleFields = watchedType !== 'billet_avion';
   const showLocationFields = watchedType === 'location_voiture';
 
@@ -226,25 +246,7 @@ export default function TransportsManager() {
           <p className="text-muted-foreground">Ajoutez et modifiez les offres de transport par catégorie.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={async () => {
-            const { addDoc, collection } = await import('firebase/firestore');
-            const db = getDbInstance();
-            const seedData = [
-              { titre: 'Berline', description: 'Véhicule élégant et confortable, idéal pour vos déplacements professionnels et urbains. Climatisation, sièges cuir, espace généreux.', image: '/mercedese.avif', tag: 'Berline', type: 'location_voiture', ordre: 1, disponible: true, vehicule: 'berline', capacitePassagers: 4, avecChauffeur: true, carburantInclus: true },
-              { titre: 'Minibus', description: 'Minibus spacieux et climatisé pour vos voyages en groupe. Confort optimal pour les trajets interurbains et les excursions familiales.', image: '/toyotahiace.webp', tag: 'Minibus', type: 'location_voiture', ordre: 2, disponible: true, vehicule: 'minibus', capacitePassagers: 14, avecChauffeur: true, carburantInclus: true },
-              { titre: 'Bus', description: 'Bus grand confort pour le transport de groupes nombreux. Climatisation, sièges inclinables et coffre à bagages spacieux.', image: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar', tag: 'Bus', type: 'location_voiture', ordre: 3, disponible: true, vehicule: 'bus', capacitePassagers: 40, avecChauffeur: true, carburantInclus: true },
-              { titre: '4x4', description: "Véhicule tout-terrain robuste et puissant pour l'aventure sénégalaise. Parfait pour explorer les régions les plus reculées en toute sécurité.", image: '/fortuner.png', tag: '4x4', type: 'location_voiture', ordre: 4, disponible: true, vehicule: '4x4', capacitePassagers: 6, avecChauffeur: true, carburantInclus: true },
-              { titre: 'SUV', description: "SUV moderne et polyvalent alliant confort et prestance. Véhicule premium pour des déplacements en tous genres avec une touche d'élégance.", image: '/toyotarav4.webp', tag: 'SUV', type: 'location_voiture', ordre: 5, disponible: true, vehicule: 'suv', capacitePassagers: 5, avecChauffeur: true, carburantInclus: true },
-            ];
-            try {
-              for (const v of seedData) {
-                await addDoc(collection(db, 'transports'), v);
-              }
-              toast({ title: 'Succès !', description: '5 véhicules ajoutés à la catégorie Location de voiture.' });
-            } catch (e) {
-              toast({ title: 'Erreur', description: e instanceof Error ? e.message : 'Échec de l\'ajout', variant: 'destructive' });
-            }
-          }}>
+          <Button variant="outline" onClick={seedVehicules}>
             <Car className="mr-2 h-4 w-4" /> Ajouter les 5 véhicules
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
