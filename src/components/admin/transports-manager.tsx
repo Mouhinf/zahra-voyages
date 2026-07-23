@@ -216,7 +216,6 @@ export default function TransportsManager() {
   }
 
   async function seedVehicules() {
-    const { addDoc, collection } = await import('firebase/firestore');
     const db = getDbInstance();
     const seedData = [
       { titre: 'Berline', description: 'Véhicule élégant et confortable, idéal pour vos déplacements professionnels et urbains. Climatisation, sièges cuir, espace généreux.', image: '/mercedese.avif', tag: 'Berline', type: 'location_voiture', ordre: 1, disponible: true, vehicule: 'berline', capacitePassagers: 4, avecChauffeur: true, carburantInclus: true },
@@ -478,6 +477,7 @@ export default function TransportsManager() {
             </Form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="border rounded-lg">
