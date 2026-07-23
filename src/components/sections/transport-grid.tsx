@@ -131,6 +131,11 @@ export default function TransportGrid() {
                 <p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p>
                 {activeCategory === 'location_voiture' ? (
                   <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-border/50">
+                    <Link href={`/transport/${item.id}`}>
+                      <Button variant="outline" size="sm" className="w-full">
+                        <Eye className="mr-2 h-4 w-4" /> Voir les détails
+                      </Button>
+                    </Link>
                     <QuoteRequestDialog defaultDestination={`Location ${item.titre} avec chauffeur`}>
                       <Button variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
                         Demander un devis <ArrowRight className="ml-2 h-4 w-4" />

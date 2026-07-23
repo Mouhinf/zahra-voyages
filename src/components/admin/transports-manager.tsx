@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where } from 'firebase/firestore';
 import { Transport } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
@@ -218,13 +218,62 @@ export default function TransportsManager() {
   async function seedVehicules() {
     const db = getDbInstance();
     const seedData = [
-      { titre: 'Berline', description: 'Véhicule élégant et confortable, idéal pour vos déplacements professionnels et urbains. Climatisation, sièges cuir, espace généreux.', image: '/mercedese.avif', tag: 'Berline', type: 'location_voiture', ordre: 1, disponible: true, vehicule: 'berline', capacitePassagers: 4, avecChauffeur: true, carburantInclus: true },
-      { titre: 'Minibus', description: 'Minibus spacieux et climatisé pour vos voyages en groupe. Confort optimal pour les trajets interurbains et les excursions familiales.', image: '/toyotahiace.webp', tag: 'Minibus', type: 'location_voiture', ordre: 2, disponible: true, vehicule: 'minibus', capacitePassagers: 14, avecChauffeur: true, carburantInclus: true },
-      { titre: 'Bus', description: 'Bus grand confort pour le transport de groupes nombreux. Climatisation, sièges inclinables et coffre à bagages spacieux.', image: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar', tag: 'Bus', type: 'location_voiture', ordre: 3, disponible: true, vehicule: 'bus', capacitePassagers: 40, avecChauffeur: true, carburantInclus: true },
-      { titre: '4x4', description: "Véhicule tout-terrain robuste et puissant pour l'aventure sénégalaise. Parfait pour explorer les régions les plus reculées en toute sécurité.", image: '/fortuner.png', tag: '4x4', type: 'location_voiture', ordre: 4, disponible: true, vehicule: '4x4', capacitePassagers: 6, avecChauffeur: true, carburantInclus: true },
-      { titre: 'SUV', description: "SUV moderne et polyvalent alliant confort et prestance. Véhicule premium pour des déplacements en tous genres avec une touche d'élégance.", image: '/toyotarav4.webp', tag: 'SUV', type: 'location_voiture', ordre: 5, disponible: true, vehicule: 'suv', capacitePassagers: 5, avecChauffeur: true, carburantInclus: true },
+      {
+        titre: 'Berline',
+        description: 'Véhicule élégant et confortable, idéal pour vos déplacements professionnels et urbains. Climatisation, sièges cuir, espace généreux.',
+        descriptionComplete: 'Nos berlines sont des véhicules haut de gamme parfaitement adaptés aux déplacements professionnels et aux transferts VIP. Chaque berline est équipée de la climatisation, de sièges en cuir ajustables, d\'un système audio haute fidélité et d\'une connexion Wi-Fi embarquée. Nos chauffeurs professionnels, formés à l\'excellence du service, assurent une conduite souple et sécurisée. Le coffre spacieux peut accueillir jusqu\'à 3 valises, idéal pour les transferts aéroportuaires. Nos berlines sont régulièrement entretenues et nettoyées après chaque course pour garantir une expérience irréprochable. Que ce soit pour un rendez-vous d\'affaires, un mariage ou un transfert VIP, la berline SLAAC vous offre le confort et l\'élégance que vous méritez.',
+        image: '/mercedese.avif',
+        images: ['/mercedese.avif', '/bmw1.webp', '/voitaff.jpeg'],
+        tag: 'Berline',
+        type: 'location_voiture',
+        ordre: 1, disponible: true, vehicule: 'berline', capacitePassagers: 4, avecChauffeur: true, carburantInclus: true,
+      },
+      {
+        titre: 'Minibus',
+        description: 'Minibus spacieux et climatisé pour vos voyages en groupe. Confort optimal pour les trajets interurbains et les excursions familiales.',
+        descriptionComplete: 'Nos minibus sont la solution idéale pour les déplacements en groupe, alliant espace et confort. Chaque minibus peut accueillir jusqu\'à 14 passagers dans des sièges baquets inclinables avec accoudoirs individuels. Le véhicule est équipé de la climatisation puissante, d\'un système multimédia avec écrans, de ports USB pour chaque passager et d\'un grand coffre pouvant contenir les bagages de tous les voyageurs. Nos chauffeurs expérimentés connaissent parfaitement les routes du Sénégal et assurent des trajets en toute sécurité. Le minibus SLAAC est parfait pour les excursions en famille, les sorties en groupe, les transferts de mariage et les navettes vers les sites touristiques. Chaque véhicule est désinfecté et préparé avec soin avant chaque départ.',
+        image: '/toyotahiace.webp',
+        images: ['/toyotahiace.webp'],
+        tag: 'Minibus',
+        type: 'location_voiture',
+        ordre: 2, disponible: true, vehicule: 'minibus', capacitePassagers: 14, avecChauffeur: true, carburantInclus: true,
+      },
+      {
+        titre: 'Bus',
+        description: 'Bus grand confort pour le transport de groupes nombreux. Climatisation, sièges inclinables et coffre à bagages spacieux.',
+        descriptionComplete: 'Nos bus grand tourisme offrent une capacité de 20 à 40 passagers avec tout le confort nécessaire pour les longs trajets. Chaque bus est équipé de sièges inclinables en velours avec repose-pieds, climatisation individuelle, écrans de divertissement, toilettes embarquées et un système audio professionnel. Le coffre à bagages spacieux peut accueillir les valises de tous les passagers ainsi que du matériel supplémentaire. Nos bus sont parfaits pour les séminaires d\'entreprise, les excursions touristiques, les pèlerinages, les mariages et les événements sportifs. Chaque conducteur possède les permis nécessaires et une expérience confirmée dans le transport de groupes. Nous proposons également un service de restauration légère à bord pour les trajets de plus de 3 heures. La sécurité et le confort de vos passagers sont notre priorité absolue.',
+        image: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar',
+        images: ['https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar'],
+        tag: 'Bus',
+        type: 'location_voiture',
+        ordre: 3, disponible: true, vehicule: 'bus', capacitePassagers: 40, avecChauffeur: true, carburantInclus: true,
+      },
+      {
+        titre: '4x4',
+        description: "Véhicule tout-terrain robuste et puissant pour l'aventure sénégalaise. Parfait pour explorer les régions les plus reculées en toute sécurité.",
+        descriptionComplete: 'Nos véhicules 4x4 sont spécialement sélectionnés pour affronter les terrains les plus exigeants du Sénégal. Que ce soit pour explorer la Casamance, traverser le désert du Sahel, atteindre le Lac Rose ou partir en safari dans la réserve de Bandia, nos 4x4 vous emmènent partout en toute sécurité. Chaque véhicule est équipé de pneus tout-terrain, d\'une suspension renforcée, de la climatisation puissante et d\'un système de navigation GPS. Nos chauffeurs-guides connaissent parfaitement les pistes et les sites naturels du Sénégal et vous feront découvrir des endroits inaccessibles aux véhicules classiques. Le 4x4 SLAAC est également idéal pour les photographes et les aventuriers souhaitant explorer les coins les plus reculés du pays. Tout l\'équipement nécessaire est inclus : glacière, trousse de premiers secours et matériel de sécurité.',
+        image: '/fortuner.png',
+        images: ['/fortuner.png', '/toyotalang.webp'],
+        tag: '4x4',
+        type: 'location_voiture',
+        ordre: 4, disponible: true, vehicule: '4x4', capacitePassagers: 6, avecChauffeur: true, carburantInclus: true,
+      },
+      {
+        titre: 'SUV',
+        description: "SUV moderne et polyvalent alliant confort et prestance. Véhicule premium pour des déplacements en tous genres avec une touche d'élégance.",
+        descriptionComplete: 'Nos SUV allient le confort d\'une berline de luxe à la polyvalence d\'un véhicule tout chemin. Parfaits pour les circuits touristiques, les transferts VIP et les escapades en famille, les SUV SLAAC offrent une expérience de conduite exceptionnelle. Chaque véhicule est équipé de la climatisation automatique, de sièges en cuir chauffants, d\'un toit ouvrant panoramique, d\'un système de navigation dernière génération et d\'une connectivité Bluetooth. Le grand coffre permet de transporter facilement les bagages de toute la famille. Nos SUV sont particulièrement appréciés pour les visites de Dakar et de la presqu\'île du Cap-Vert, alliant prestige et confort. Que ce soit pour un circuit touristique, un transfert VIP ou une escapade le week-end, le SUV SLAAC vous garantit un voyage mémorable dans un cadre élégant et raffiné.',
+        image: '/toyotarav4.webp',
+        images: ['/toyotarav4.webp', '/TUCSON.avif', '/tucocc.avif'],
+        tag: 'SUV',
+        type: 'location_voiture',
+        ordre: 5, disponible: true, vehicule: 'suv', capacitePassagers: 5, avecChauffeur: true, carburantInclus: true,
+      },
     ];
     try {
+      const existing = await getDocs(query(collection(db, 'transports'), where('type', '==', 'location_voiture')));
+      for (const d of existing.docs) {
+        await deleteDoc(doc(db, 'transports', d.id));
+      }
       for (const v of seedData) {
         await addDoc(collection(db, 'transports'), v);
       }
