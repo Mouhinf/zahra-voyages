@@ -11,12 +11,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Mail, Send, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const FALLBACK_AGENCY = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png';
+
+const VEHICULES = [
+  { key: 'berline', label: 'Berline', image: '/mercedese.avif' },
+  { key: 'minibus', label: 'Minibus', image: '/toyotahiace.webp' },
+  { key: '4x4', label: '4x4', image: '/fortuner.png' },
+  { key: 'suv', label: 'SUV', image: '/toyotarav4.webp' },
+  { key: 'bus', label: 'Bus', image: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar' },
+];
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -34,6 +43,7 @@ const formSchema = z.object({
 export default function HomeContactQuick() {
   const { toast } = useToast();
   const [agenceImg, setAgenceImg] = useState<string>(FALLBACK_AGENCY);
+  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -59,12 +69,14 @@ export default function HomeContactQuick() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const vehicleInfo = selectedVehicle ? ` (Véhicule souhaité : ${VEHICULES.find(v => v.key === selectedVehicle)?.label || selectedVehicle})` : '';
+    console.log({ ...values, vehicle: selectedVehicle });
     toast({
       title: 'Message envoyé !',
       description: 'Merci de nous avoir contactés. Nous reviendrons vers vous sous 24h.',
     });
     form.reset();
+    setSelectedVehicle(null);
   }
 
   return (
@@ -193,6 +205,45 @@ export default function HomeContactQuick() {
                       )}
                     />
                   </div>
+                  {/* Véhicules */}
+                  <div>
+                    <FormLabel className="mb-2 block">Véhicule souhaité (optionnel)</FormLabel>
+                    <div className="grid grid-cols-5 gap-2">
+                      {VEHICULES.map((v) => (
+                        <button
+                          key={v.key}
+                          type="button"
+                          onClick={() => setSelectedVehicle(selectedVehicle === v.key ? null : v.key)}
+                          className={cn(
+                            'flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all',
+                            selectedVehicle === v.key
+                              ? 'border-primary bg-primary/5 shadow-sm'
+                              : 'border-border/50 hover:border-primary/30 hover:bg-muted/30'
+                          )}
+                        >
+                          <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-muted">
+                            <Image
+                              src={v.image}
+                              alt={v.label}
+                              fill
+                              sizes="(max-width: 640px) 20vw, 10vw"
+                              className="object-cover"
+                              onError={(e) => {
+                                const t = e.currentTarget as HTMLImageElement;
+                                if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = '/logo-slaac.png'; }
+                              }}
+                            />
+                          </div>
+                          <span className={cn(
+                            'text-[10px] font-medium leading-tight',
+                            selectedVehicle === v.key ? 'text-primary' : 'text-muted-foreground'
+                          )}>
+                            {v.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <FormField
                     control={form.control}
                     name="message"
@@ -200,7 +251,12 @@ export default function HomeContactQuick() {
                       <FormItem>
                         <FormLabel>Votre message</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Bonjour, je souhaiterais obtenir des informations sur..." rows={4} {...field} />
+                          <Textarea
+                            placeholder="Bonjour, je souhaiterais obtenir des informations sur..."
+                            rows={4}
+                            {...field}
+                            value={selectedVehicle ? `Bonjour, je suis intéressé(e) par la location d'un ${VEHICULES.find(v => v.key === selectedVehicle)?.label || selectedVehicle} avec chauffeur.` : field.value}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
