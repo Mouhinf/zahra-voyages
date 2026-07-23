@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
+import { PlusCircle, Loader2, Trash2, Pencil, X, Car } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
 
 const formSchema = z.object({
@@ -225,7 +225,29 @@ export default function TransportsManager() {
           <h2 className="text-2xl font-semibold">Gérer les Transports</h2>
           <p className="text-muted-foreground">Ajoutez et modifiez les offres de transport par catégorie.</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={async () => {
+            const { addDoc, collection } = await import('firebase/firestore');
+            const db = getDbInstance();
+            const seedData = [
+              { titre: 'Berline', description: 'Véhicule élégant et confortable, idéal pour vos déplacements professionnels et urbains. Climatisation, sièges cuir, espace généreux.', image: '/mercedese.avif', tag: 'Berline', type: 'location_voiture', ordre: 1, disponible: true, vehicule: 'berline', capacitePassagers: 4, avecChauffeur: true, carburantInclus: true },
+              { titre: 'Minibus', description: 'Minibus spacieux et climatisé pour vos voyages en groupe. Confort optimal pour les trajets interurbains et les excursions familiales.', image: '/toyotahiace.webp', tag: 'Minibus', type: 'location_voiture', ordre: 2, disponible: true, vehicule: 'minibus', capacitePassagers: 14, avecChauffeur: true, carburantInclus: true },
+              { titre: 'Bus', description: 'Bus grand confort pour le transport de groupes nombreux. Climatisation, sièges inclinables et coffre à bagages spacieux.', image: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/bus-autocar', tag: 'Bus', type: 'location_voiture', ordre: 3, disponible: true, vehicule: 'bus', capacitePassagers: 40, avecChauffeur: true, carburantInclus: true },
+              { titre: '4x4', description: "Véhicule tout-terrain robuste et puissant pour l'aventure sénégalaise. Parfait pour explorer les régions les plus reculées en toute sécurité.", image: '/fortuner.png', tag: '4x4', type: 'location_voiture', ordre: 4, disponible: true, vehicule: '4x4', capacitePassagers: 6, avecChauffeur: true, carburantInclus: true },
+              { titre: 'SUV', description: "SUV moderne et polyvalent alliant confort et prestance. Véhicule premium pour des déplacements en tous genres avec une touche d'élégance.", image: '/toyotarav4.webp', tag: 'SUV', type: 'location_voiture', ordre: 5, disponible: true, vehicule: 'suv', capacitePassagers: 5, avecChauffeur: true, carburantInclus: true },
+            ];
+            try {
+              for (const v of seedData) {
+                await addDoc(collection(db, 'transports'), v);
+              }
+              toast({ title: 'Succès !', description: '5 véhicules ajoutés à la catégorie Location de voiture.' });
+            } catch (e) {
+              toast({ title: 'Erreur', description: e instanceof Error ? e.message : 'Échec de l\'ajout', variant: 'destructive' });
+            }
+          }}>
+            <Car className="mr-2 h-4 w-4" /> Ajouter les 5 véhicules
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={openAddDialog}><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un transport</Button>
           </DialogTrigger>
