@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Send } from 'lucide-react';
 import { QuoteRequestDialog } from './quote-request-dialog';
 
@@ -72,9 +72,10 @@ export default function Header() {
                 <span className="sr-only">Ouvrir le menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <div className="grid gap-6 p-6">
-                <Link href="/" className="flex items-center gap-2">
+            <SheetContent side="right" className="w-[min(22rem,calc(100vw-1rem))] overflow-y-auto p-0">
+              <div className="grid gap-6 p-6 pb-10">
+                <SheetClose asChild>
+                  <Link href="/" className="flex items-center gap-2 pr-8">
                    <Image
                      src="/logo-slaac.png"
                      alt="SLAAC Voyages"
@@ -83,16 +84,15 @@ export default function Header() {
                      className="h-9 w-9 object-contain"
                    />
                   <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
-                </Link>
+                  </Link>
+                </SheetClose>
                 <nav className="grid gap-4">
                   {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-lg font-medium"
-                    >
-                      {link.label}
-                    </Link>
+                    <SheetClose asChild key={link.href}>
+                      <Link href={link.href} className="rounded-md py-1 text-lg font-medium transition-colors hover:text-primary">
+                        {link.label}
+                      </Link>
+                    </SheetClose>
                   ))}
                 </nav>
                 <QuoteRequestDialog>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useGallerySwipe } from '@/hooks/use-gallery-swipe';
 import { useParams, useRouter } from 'next/navigation';
 import { getDbInstance } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -51,6 +52,8 @@ export default function ExcursionDetailPage() {
   const prevImage = useCallback(() => {
     setCurrentImageIdx((prev) => (prev - 1 + Math.max(gallery.length, 1)) % Math.max(gallery.length, 1));
   }, [gallery.length]);
+
+  const gallerySwipe = useGallerySwipe(gallery.length, nextImage, prevImage);
 
   const closeLightbox = useCallback(() => setLightboxOpen(false), []);
 
@@ -103,8 +106,8 @@ export default function ExcursionDetailPage() {
       <Header />
       <main className="flex-grow">
         <section className="relative h-[50vh] min-h-[350px] bg-muted">
-          <div className="relative w-full h-full cursor-pointer" onClick={() => setLightboxOpen(true)}>
-            <Image src={gallery[currentImageIdx]} alt={item.titre} fill className="object-cover" priority />
+          <div className="relative w-full h-full cursor-pointer touch-pan-y select-none" onTouchStart={gallerySwipe.onTouchStart} onTouchEnd={gallerySwipe.onTouchEnd} onClick={() => setLightboxOpen(true)}>
+            <Image src={gallery[currentImageIdx]} alt={item.titre} fill sizes="100vw" className="object-cover" priority />
             {gallery.length > 1 && (
               <>
                 <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
@@ -175,10 +178,10 @@ export default function ExcursionDetailPage() {
                 {gallery.length > 1 && (
                   <div className="mb-8">
                     <h2 className="text-xl font-semibold text-primary mb-4">Galerie photos</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:thin]">
                       {gallery.map((img, idx) => (
-                        <div key={idx} className={`relative h-24 sm:h-32 rounded-lg overflow-hidden cursor-pointer border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`} onClick={() => setCurrentImageIdx(idx)}>
-                          <Image src={img} alt={`Photo ${idx + 1}`} fill className="object-cover" />
+                        <div key={idx} className={`relative h-24 min-w-[8.5rem] sm:min-w-0 sm:w-auto sm:flex-1 sm:h-32 rounded-lg overflow-hidden cursor-pointer snap-start border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`} onClick={() => setCurrentImageIdx(idx)}>
+                          <Image src={img} alt={`Photo ${idx + 1}`} fill sizes="(max-width: 640px) 8.5rem, 33vw" className="object-cover" />
                         </div>
                       ))}
                     </div>
@@ -242,8 +245,8 @@ export default function ExcursionDetailPage() {
               </button>
             </>
           )}
-          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <Image src={gallery[currentImageIdx]} alt={`${item.titre} - Photo ${currentImageIdx + 1}`} fill className="object-contain" />
+          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center touch-pan-y select-none" onTouchStart={gallerySwipe.onTouchStart} onTouchEnd={gallerySwipe.onTouchEnd} onClick={(e) => e.stopPropagation()}>
+            <Image src={gallery[currentImageIdx]} alt={`${item.titre} - Photo ${currentImageIdx + 1}`} fill sizes="100vw" className="object-contain" />
           </div>
           {gallery.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">

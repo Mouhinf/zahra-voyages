@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Inter, Playfair_Display } from 'next/font/google';
-import Chatbot from '@/components/chatbot';
+import ChatbotLoader from '@/components/chatbot-loader';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable} font-body antialiased`}>
         {children}
         <Toaster />
-        <Chatbot />
+        <ChatbotLoader />
       </body>
     </html>
   );

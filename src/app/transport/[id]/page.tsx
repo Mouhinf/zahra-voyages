@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useGallerySwipe } from '@/hooks/use-gallery-swipe';
 import { useParams, useRouter } from 'next/navigation';
 import { getDbInstance } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -58,6 +59,8 @@ export default function TransportDetailPage() {
     setCurrentImageIdx((prev) => (prev - 1 + Math.max(gallery.length, 1)) % Math.max(gallery.length, 1));
   }, [gallery.length]);
 
+  const gallerySwipe = useGallerySwipe(gallery.length, nextImage, prevImage);
+
   const closeLightbox = useCallback(() => setLightboxOpen(false), []);
 
   useEffect(() => {
@@ -109,7 +112,7 @@ export default function TransportDetailPage() {
       <Header />
       <main className="flex-grow">
         <section className="relative h-[50vh] min-h-[350px] bg-muted">
-          <div className="relative w-full h-full cursor-pointer" onClick={() => setLightboxOpen(true)}>
+          <div className="relative w-full h-full cursor-pointer touch-pan-y select-none" onTouchStart={gallerySwipe.onTouchStart} onTouchEnd={gallerySwipe.onTouchEnd} onClick={() => setLightboxOpen(true)}>
             <Image
               src={gallery[currentImageIdx]}
               alt={item.titre}
@@ -204,14 +207,14 @@ export default function TransportDetailPage() {
                 {gallery.length > 1 && (
                   <div className="mb-8">
                     <h2 className="text-xl font-semibold text-primary mb-4">Galerie photos</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:thin]">
                       {gallery.map((img, idx) => (
                         <div
                           key={idx}
-                          className={`relative h-24 sm:h-32 rounded-lg overflow-hidden cursor-pointer border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`}
+                          className={`relative h-24 min-w-[8.5rem] sm:min-w-0 sm:w-auto sm:flex-1 sm:h-32 rounded-lg overflow-hidden cursor-pointer snap-start border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`}
                           onClick={() => setCurrentImageIdx(idx)}
                         >
-                          <Image src={img} alt={`Photo ${idx + 1}`} fill className="object-cover" />
+                          <Image src={img} alt={`Photo ${idx + 1}`} fill sizes="(max-width: 640px) 8.5rem, 33vw" className="object-cover" />
                         </div>
                       ))}
                     </div>
@@ -307,11 +310,12 @@ export default function TransportDetailPage() {
             </>
           )}
 
-          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full h-full max-w-5xl max-h-[85vh] flex items-center justify-center touch-pan-y select-none" onTouchStart={gallerySwipe.onTouchStart} onTouchEnd={gallerySwipe.onTouchEnd} onClick={(e) => e.stopPropagation()}>
             <Image
               src={gallery[currentImageIdx]}
               alt={`${item.titre} - Photo ${currentImageIdx + 1}`}
               fill
+              sizes="100vw"
               className="object-contain"
             />
           </div>

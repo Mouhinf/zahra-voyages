@@ -60,8 +60,14 @@ export default function TransportGrid() {
             ...featuredTransportOffers.filter((item) => !existingIds.has(item.id)),
           ];
           setItems(combinedItems);
-          const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
-          if (firstWithItems) setActiveCategory(firstWithItems.key);
+          const params = new URLSearchParams(window.location.search);
+          const catParam = params.get('cat');
+          if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
+            setActiveCategory(catParam);
+          } else {
+            const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
+            if (firstWithItems) setActiveCategory(firstWithItems.key);
+          }
         }
       } catch (e) {
         console.error('Erreur fetch transports:', e);
@@ -142,6 +148,7 @@ export default function TransportGrid() {
                   src={item.image}
                   alt={item.titre}
                   fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 {item.tag && <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground shadow-md">{item.tag}</Badge>}
