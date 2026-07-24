@@ -8,7 +8,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { Transport } from '@/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -18,7 +18,7 @@ import { featuredTransfertsAeroport } from '@/data/featured-transferts';
 import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
 
 const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport, ...featuredTransfertsPlage];
-const WHATSAPP_NUMBER = '221775396325';
+const WHATSAPP_NUMBER = '221773129090';
 
 export default function TransportDetailPage() {
   const params = useParams();
@@ -255,11 +255,9 @@ export default function TransportDetailPage() {
                     </div>
                   </div>
 
-                  <QuoteRequestDialog defaultDestination={item.titre}>
-                    <Button className="w-full" size="lg" disabled={!item.disponible}>
+                  <QuoteRequestButton defaultDestination={item.titre} className="w-full" size="lg" disabled={!item.disponible}>
                       Demander un devis
-                    </Button>
-                  </QuoteRequestDialog>
+                  </QuoteRequestButton>
                   <a
                     href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Bonjour, je souhaiterais obtenir un devis pour ${item.titre}.`)}`}
                     target="_blank"

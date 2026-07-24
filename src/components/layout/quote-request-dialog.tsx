@@ -52,8 +52,28 @@ export function QuoteRequestDialog({
   children: React.ReactNode;
   defaultDestination?: string;
 }) {
-  const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+      </Dialog>
+      <QuoteRequestModal open={open} onOpenChange={setOpen} defaultDestination={defaultDestination} />
+    </>
+  );
+}
+
+export function QuoteRequestModal({
+  open,
+  onOpenChange,
+  defaultDestination,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultDestination?: string;
+}) {
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,12 +94,11 @@ export function QuoteRequestDialog({
       description: 'Merci ! Votre demande de devis a bien été envoyée. Nous reviendrons vers vous rapidement.',
     });
     form.reset();
-    setOpen(false);
+    onOpenChange(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle>Demander un devis</DialogTitle>

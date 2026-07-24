@@ -2,8 +2,9 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import HebergementGrid from '@/components/sections/hebergement-grid';
 import FaqSection from '@/components/sections/faq-section';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
-import { Button } from '@/components/ui/button';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { fetchPublicCollection } from '@/lib/public-data';
+import type { Hebergement } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
 
@@ -13,6 +14,8 @@ export const metadata = {
   title: 'Hébergement - SLAAC Voyages',
   description: "Hôtels, résidences et appartements à Dakar, Saly, Casamance et à l'international. Trouvez l'hébergement idéal pour votre séjour avec SLAAC Voyages.",
 };
+
+export const revalidate = 300;
 
 const hebergementFaq = [
   {
@@ -33,7 +36,9 @@ const hebergementFaq = [
   },
 ];
 
-export default function HebergementPage() {
+export default async function HebergementPage() {
+  const hebergementItems = await fetchPublicCollection<Hebergement>('hebergements');
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -63,7 +68,7 @@ export default function HebergementPage() {
                 Découvrez nos trois catégories d'hébergements soigneusement sélectionnés. Que vous cherchiez le confort d'un hôtel, l'immersion d'un lodge ou l'authenticité d'un campement, nous avons l'offre parfaite pour votre séjour.
               </p>
             </div>
-            <HebergementGrid />
+            <HebergementGrid initialItems={hebergementItems} />
           </div>
         </section>
 
@@ -75,9 +80,7 @@ export default function HebergementPage() {
               Notre équipe trouve l'hébergement parfait selon vos critères et votre budget. Et parce que chaque séjour mérite d'être sans souci, nous restons à votre disposition du check-in au check-out.
             </p>
             <div className="mt-8">
-              <QuoteRequestDialog>
-                <Button size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</Button>
-              </QuoteRequestDialog>
+              <QuoteRequestButton size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</QuoteRequestButton>
             </div>
           </div>
         </section>

@@ -129,7 +129,7 @@ export default function Chatbot() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: "Désolé, je ne peux pas répondre pour le moment. Contactez-nous au +221 77 539 63 25." },
+        { role: 'assistant', content: "Désolé, je ne peux pas répondre pour le moment. Contactez-nous au +221 77 312 90 90." },
       ]);
     } finally {
       setIsLoading(false);
@@ -150,7 +150,7 @@ export default function Chatbot() {
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
         {/* WhatsApp (au-dessus) */}
         <a
-          href="https://wa.me/221775396325"
+          href="https://wa.me/221773129090"
           target="_blank"
           rel="noopener noreferrer"
           className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center"

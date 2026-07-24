@@ -67,7 +67,7 @@ export default function Footer() {
             <div className="flex gap-4 mt-4">
               <a href="#" className="hover:text-primary" aria-label="Suivez SLAAC Voyages sur Facebook"><Facebook className="h-6 w-6" aria-hidden="true" /></a>
               <a href="#" className="hover:text-primary" aria-label="Suivez SLAAC Voyages sur Instagram"><Instagram className="h-6 w-6" aria-hidden="true" /></a>
-              <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" className="hover:text-primary" aria-label="Contactez SLAAC Voyages sur WhatsApp"><WhatsAppIcon className="h-6 w-6" /></a>
+              <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" className="hover:text-primary" aria-label="Contactez SLAAC Voyages sur WhatsApp"><WhatsAppIcon className="h-6 w-6" /></a>
             </div>
           </div>
         </div>

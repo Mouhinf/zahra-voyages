@@ -1,8 +1,9 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import VoyagesCroisieresGrid from '@/components/sections/voyages-croisieres-grid';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
-import { Button } from '@/components/ui/button';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { fetchPublicCollection } from '@/lib/public-data';
+import type { VoyageCroisiere } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
 
@@ -13,7 +14,11 @@ export const metadata = {
   description: 'Voyages sur mesure et croisières vers des destinations de rêve. Réservez votre prochaine aventure avec SLAAC Voyages.',
 };
 
-export default function VoyagesCroisieresPage() {
+export const revalidate = 300;
+
+export default async function VoyagesCroisieresPage() {
+  const voyageItems = await fetchPublicCollection<VoyageCroisiere>('voyagesCroisieres');
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -42,7 +47,7 @@ export default function VoyagesCroisieresPage() {
                 Explorez le monde avec nos packages de voyage et nos croisières soigneusement sélectionnés. Vol, hôtel, transferts et activités inclus.
               </p>
             </div>
-            <VoyagesCroisieresGrid />
+            <VoyagesCroisieresGrid initialItems={voyageItems} />
           </div>
         </section>
 
@@ -52,9 +57,7 @@ export default function VoyagesCroisieresPage() {
             <div className="w-12 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-muted-foreground text-lg text-balance">Nos experts conçoivent le voyage de vos rêves, sur mesure.</p>
             <div className="mt-8">
-              <QuoteRequestDialog>
-                <Button size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</Button>
-              </QuoteRequestDialog>
+              <QuoteRequestButton size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</QuoteRequestButton>
             </div>
           </div>
         </section>

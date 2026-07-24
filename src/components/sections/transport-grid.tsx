@@ -1,22 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Loader2, Eye, Info, Plane, PlaneTakeoff, Waves, Car, MessageCircle } from 'lucide-react';
+import { ArrowRight, Eye, Info, Plane, PlaneTakeoff, Waves, Car, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { featuredDestinations, allWorldDestinationsMessage } from '@/data/featured-destinations';
 import { featuredTransfertsAeroport } from '@/data/featured-transferts';
 import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
 
-const WHATSAPP_NUMBER = '221775396325';
+const WHATSAPP_NUMBER = '221773129090';
 const featuredTransportOffers = [...featuredDestinations, ...featuredTransfertsAeroport, ...featuredTransfertsPlage];
 
 type Offre = {
@@ -37,57 +35,30 @@ const CATEGORIES = [
   { key: 'location_voiture', label: 'Location de voiture (avec chauffeur)', icon: Car, description: 'Véhicules avec chauffeur professionnel' },
 ];
 
-export default function TransportGrid() {
-  const [items, setItems] = useState<Offre[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function TransportGrid({ initialItems = [] }: { initialItems?: Offre[] }) {
+  const items = useMemo(() => {
+    const availableItems = initialItems.filter((item) => item.disponible !== false);
+    const existingIds = new Set(availableItems.map((item) => item.id));
+    return [
+      ...availableItems,
+      ...featuredTransportOffers.filter((item) => !existingIds.has(item.id)),
+    ];
+  }, [initialItems]);
   const [activeCategory, setActiveCategory] = useState<string>('billet_avion');
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const q = query(collection(getDbInstance(), 'transports'), orderBy('ordre', 'asc'));
-        const snap = await getDocs(q);
-        const data: Offre[] = [];
-        snap.forEach((docSnap) => {
-          const d = docSnap.data() as Omit<Offre, 'id'>;
-          if (d.disponible !== false) data.push({ id: docSnap.id, ...d });
-        });
-        if (mounted) {
-          const existingIds = new Set(data.map((item) => item.id));
-          const combinedItems = [
-            ...data,
-            ...featuredTransportOffers.filter((item) => !existingIds.has(item.id)),
-          ];
-          setItems(combinedItems);
-          const params = new URLSearchParams(window.location.search);
-          const catParam = params.get('cat');
-          if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
-            setActiveCategory(catParam);
-          } else {
-            const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
-            if (firstWithItems) setActiveCategory(firstWithItems.key);
-          }
-        }
-      } catch (e) {
-        console.error('Erreur fetch transports:', e);
-        if (mounted) {
-          setItems(featuredTransportOffers);
-          setActiveCategory('billet_avion');
-        }
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+    const params = new URLSearchParams(window.location.search);
+    const catParam = params.get('cat');
+    if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
+      setActiveCategory(catParam);
+      return;
+    }
+    const firstWithItems = CATEGORIES.find((c) => items.some((d) => d.type === c.key));
+    if (firstWithItems) setActiveCategory(firstWithItems.key);
+  }, [items]);
 
   const filteredItems = items.filter((item) => item.type === activeCategory);
   const activeCat = CATEGORIES.find((c) => c.key === activeCategory);
-
-  if (isLoading) {
-    return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  }
 
   return (
     <>
@@ -163,11 +134,9 @@ export default function TransportGrid() {
                         <Eye className="mr-2 h-4 w-4" /> Voir les détails
                       </Button>
                     </Link>
-                    <QuoteRequestDialog defaultDestination={`${activeCategory === 'transfert_aeroport' ? 'Transfert aéroport' : activeCategory === 'transfert_plage' ? 'Transfert par la plage en 4×4' : 'Location'} ${item.titre}`}>
-                      <Button variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
+                    <QuoteRequestButton defaultDestination={`${activeCategory === 'transfert_aeroport' ? 'Transfert aéroport' : activeCategory === 'transfert_plage' ? 'Transfert par la plage en 4×4' : 'Location'} ${item.titre}`} variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
                         Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </QuoteRequestDialog>
+                    </QuoteRequestButton>
                     <a
                       href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(activeCategory === 'transfert_aeroport' ? `Bonjour, je souhaiterais obtenir un devis pour un transfert aéroport avec ${item.titre}.` : activeCategory === 'transfert_plage' ? `Bonjour, je souhaiterais obtenir un devis pour un transfert par la plage en véhicule 4×4 avec ${item.titre}.` : `Bonjour, je souhaiterais obtenir un devis pour la location d'un ${item.titre} avec chauffeur.`)}`}
                       target="_blank"
@@ -189,11 +158,9 @@ export default function TransportGrid() {
                           <Eye className="mr-2 h-4 w-4" /> Voir les détails
                         </Button>
                       </Link>
-                      <QuoteRequestDialog defaultDestination={`${item.titre} (${item.tag})`}>
-                        <Button variant="link" className="p-0 text-primary">
+                      <QuoteRequestButton defaultDestination={`${item.titre} (${item.tag})`} variant="link" className="p-0 text-primary">
                           Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </QuoteRequestDialog>
+                      </QuoteRequestButton>
                     </div>
                   </>
                 )}

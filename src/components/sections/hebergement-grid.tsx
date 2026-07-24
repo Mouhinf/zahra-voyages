@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Loader2, Eye, Info, Hotel, Tent, TreePine } from 'lucide-react';
+import { ArrowRight, Eye, Info, Hotel, Tent, TreePine } from 'lucide-react';
 import Image from 'next/image';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { hebergementEnrichments } from '@/data/hebergement-enrichments';
 import { featuredHebergements } from '@/data/featured-hebergements';
@@ -32,53 +30,32 @@ const CATEGORIES = [
   { key: 'campement', label: 'Campements', icon: Tent, description: 'Aventure et traditions locales' },
 ];
 
-export default function HebergementGrid() {
-  const [items, setItems] = useState<Offre[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function HebergementGrid({ initialItems = [] }: { initialItems?: Offre[] }) {
+  const items = useMemo(() => {
+    const availableItems = initialItems
+      .filter((item) => item.disponible !== false)
+      .map((item) => ({ ...item, ...hebergementEnrichments[item.id] }));
+    const existingIds = new Set(availableItems.map((item) => item.id));
+    return [
+      ...availableItems,
+      ...featuredHebergements.filter((item) => !existingIds.has(item.id)),
+    ];
+  }, [initialItems]);
   const [activeCategory, setActiveCategory] = useState<string>('hotel');
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const q = query(collection(getDbInstance(), 'hebergements'), orderBy('ordre', 'asc'));
-        const snap = await getDocs(q);
-        const data: Offre[] = [];
-        snap.forEach((docSnap) => {
-          const d = docSnap.data() as Omit<Offre, 'id'>;
-          if (d.disponible !== false) data.push({ id: docSnap.id, ...d, ...hebergementEnrichments[docSnap.id] });
-        });
-        if (mounted) {
-          const existingIds = new Set(data.map((item) => item.id));
-          const combinedItems = [
-            ...data,
-            ...featuredHebergements.filter((item) => !existingIds.has(item.id)),
-          ];
-          setItems(combinedItems);
-          const params = new URLSearchParams(window.location.search);
-          const catParam = params.get('cat');
-          if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
-            setActiveCategory(catParam);
-          } else {
-            const firstWithItems = CATEGORIES.find((c) => combinedItems.some((d) => d.type === c.key));
-            if (firstWithItems) setActiveCategory(firstWithItems.key);
-          }
-        }
-      } catch (e) {
-        console.error('Erreur fetch hebergements:', e);
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+    const params = new URLSearchParams(window.location.search);
+    const catParam = params.get('cat');
+    if (catParam && CATEGORIES.some((c) => c.key === catParam)) {
+      setActiveCategory(catParam);
+      return;
+    }
+    const firstWithItems = CATEGORIES.find((c) => items.some((d) => d.type === c.key));
+    if (firstWithItems) setActiveCategory(firstWithItems.key);
+  }, [items]);
 
   const filteredItems = items.filter((item) => item.type === activeCategory);
   const activeCat = CATEGORIES.find((c) => c.key === activeCategory);
-
-  if (isLoading) {
-    return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  }
 
   return (
     <>
@@ -147,11 +124,9 @@ export default function HebergementGrid() {
                       <Eye className="mr-2 h-4 w-4" /> Voir les détails
                     </Button>
                   </Link>
-                  <QuoteRequestDialog defaultDestination={`${item.titre} (${item.tag})`}>
-                    <Button variant="link" className="p-0 text-primary">
+                  <QuoteRequestButton defaultDestination={`${item.titre} (${item.tag})`} variant="link" className="p-0 text-primary">
                       Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </QuoteRequestDialog>
+                  </QuoteRequestButton>
                 </div>
               </CardContent>
             </Card>

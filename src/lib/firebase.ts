@@ -15,19 +15,19 @@ let app: ReturnType<typeof initializeApp> | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 
-function initFirebase() {
-  if (typeof window === 'undefined') return;
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
+function getAppInstance() {
+  if (!app) {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  }
+  return app;
 }
 
 export function getAuthInstance(): Auth {
-  if (!auth) initFirebase();
+  if (!auth) auth = getAuth(getAppInstance());
   return auth!;
 }
 
 export function getDbInstance(): Firestore {
-  if (!db) initFirebase();
+  if (!db) db = getFirestore(getAppInstance());
   return db!;
 }

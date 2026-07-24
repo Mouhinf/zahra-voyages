@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Loader2, Info, Eye } from 'lucide-react';
+import { ArrowRight, Info, Eye } from 'lucide-react';
 import Image from 'next/image';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 
 type Offre = {
   id: string;
@@ -26,45 +24,27 @@ type OffresGridProps = {
   collectionName: string;
   emptyMessage: string;
   detailBasePath?: string;
+  initialItems?: Offre[];
   staticItems?: Offre[];
   hidePrices?: boolean;
   enrichments?: Record<string, Partial<Offre>>;
 };
 
-export default function OffresGrid({ collectionName, emptyMessage, detailBasePath, staticItems = [], hidePrices = false, enrichments = {} }: OffresGridProps) {
-  const [items, setItems] = useState<Offre[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const q = query(collection(getDbInstance(), collectionName), orderBy('ordre', 'asc'));
-        const snap = await getDocs(q);
-        if (mounted) {
-          const data: Offre[] = [];
-          snap.forEach((doc) => {
-            const d = doc.data() as Omit<Offre, 'id'>;
-            if ((d as Offre).disponible !== false) {
-              const sanitized = { ...d, image: d.image && d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image };
-              data.push({ id: doc.id, ...sanitized, ...enrichments[doc.id] });
-            }
-          });
-          setItems([...data, ...staticItems]);
-        }
-      } catch (error) {
-        console.error(`Erreur fetch ${collectionName}:`, error);
-        if (mounted) setItems(staticItems);
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, [collectionName]);
-
-  if (isLoading) {
-    return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  }
+export default function OffresGrid({ emptyMessage, detailBasePath, initialItems = [], staticItems = [], hidePrices = false, enrichments = {} }: OffresGridProps) {
+  const items = useMemo(() => {
+    const data = initialItems
+      .filter((item) => item.disponible !== false)
+      .map((item) => {
+        const sanitized = {
+          ...item,
+          image: item.image && item.image.includes('unsplash')
+            ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png'
+            : item.image,
+        };
+        return { ...sanitized, ...enrichments[item.id] };
+      });
+    return [...data, ...staticItems];
+  }, [initialItems, staticItems, enrichments]);
 
   return (
     <>
@@ -101,11 +81,9 @@ export default function OffresGrid({ collectionName, emptyMessage, detailBasePat
                       </Button>
                     </Link>
                   )}
-                  <QuoteRequestDialog defaultDestination={`${item.titre} (${item.tag})`}>
-                    <Button variant="link" className="p-0 text-primary">
+                  <QuoteRequestButton defaultDestination={`${item.titre} (${item.tag})`} variant="link" className="p-0 text-primary">
                       Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </QuoteRequestDialog>
+                  </QuoteRequestButton>
                 </div>
               </CardContent>
             </Card>

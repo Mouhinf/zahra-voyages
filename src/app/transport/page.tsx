@@ -1,8 +1,9 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import TransportGrid from '@/components/sections/transport-grid';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
-import { Button } from '@/components/ui/button';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { fetchPublicCollection } from '@/lib/public-data';
+import type { Transport } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
 
@@ -13,7 +14,11 @@ export const metadata = {
   description: 'Location de voiture, VTC, transferts aéroport et bus privé à Dakar et au Sénégal. Voyagez en toute liberté avec SLAAC Voyages.',
 };
 
-export default function TransportPage() {
+export const revalidate = 300;
+
+export default async function TransportPage() {
+  const transportItems = await fetchPublicCollection<Transport>('transports');
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -43,7 +48,7 @@ export default function TransportPage() {
                 Trois solutions de transport adaptées à vos besoins : billets d'avion vers toutes destinations, transferts aéroport confortables et transferts par la plage pour vos escapades balnéaires.
               </p>
             </div>
-            <TransportGrid />
+            <TransportGrid initialItems={transportItems} />
           </div>
         </section>
 
@@ -53,9 +58,7 @@ export default function TransportPage() {
             <div className="w-12 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-muted-foreground text-lg text-balance">Contactez-nous pour une solution de transport sur mesure.</p>
             <div className="mt-8">
-              <QuoteRequestDialog>
-                <Button size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</Button>
-              </QuoteRequestDialog>
+              <QuoteRequestButton size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</QuoteRequestButton>
             </div>
           </div>
         </section>

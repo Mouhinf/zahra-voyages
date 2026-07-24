@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Send } from 'lucide-react';
-import { QuoteRequestDialog } from './quote-request-dialog';
+import { QuoteRequestButton } from './quote-request-button';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
@@ -53,18 +53,16 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-            <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp">
+            <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp">
                 <Button variant="outline" size="icon" className="hidden sm:flex">
                     <WhatsAppIcon className="h-5 w-5 fill-current" />
                     <span className="sr-only">Contacter sur WhatsApp</span>
                 </Button>
             </a>
-            <QuoteRequestDialog>
-              <Button className="hidden sm:flex" variant="default">
+            <QuoteRequestButton className="hidden sm:flex" variant="default">
                   Demander un Devis
                   <Send className="ml-2 h-4 w-4" />
-              </Button>
-            </QuoteRequestDialog>
+            </QuoteRequestButton>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden">
@@ -95,13 +93,11 @@ export default function Header() {
                     </SheetClose>
                   ))}
                 </nav>
-                <QuoteRequestDialog>
-                  <Button className="w-full" variant="default">
+                <QuoteRequestButton className="w-full" variant="default">
                       Demander un Devis
                       <Send className="ml-2 h-4 w-4" />
-                  </Button>
-                </QuoteRequestDialog>
-                <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp">
+                </QuoteRequestButton>
+                <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp">
                     <Button variant="outline" className="w-full">
                         <WhatsAppIcon className="mr-2 h-5 w-5 fill-current" /> Contacter sur WhatsApp
                     </Button>

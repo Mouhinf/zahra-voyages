@@ -1,8 +1,9 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import OffresGrid from '@/components/sections/offres-grid';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
-import { Button } from '@/components/ui/button';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { fetchPublicCollection } from '@/lib/public-data';
+import type { Excursion } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
 import { featuredExcursions } from '@/data/featured-excursions';
@@ -15,7 +16,11 @@ export const metadata = {
   description: "Excursions et visites guidées au Sénégal : Île de Gorée, Lac Rose, Casamance. Découvrez les trésors du Sénégal avec SLAAC Voyages.",
 };
 
-export default function ExcursionsPage() {
+export const revalidate = 300;
+
+export default async function ExcursionsPage() {
+  const excursionItems = await fetchPublicCollection<Excursion>('excursions');
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -45,7 +50,7 @@ export default function ExcursionsPage() {
                 Découvrez les sites incontournables et les trésors cachés du Sénégal avec nos excursions guidées, de la demi-journée au séjour de plusieurs jours.
               </p>
             </div>
-            <OffresGrid collectionName="excursions" emptyMessage="Aucune excursion disponible pour le moment. Contactez-nous pour une excursion sur mesure." detailBasePath="/excursions" staticItems={featuredExcursions} hidePrices enrichments={excursionEnrichments} />
+            <OffresGrid collectionName="excursions" emptyMessage="Aucune excursion disponible pour le moment. Contactez-nous pour une excursion sur mesure." detailBasePath="/excursions" initialItems={excursionItems} staticItems={featuredExcursions} hidePrices enrichments={excursionEnrichments} />
           </div>
         </section>
 
@@ -55,9 +60,7 @@ export default function ExcursionsPage() {
             <div className="w-12 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-muted-foreground text-lg text-balance">Réservez votre excursion ou demandez un programme sur mesure.</p>
             <div className="mt-8">
-              <QuoteRequestDialog>
-                <Button size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</Button>
-              </QuoteRequestDialog>
+              <QuoteRequestButton size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</QuoteRequestButton>
             </div>
           </div>
         </section>

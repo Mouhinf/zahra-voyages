@@ -10,7 +10,7 @@ import { getFeaturedExcursion } from '@/data/featured-excursions';
 import { getExcursionEnrichment } from '@/data/excursion-enrichments';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -218,9 +218,7 @@ export default function ExcursionDetailPage() {
                     </div>
                   </div>
 
-                  <QuoteRequestDialog defaultDestination={item.titre}>
-                    <Button className="w-full" size="lg" disabled={!item.disponible}>Demander un devis</Button>
-                  </QuoteRequestDialog>
+                  <QuoteRequestButton defaultDestination={item.titre} className="w-full" size="lg" disabled={!item.disponible}>Demander un devis</QuoteRequestButton>
                   <p className="text-xs text-center text-muted-foreground mt-3">Réponse sous 24h · Devis gratuit et sans engagement</p>
                 </div>
               </div>

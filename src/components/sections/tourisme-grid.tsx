@@ -1,17 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Building2, Eye, Info, Landmark, Languages, Loader2, Map } from 'lucide-react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { getDbInstance } from '@/lib/firebase';
+import { ArrowRight, Building2, Eye, Info, Landmark, Languages, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { featuredTourismeOffers } from '@/data/featured-tourisme';
 import { withBusinessOfferImage } from '@/data/business-offer-images';
 
@@ -27,57 +25,33 @@ const CATEGORIES = [
 const legacyBusinessTypes = new Set(['seminaire', 'incentive', 'mice', 'mission_sur_mesure']);
 const categoryFor = (item: Offre) => legacyBusinessTypes.has(item.type) ? 'tourisme_affaires' : item.type;
 
-export default function TourismeGrid() {
-  const [items, setItems] = useState<Offre[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function TourismeGrid({ initialItems = [] }: { initialItems?: Offre[] }) {
+  const items = useMemo(() => {
+    const availableItems = initialItems
+      .filter((item) => item.disponible !== false)
+      .map((offer) => legacyBusinessTypes.has(offer.type) || offer.type === 'tourisme_affaires'
+        ? ({ id: offer.id, ...withBusinessOfferImage(offer) } as Offre)
+        : offer);
+    const existingIds = new Set(availableItems.map((item) => item.id));
+    return [
+      ...availableItems,
+      ...featuredTourismeOffers.filter((item) => !existingIds.has(item.id)),
+    ];
+  }, [initialItems]);
   const [activeCategory, setActiveCategory] = useState('tourisme_affaires');
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const snapshot = await getDocs(query(collection(getDbInstance(), 'offresAffaires'), orderBy('ordre', 'asc')));
-        const data: Offre[] = [];
-        snapshot.forEach((doc) => {
-          const offer = doc.data() as Omit<Offre, 'id'> & { images?: string[] };
-          if (offer.disponible !== false) {
-            const normalized = legacyBusinessTypes.has(offer.type) || offer.type === 'tourisme_affaires'
-              ? withBusinessOfferImage(offer)
-              : offer;
-            data.push({ id: doc.id, ...normalized });
-          }
-        });
-        if (mounted) {
-          const existingIds = new Set(data.map((item) => item.id));
-          const combinedItems = [
-            ...data,
-            ...featuredTourismeOffers.filter((item) => !existingIds.has(item.id)),
-          ];
-          setItems(combinedItems);
-          const categoryParam = new URLSearchParams(window.location.search).get('cat');
-          if (categoryParam && CATEGORIES.some((category) => category.key === categoryParam)) setActiveCategory(categoryParam);
-          else {
-            const firstWithItems = CATEGORIES.find((category) => combinedItems.some((item) => categoryFor(item) === category.key));
-            if (firstWithItems) setActiveCategory(firstWithItems.key);
-          }
-        }
-      } catch (error) {
-        console.error('Erreur fetch offres tourisme:', error);
-        if (mounted) {
-          setItems(featuredTourismeOffers);
-          setActiveCategory('tourisme_religieux');
-        }
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+    const categoryParam = new URLSearchParams(window.location.search).get('cat');
+    if (categoryParam && CATEGORIES.some((category) => category.key === categoryParam)) {
+      setActiveCategory(categoryParam);
+      return;
+    }
+    const firstWithItems = CATEGORIES.find((category) => items.some((item) => categoryFor(item) === category.key));
+    if (firstWithItems) setActiveCategory(firstWithItems.key);
+  }, [items]);
 
   const filteredItems = items.filter((item) => categoryFor(item) === activeCategory);
   const activeCat = CATEGORIES.find((category) => category.key === activeCategory);
-
-  if (isLoading) return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return <>
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
@@ -97,7 +71,7 @@ export default function TourismeGrid() {
     {filteredItems.length > 0 ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {filteredItems.map((item) => <Card key={item.id} className="overflow-hidden group shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col rounded-2xl border-border/50">
         <div className="relative h-64 overflow-hidden"><Image src={item.image} alt={item.titre} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-110" /><Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground shadow-md">{item.tag}</Badge></div>
-        <CardContent className="p-5 flex flex-col flex-grow"><h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3><p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p><p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p><div className="flex items-center gap-2 mt-4"><Link href={`/tourisme-affaires/${item.id}`}><Button variant="outline" size="sm"><Eye className="mr-2 h-4 w-4" /> Voir les détails</Button></Link><QuoteRequestDialog defaultDestination={`${item.titre} (${item.tag})`}><Button variant="link" className="p-0 text-primary">Demander un devis <ArrowRight className="ml-2 h-4 w-4" /></Button></QuoteRequestDialog></div></CardContent>
+        <CardContent className="p-5 flex flex-col flex-grow"><h3 className="text-lg font-semibold text-primary font-headline">{item.titre}</h3><p className="text-sm text-muted-foreground mt-1 flex-grow line-clamp-3">{item.description}</p><p className="text-base font-semibold text-accent-foreground mt-3">{item.prix}</p><div className="flex items-center gap-2 mt-4"><Link href={`/tourisme-affaires/${item.id}`}><Button variant="outline" size="sm"><Eye className="mr-2 h-4 w-4" /> Voir les détails</Button></Link><QuoteRequestButton defaultDestination={`${item.titre} (${item.tag})`} variant="link" className="p-0 text-primary">Demander un devis <ArrowRight className="ml-2 h-4 w-4" /></QuoteRequestButton></div></CardContent>
       </Card>)}
     </div> : <div className="text-center py-16">{activeCat && <activeCat.icon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />}<p className="text-muted-foreground">Aucune offre dans la catégorie « {activeCat?.label} » pour le moment. Contactez-nous pour une demande personnalisée.</p></div>}
   </>;

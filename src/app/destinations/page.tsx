@@ -1,11 +1,10 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { ArrowRight, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const destinations = [
@@ -163,11 +162,9 @@ export default function DestinationsPage() {
                   <CardContent className="p-5 flex flex-col flex-grow">
                     <h3 className="text-lg font-semibold text-primary font-headline">{dest.name}</h3>
                     <p className="text-sm font-medium text-accent-foreground mt-1 flex-grow">{dest.price}</p>
-                    <QuoteRequestDialog>
-                      <Button variant="link" className="p-0 mt-2 text-primary self-start">
+                    <QuoteRequestButton variant="link" className="p-0 mt-2 text-primary self-start">
                         Obtenir un devis <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </QuoteRequestDialog>
+                    </QuoteRequestButton>
                   </CardContent>
                 </Card>
               ))}

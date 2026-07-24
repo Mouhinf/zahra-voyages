@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { ArrowRight, Hotel, Car, Ship, MapPinned, Briefcase, Zap } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
@@ -136,7 +135,7 @@ export default function HomeServicesGrid() {
           })}
 
           {/* 6e carte : Réservation express */}
-          <QuoteRequestDialog>
+          <QuoteRequestButton asChild>
             <button type="button" className="text-left w-full h-full cursor-pointer">
             <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-accent/5 border-accent/30 flex flex-col p-0">
               <div className="relative h-48 overflow-hidden">
@@ -163,7 +162,7 @@ export default function HomeServicesGrid() {
               </div>
             </Card>
             </button>
-          </QuoteRequestDialog>
+          </QuoteRequestButton>
         </div>
       </div>
     </section>

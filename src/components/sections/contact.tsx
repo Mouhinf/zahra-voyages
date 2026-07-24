@@ -62,15 +62,15 @@ export default function Contact() {
                 <div className="p-3 bg-primary/10 rounded-full"><MapPin className="h-6 w-6 text-primary" /></div>
                 <div>
                     <h3 className="text-lg font-semibold text-primary">Notre Bureau</h3>
-                    <p className="text-muted-foreground">Avenue Lamine Guèye Centre-ville, Dakar, Sénégal</p>
+                    <p className="text-muted-foreground">Dakar Plateau rue Mouhamed 5 à l'Immeuble Djolof Chicken à la Troisième étage</p>
                 </div>
             </div>
             <div className="flex items-start gap-4">
                 <div className="p-3 bg-primary/10 rounded-full"><WhatsAppIcon className="h-6 w-6 text-primary" /></div>
                 <div>
                     <h3 className="text-lg font-semibold text-primary">WhatsApp</h3>
-                    <a href="https://wa.me/221775396325" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2">
-                        <WhatsAppIcon className="h-4 w-4 fill-current" /> +221 77 539 63 25 (Discussion instantanée)
+                    <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2">
+                        <WhatsAppIcon className="h-4 w-4 fill-current" /> +221 77 312 90 90 (Discussion instantanée)
                     </a>
                 </div>
             </div>
@@ -78,7 +78,7 @@ export default function Contact() {
                 <div className="p-3 bg-primary/10 rounded-full"><Mail className="h-6 w-6 text-primary" /></div>
                 <div>
                     <h3 className="text-lg font-semibold text-primary">Écrivez-nous</h3>
-                    <p className="text-muted-foreground">contact@zahravoyages.com</p>
+                    <p className="text-muted-foreground">mdslaacvoyages@gmail.com</p>
                 </div>
             </div>
              <div className="pt-6">

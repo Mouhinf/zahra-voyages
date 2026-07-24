@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -141,9 +141,7 @@ export default function ServicesPage() {
                               <p className="text-muted-foreground leading-relaxed">{service.description}</p>
                             </CardContent>
                             <div className="mt-5">
-                              <QuoteRequestDialog>
-                                <Button variant="link">Demander un devis</Button>
-                              </QuoteRequestDialog>
+                              <QuoteRequestButton variant="link">Demander un devis</QuoteRequestButton>
                             </div>
                         </Card>
                       ))}
@@ -164,9 +162,7 @@ export default function ServicesPage() {
                               <p className="text-muted-foreground leading-relaxed">{service.description}</p>
                             </CardContent>
                             <div className="mt-5">
-                              <QuoteRequestDialog>
-                                <Button variant="link">Demander un devis</Button>
-                              </QuoteRequestDialog>
+                              <QuoteRequestButton variant="link">Demander un devis</QuoteRequestButton>
                             </div>
                         </Card>
                       ))}

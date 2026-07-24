@@ -10,7 +10,7 @@ import { getHebergementEnrichment } from '@/data/hebergement-enrichments';
 import { getFeaturedHebergement } from '@/data/featured-hebergements';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { QuoteRequestDialog } from '@/components/layout/quote-request-dialog';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -250,13 +250,11 @@ export default function HebergementDetailPage() {
                     </div>
                   </div>
 
-                  <QuoteRequestDialog defaultDestination={item.titre}>
-                    <Button className="w-full" size="lg" disabled={!item.disponible}>
+                  <QuoteRequestButton defaultDestination={item.titre} className="w-full" size="lg" disabled={!item.disponible}>
                       Demander un devis
-                    </Button>
-                  </QuoteRequestDialog>
+                  </QuoteRequestButton>
                   <a
-                    href={`https://wa.me/221775396325?text=${encodeURIComponent(`Bonjour, je souhaite des informations sur ${item.titre}.`)}`}
+                    href={`https://wa.me/221773129090?text=${encodeURIComponent(`Bonjour, je souhaite des informations sur ${item.titre}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-green-600 bg-green-600/10 px-4 text-sm font-medium text-green-700 transition-colors hover:bg-green-600 hover:text-white"
