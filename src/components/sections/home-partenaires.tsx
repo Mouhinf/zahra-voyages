@@ -17,7 +17,7 @@ const PartnerImage = ({ src, alt, sizes, className, priority }: { src: string, a
       sizes={sizes}
       className={className}
       priority={priority}
-      onError={undefined} // Explicitly pass undefined to onError to prevent serialization issues
+      onError={null} // Explicitly pass null to onError to prevent serialization issues
       // The error message 'onError: function onError' suggests a conflict with event handlers.
       // By ensuring props like `alt` are static strings and explicitly handling onError,
       // we aim to prevent Next.js from serializing client-side functions during static generation.
@@ -87,7 +87,7 @@ export default function HomePartenaires() {
                   sizes="(max-width: 640px) 96px, 112px"
                   className="object-contain"
                   priority={true}
-                  onError={undefined} // Explicitly passing undefined to onError
+                  onError={null} // Explicitly passing null to onError
                 />
               </div>
               <span className="text-xs sm:text-sm font-medium text-muted-foreground">{p.nom}</span>
