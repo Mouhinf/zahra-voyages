@@ -7,6 +7,23 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Partenaire } from '@/types';
 import { Loader2 } from 'lucide-react';
 
+// Wrapper component for Image to potentially isolate client-side props
+const PartnerImage = ({ src, alt, sizes, className, priority }: { src: string, alt: string, sizes: string, className: string, priority?: boolean }) => {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={className}
+      priority={priority}
+      // The error message suggests 'onError: function onError' is problematic during SSR.
+      // While next/image doesn't directly expose onError, explicit handling or isolation might help.
+      // This wrapper aims to ensure the Image component behaves correctly in client contexts.
+    />
+  );
+};
+
 export default function HomePartenaires() {
   const [partenaires, setPartenaires] = useState<Partenaire[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,12 +80,12 @@ export default function HomePartenaires() {
               className="flex flex-col items-center gap-2 shrink-0"
             >
               <div className="relative h-16 w-24 sm:h-20 sm:w-28 grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100">
-                <Image
+                <PartnerImage
                   src={p.logo}
                   alt={p.nom?.trim() || 'Logo partenaire'}
-                  fill
                   sizes="(max-width: 640px) 96px, 112px"
                   className="object-contain"
+                  priority={true}
                 />
               </div>
               <span className="text-xs sm:text-sm font-medium text-muted-foreground">{p.nom}</span>
