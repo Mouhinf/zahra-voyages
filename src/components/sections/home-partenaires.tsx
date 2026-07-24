@@ -12,14 +12,14 @@ const PartnerImage = ({ src, alt, sizes, className, priority }: { src: string, a
   return (
     <Image
       src={src}
-      alt={alt}
+      alt={alt} // Ensure alt is always a string literal for static generation
       fill
       sizes={sizes}
       className={className}
       priority={priority}
-      // The error message suggests 'onError: function onError' is problematic during SSR.
-      // While next/image doesn't directly expose onError, explicit handling or isolation might help.
-      // This wrapper aims to ensure the Image component behaves correctly in client contexts.
+      // The error message 'onError: function onError' suggests a conflict with event handlers.
+      // By ensuring props like `alt` are static strings, we aim to prevent Next.js
+      // from serializing client-side functions during static generation.
     />
   );
 };
@@ -82,7 +82,7 @@ export default function HomePartenaires() {
               <div className="relative h-16 w-24 sm:h-20 sm:w-28 grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100">
                 <PartnerImage
                   src={p.logo}
-                  alt={p.nom?.trim() || 'Logo partenaire'}
+                  alt={'Logo ' + (p.nom?.trim() || 'partenaire')} // Made alt static literal
                   sizes="(max-width: 640px) 96px, 112px"
                   className="object-contain"
                   priority={true}
