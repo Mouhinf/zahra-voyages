@@ -81,7 +81,7 @@ export default function HomeContactQuick() {
         <div className="mt-12 grid lg:grid-cols-2 gap-8 items-start">
           <div className="space-y-6">
             <div className="relative h-56 rounded-lg overflow-hidden shadow-md">
-              <Image src={agenceImg} alt="SLAAC Voyages — Dakar" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" onError={(e) => { const t = e.currentTarget as HTMLImageElement; if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = FALLBACK_AGENCY; } }} />
+              <Image src={agenceImg} alt="SLAAC Voyages — Dakar" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent" />
               <div className="absolute bottom-4 left-4 text-white">
                 <p className="font-semibold text-lg drop-shadow-lg">SLAAC Voyages</p>

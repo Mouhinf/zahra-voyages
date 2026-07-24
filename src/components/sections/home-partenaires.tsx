@@ -7,20 +7,16 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Partenaire } from '@/types';
 import { Loader2 } from 'lucide-react';
 
-// Wrapper component for Image to potentially isolate client-side props
-const PartnerImage = ({ src, alt, sizes, className, priority }: { src: string, alt: string, sizes: string, className: string, priority?: boolean }) => {
+// Simple Image wrapper without event handlers to avoid serialization issues
+const PartnerImage = ({ src, alt, width, height, className }: { src: string, alt: string, width: number, height: number, className: string }) => {
   return (
     <Image
       src={src}
-      alt={alt} // Ensure alt is always a string literal for static generation
-      fill
-      sizes={sizes}
+      alt={alt}
+      width={width}
+      height={height}
       className={className}
-      priority={priority}
-      onError={() => {}} // Explicitly pass an empty function to onError
-      // The error message 'onError: function onError' suggests a conflict with event handlers.
-      // By ensuring props like `alt` are static strings and explicitly handling onError,
-      // we aim to prevent Next.js from serializing client-side functions during static generation.
+      unoptimized={true} // Disable optimization to avoid SSR issues with Cloudinary URLs
     />
   );
 };
@@ -83,11 +79,10 @@ export default function HomePartenaires() {
               <div className="relative h-16 w-24 sm:h-20 sm:w-28 grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100">
                 <PartnerImage
                   src={p.logo}
-                  alt={'Logo ' + (p.nom?.trim() || 'partenaire')} // Made alt static literal
-                  sizes="(max-width: 640px) 96px, 112px"
+                  alt={'Logo ' + (p.nom?.trim() || 'partenaire')}
+                  width={96}
+                  height={64}
                   className="object-contain"
-                  priority={true}
-                  onError={() => {}} // Explicitly passing an empty function to onError
                 />
               </div>
               <span className="text-xs sm:text-sm font-medium text-muted-foreground">{p.nom}</span>
