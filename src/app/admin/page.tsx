@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { getAuthInstance } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import { Loader2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, LogOut } from 'lucide-react';
 import DestinationsManager from '@/components/admin/destinations-manager';
 import HebergementsManager from '@/components/admin/hebergements-manager';
 import TransportsManager from '@/components/admin/transports-manager';
@@ -29,14 +29,8 @@ export default function AdminDashboard() {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, [router]);
-
-  const handleLogout = async () => {
-    await signOut(getAuthInstance());
-    router.push('/admin/login');
-  };
 
   if (loading) {
     return (
@@ -50,38 +44,45 @@ export default function AdminDashboard() {
     return null;
   }
 
+  const handleLogout = async () => {
+    await signOut(getAuthInstance());
+    router.push('/admin/login');
+  };
+
   return (
     <div className="p-4 sm:p-8 bg-secondary/50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8 pb-4 border-b">
-            <div>
-                <h1 className="text-3xl font-bold text-primary">Tableau de Bord</h1>
-                <p className="text-muted-foreground">Bienvenue, {user.email}</p>
-            </div>
-            <Button onClick={handleLogout} variant="outline">
-                <LogOut className="mr-2 h-4 w-4" />
-                Déconnexion
-            </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-primary">Tableau de Bord</h1>
+            <p className="text-muted-foreground">Bienvenue, {user.email}</p>
+          </div>
+          <Button onClick={handleLogout} variant="outline">
+            <LogOut className="mr-2 h-4 w-4" />
+            Déconnexion
+          </Button>
         </header>
         <main>
-            <Tabs defaultValue="destinations" className="w-full">
-              <TabsList className="flex flex-wrap h-auto gap-1 mb-6 bg-background border">
-                <TabsTrigger value="destinations">Destinations</TabsTrigger>
-                <TabsTrigger value="hebergements">Hébergements</TabsTrigger>
-                <TabsTrigger value="transports">Transports</TabsTrigger>
-                <TabsTrigger value="voyages">Voyages & Croisières</TabsTrigger>
-                <TabsTrigger value="excursions">Excursions</TabsTrigger>
-                <TabsTrigger value="affaires">Tourisme d'Affaires</TabsTrigger>
-                <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
-              </TabsList>
-              <TabsContent value="destinations"><DestinationsManager /></TabsContent>
-              <TabsContent value="hebergements"><HebergementsManager /></TabsContent>
-              <TabsContent value="transports"><TransportsManager /></TabsContent>
-              <TabsContent value="voyages"><VoyagesCroisieresManager /></TabsContent>
-              <TabsContent value="excursions"><ExcursionsManager /></TabsContent>
-              <TabsContent value="affaires"><OffresAffairesManager /></TabsContent>
-              <TabsContent value="partenaires"><PartenairesManager /></TabsContent>
-            </Tabs>
+          <Tabs defaultValue="destinations" className="w-full">
+            <TabsList className="flex flex-wrap h-auto gap-1 mb-6 bg-background border">
+              <TabsTrigger value="destinations">Destinations</TabsTrigger>
+              <TabsTrigger value="hebergements">Hébergements</TabsTrigger>
+              <TabsTrigger value="transports">Transports</TabsTrigger>
+              <TabsTrigger value="voyages">Voyages & Croisières</TabsTrigger>
+              <TabsTrigger value="excursions">Excursions</TabsTrigger>
+              <TabsTrigger value="affaires">Tourisme d'Affaires</TabsTrigger>
+              <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            </TabsList>
+            <TabsContent value="destinations"><DestinationsManager /></TabsContent>
+            <TabsContent value="hebergements"><HebergementsManager /></TabsContent>
+            <TabsContent value="transports"><TransportsManager /></TabsContent>
+            <TabsContent value="voyages"><VoyagesCroisieresManager /></TabsContent>
+            <TabsContent value="excursions"><ExcursionsManager /></TabsContent>
+            <TabsContent value="affaires"><OffresAffairesManager /></TabsContent>
+            <TabsContent value="partenaires"><PartenairesManager /></TabsContent>
+            <TabsContent value="dashboard"><div className="min-h-[600px]"><AdminDashboardPage /></div></TabsContent>
+          </Tabs>
         </main>
       </div>
     </div>

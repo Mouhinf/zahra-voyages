@@ -22,25 +22,83 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
+import { PlusCircle, Loader2, Trash2, Pencil, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
 
+// Define schema for both voyage and croisiere types
 const formSchema = z.object({
+  // Common fields for all sections
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
-  description: z.string().min(10, 'La description doit contenir au moins 10 caractères.'),
-  descriptionComplete: z.string().optional(),
   prix: z.string().optional(),
   tag: z.string().min(2, 'Veuillez entrer une catégorie.'),
+  
+  // Section-specific fields
   type: z.enum(['voyage', 'croisiere']),
   destination: z.string().min(2, 'Veuillez entrer une destination.'),
   duree: z.string().min(2, 'Veuillez entrer une durée.'),
-  dateDepart: z.string(),
-  inclus: z.string(),
-  nonInclus: z.string(),
+  dateDepart: z.string().optional(),
+  inclus: z.string().optional(),
+  nonInclus: z.string().optional(),
+  description: z.string().min(10, 'La description doit contenir au moins 10 caractères.'),
+  descriptionComplete: z.string().optional(),
+  
+  // Form-specific fields
   disponible: z.boolean().default(true),
   ordre: z.coerce.number().default(0),
   image: z.custom<FileList>((value) => typeof FileList !== 'undefined' && value instanceof FileList).optional(),
 });
+
+// Define field visibility based on type/category
+function getFieldsVisibility(type: string, tag: string) {
+  const base = {
+    titre: true,
+    prix: tag.includes('premium') || tag.includes('luxury') || tag.includes('luxe') || tag.includes('affaires'),
+    type: true,
+    destination: true,
+    duree: true,
+    dateDepart: type === 'croisiere',
+    inclus: type === 'voyage' || type === 'croisiere',
+    nonInclus: type === 'voyage' || type === 'croisiere',
+    description: true,
+    descriptionComplete: type === 'croisiere',
+    disponible: true,
+    ordre: true,
+    image: true,
+  };
+
+  return base;
+}
+
+const labelByField = {
+  titre: 'Titre',
+  prix: 'Prix',
+  tag: 'Catégorie',
+  type: 'Type',
+  destination: 'Destination',
+  duree: 'Durée',
+  dateDepart: 'Date de départ',
+  inclus: 'Inclus (séparés par virgules)',
+  nonInclus: 'Non inclus (séparés par virgules)',
+  description: 'Description courte',
+  descriptionComplete: 'Description complète',
+  disponible: 'Disponible',
+  ordre: 'Ordre d\'affichage',
+};
+
+const placeholderByField = {
+  titre: 'Séjour Paris - La Ville Lumière',
+  prix: 'Dès 850 000 FCFA',
+  tag: 'Voyage, Croisière, Premium...',
+  type: 'Type',
+  destination: 'Paris, France',
+  duree: '7 jours / 6 nuits',
+  dateDepart: 'YYYY-MM-DD',
+  inclus: 'Vol, Hébergement, Excursions, Transferts',
+  nonInclus: 'Repas, Activités optionnelles',
+  description: 'Trois jours de musées...',
+  descriptionComplete: 'Description détaillée...',
+  ordre: '0',
+};
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -56,11 +114,15 @@ export default function VoyagesCroisieresManager() {
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Track form field visibility
+  const [fieldVisibility, setFieldVisibility] = useState(getFieldsVisibility('voyage', ''));
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'voyage',
+      titre: '', prix: '', tag: '', type: 'voyage',
       destination: '', duree: '', dateDepart: '', inclus: '', nonInclus: '',
+      description: '', descriptionComplete: '',
       disponible: true, ordre: 0,
     },
   });
@@ -80,11 +142,14 @@ export default function VoyagesCroisieresManager() {
     setEditingItem(null);
     setGalleryFiles([]);
     setMainImageFile(null);
+    // Reset form with default values for a new item
     form.reset({
       titre: '', description: '', descriptionComplete: '', prix: '', tag: '', type: 'voyage',
       destination: '', duree: '', dateDepart: '', inclus: '', nonInclus: '',
       disponible: true, ordre: 0,
     });
+    // Update field visibility
+    setFieldVisibility(getFieldsVisibility('voyage', ''));
     setIsDialogOpen(true);
   }
 
@@ -107,8 +172,20 @@ export default function VoyagesCroisieresManager() {
       disponible: item.disponible,
       ordre: item.ordre,
     });
+    // Update field visibility based on the item's type and tag
+    setFieldVisibility(getFieldsVisibility(item.type, item.tag));
     setIsDialogOpen(true);
   }
+
+  // Watch for type and tag changes to update field visibility dynamically
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'type' || name === 'tag') {
+        setFieldVisibility(getFieldsVisibility(value.type || 'voyage', value.tag || ''));
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
   async function onSubmit(values: FormValues) {
     setIsUploading(true);
@@ -213,68 +290,105 @@ export default function VoyagesCroisieresManager() {
           <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? 'Modifier' : 'Nouveau'} Voyage / Croisière</DialogTitle>
-              <DialogDescription>Remplissez les informations ci-dessous.</DialogDescription>
+                <DialogDescription>
+                  Remplissez les informations ci-dessous. 
+                  <span className="text-xs text-muted-foreground block mt-1">
+                    Remarque : Les champs spécifiques au type sont requis en fonction de votre sélection.
+                    Le formulaire s'adapte automatiquement en fonction du type et de la catégorie sélectionnés.
+                  </span>
+                </DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {/* Common fields for all sections */}
                 <FormField control={form.control} name="titre" render={({ field }) => (
-                  <FormItem><FormLabel>Titre</FormLabel><FormControl><Input placeholder="Séjour Paris - La Ville Lumière" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>{labelByField.titre}</FormLabel><FormControl><Input placeholder={placeholderByField.titre} {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
+
+                {/* Type selector - affects all fields */}
+                <FormField control={form.control} name="type" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de voyage</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl><SelectTrigger><SelectValue placeholder={placeholderByField.type} /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        <SelectItem value="voyage">Voyage</SelectItem>
+                        <SelectItem value="croisiere">Croisière</SelectItem>
+                      </SelectContent>
+                    </Select><FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* Category selector - affects field visibility */}
+                <FormField control={form.control} name="tag" render={({ field }) => (
+                  <FormItem><FormLabel>Catégorie</FormLabel><FormControl><Input placeholder={placeholderByField.tag} {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+
+                {/* Dynamic fields based on type and category */}
+                <div className="grid grid-cols-2 gap-4">
+                  {fieldVisibility.destination && (
+                    <FormField control={form.control} name="destination" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.destination}</FormLabel><FormControl><Input placeholder={placeholderByField.destination} {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                  {fieldVisibility.duree && (
+                    <FormField control={form.control} name="duree" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.duree}</FormLabel><FormControl><Input placeholder={placeholderByField.duree} {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                  {fieldVisibility.dateDepart && (
+                    <FormField control={form.control} name="dateDepart" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.dateDepart}</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                  {fieldVisibility.prix && (
+                    <FormField control={form.control} name="prix" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.prix}</FormLabel><FormControl><Input placeholder={placeholderByField.prix} {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {fieldVisibility.inclus && (
+                    <FormField control={form.control} name="inclus" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.inclus}</FormLabel><FormControl><Textarea placeholder={placeholderByField.inclus} className="resize-none" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                  {fieldVisibility.nonInclus && (
+                    <FormField control={form.control} name="nonInclus" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.nonInclus}</FormLabel><FormControl><Textarea placeholder={placeholderByField.nonInclus} className="resize-none" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                </div>
+
                 <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem><FormLabel>Description courte</FormLabel><FormControl><Textarea placeholder="Trois jours de musées..." {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>{labelByField.description}</FormLabel><FormControl><Textarea placeholder={placeholderByField.description} className="resize-none" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
-                <FormField control={form.control} name="descriptionComplete" render={({ field }) => (
-                  <FormItem><FormLabel>Description complète</FormLabel><FormControl><Textarea className="min-h-[120px]" placeholder="Description détaillée affichée sur la page..." {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
+
+                {fieldVisibility.descriptionComplete && (
+                  <FormField control={form.control} name="descriptionComplete" render={({ field }) => (
+                    <FormItem><FormLabel>{labelByField.descriptionComplete}</FormLabel><FormControl><Textarea placeholder={placeholderByField.descriptionComplete} className="min-h-[120px] resize-none" {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                )}
+
+                {/* Fields that always appear but have conditional display on the UI */}
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="prix" render={({ field }) => (
-                    <FormItem><FormLabel>Prix</FormLabel><FormControl><Input placeholder="Dès 850 000 FCFA" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="tag" render={({ field }) => (
-                    <FormItem><FormLabel>Catégorie</FormLabel><FormControl><Input placeholder="Voyage" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
+                  {fieldVisibility.ordre && (
+                    <FormField control={form.control} name="ordre" render={({ field }) => (
+                      <FormItem><FormLabel>{labelByField.ordre}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                  )}
+                  {fieldVisibility.disponible && (
+                    <FormField control={form.control} name="disponible" render={({ field }) => (
+                      <FormItem className="flex flex-row items-center gap-3 pt-6">
+                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                        <FormLabel className="!mt-0">{labelByField.disponible}</FormLabel>
+                      </FormItem>
+                    )} />
+                  )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="type" render={({ field }) => (
-                    <FormItem><FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          <SelectItem value="voyage">Voyage</SelectItem>
-                          <SelectItem value="croisiere">Croisière</SelectItem>
-                        </SelectContent>
-                      </Select><FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="destination" render={({ field }) => (
-                    <FormItem><FormLabel>Destination</FormLabel><FormControl><Input placeholder="Paris, France" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="duree" render={({ field }) => (
-                    <FormItem><FormLabel>Durée</FormLabel><FormControl><Input placeholder="7 jours / 6 nuits" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="dateDepart" render={({ field }) => (
-                    <FormItem><FormLabel>Date de départ</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                </div>
-                <FormField control={form.control} name="inclus" render={({ field }) => (
-                  <FormItem><FormLabel>Inclus (séparés par virgules)</FormLabel><FormControl><Input placeholder="Vol, Hébergement, Excursions, Transferts" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="nonInclus" render={({ field }) => (
-                  <FormItem><FormLabel>Non inclus (séparés par virgules)</FormLabel><FormControl><Input placeholder="Repas, Activités optionnelles" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="ordre" render={({ field }) => (
-                    <FormItem><FormLabel>Ordre d'affichage</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="disponible" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3 pt-6">
-                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                      <FormLabel className="!mt-0">Disponible</FormLabel>
-                    </FormItem>
-                  )} />
-                </div>
+
+                {/* Image upload sections */}
                 <FormField control={form.control} name="image" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Image principale {editingItem && "(laisser vide pour garder l'actuelle)"}</FormLabel>
@@ -294,6 +408,8 @@ export default function VoyagesCroisieresManager() {
                     )}
                   </FormItem>
                 )} />
+
+                {/* Gallery upload section */}
                 <div>
                   <FormLabel>Images galerie (optionnel)</FormLabel>
                   <Input type="file" accept="image/*" multiple className="mt-1" onChange={(e) => {
@@ -326,6 +442,7 @@ export default function VoyagesCroisieresManager() {
                     </div>
                   )}
                 </div>
+
                 {isUploading && <Progress value={uploadProgress} className="w-full" />}
                 <DialogFooter>
                   <DialogClose asChild><Button type="button" variant="secondary">Annuler</Button></DialogClose>
