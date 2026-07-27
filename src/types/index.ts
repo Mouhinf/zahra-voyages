@@ -55,6 +55,7 @@ export type VoyageCroisiere = OffreBase & {
 };
 
 export type Excursion = OffreBase & {
+  type: 'excursion' | 'circuit';
   lieu: string;
   duree: string;
   pointDepart: string;

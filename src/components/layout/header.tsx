@@ -14,6 +14,7 @@ const navLinks = [
   { href: '/voyages-croisieres', label: 'Voyages & Croisières' },
   { href: '/excursions', label: 'Excursions' },
   { href: '/tourisme-affaires', label: 'Tourisme' },
+  { href: '/assistance-voyage', label: 'Assistance voyage' },
   { href: '/contact', label: 'Contact' },
 ];
 

@@ -26,11 +26,6 @@ export function adminGuardFromRequest(request: Request) {
   return adminEmail === 'mouhopap@gmail.com';
 }
 
-export function adminGuardFromRequest(request: Request) {
-  const adminEmail = request.headers.get('x-admin-email')?.toLowerCase();
-  return adminEmail === 'mouhopap@gmail.com';
-}
-
 
 export function useGuard() {
   const [isAdmin, setIsAdmin] = React.useState(false);

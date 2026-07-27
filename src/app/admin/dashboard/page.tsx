@@ -55,7 +55,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="hebergements">Hébergements</TabsTrigger>
               <TabsTrigger value="transports">Transports</TabsTrigger>
               <TabsTrigger value="voyages">Voyages & Croisières</TabsTrigger>
-              <TabsTrigger value="excursions">Excursions</TabsTrigger>
+              <TabsTrigger value="excursions">Excursions et circuits</TabsTrigger>
               <TabsTrigger value="affaires">Tourisme d'Affaires</TabsTrigger>
               <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
             <TabsContent value="hebergements">Gestion des hébergements</TabsContent>
             <TabsContent value="transports">Gestion des transports</TabsContent>
             <TabsContent value="voyages">Gestion des voyages</TabsContent>
-            <TabsContent value="excursions">Gestion des excursions</TabsContent>
+            <TabsContent value="excursions">Gestion des excursions et circuits</TabsContent>
             <TabsContent value="affaires">Offres d'affaires</TabsContent>
             <TabsContent value="partenaires">Gestion des partenaires</TabsContent>
             <TabsContent value="dashboard"><AdminDashboardPage /></TabsContent>
