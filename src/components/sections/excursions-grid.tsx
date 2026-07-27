@@ -30,10 +30,15 @@ const CATEGORIES = [
   { key: 'circuit', label: 'Circuits', icon: Map, description: 'Circuits de plusieurs jours et séjours organisés' },
 ];
 
-export default function ExcursionsGrid({ initialItems = [] }: { initialItems?: Offre[] }) {
+export default function ExcursionsGrid({ initialItems = [], staticItems = [], enrichments = {} }: { initialItems?: Offre[]; staticItems?: Offre[]; enrichments?: Record<string, any> }) {
   const items = useMemo(() => {
-    return initialItems.filter((item) => item.disponible !== false);
-  }, [initialItems]);
+    const availableItems = initialItems.filter((item) => item.disponible !== false);
+    const existingIds = new Set(availableItems.map((item) => item.id));
+    return [
+      ...availableItems,
+      ...staticItems.filter((item) => !existingIds.has(item.id)),
+    ];
+  }, [initialItems, staticItems]);
   const [activeCategory, setActiveCategory] = useState<string>('excursion');
 
   useEffect(() => {

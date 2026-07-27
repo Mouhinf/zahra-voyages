@@ -3,6 +3,7 @@ import type { Excursion } from '@/types';
 export const featuredExcursions: Excursion[] = [
   {
     id: 'lompoul-desert',
+    type: 'excursion',
     titre: 'Désert de Lompoul',
     description: 'Partez à la rencontre des dunes ocre de Lompoul, entre balade à dos de dromadaire, coucher de soleil sahélien et nuit sous les étoiles.',
     descriptionComplete: 'À mi-chemin entre Dakar et Saint-Louis, le désert de Lompoul dévoile un paysage de dunes blondes et de silence. Cette escapade invite à ralentir : promenade dans le sable, découverte du mode de vie nomade et moment privilégié au coucher du soleil.',
@@ -27,6 +28,7 @@ export const featuredExcursions: Excursion[] = [
   },
   {
     id: 'reserve-fathala',
+    type: 'excursion',
     titre: 'Réserve de Fathala',
     description: 'Une journée de safari au cœur d’une réserve privée où la savane sénégalaise abrite une riche faune et une végétation préservée.',
     descriptionComplete: 'Située au sud du delta du Saloum, la réserve de Fathala est une parenthèse nature idéale pour observer la faune de savane. Accompagné d’un guide, vous parcourez les pistes de la réserve et découvrez les espèces qui peuplent cet environnement protégé.',
@@ -51,6 +53,7 @@ export const featuredExcursions: Excursion[] = [
   },
   {
     id: 'ile-palmarin',
+    type: 'excursion',
     titre: 'Île de Palmarin',
     description: 'Explorez les bolongs, les mangroves et les villages sereins de Palmarin, au rythme des pirogues et de la vie du Sine-Saloum.',
     descriptionComplete: 'Palmarin offre une immersion douce dans les paysages du delta du Sine-Saloum. Entre mangroves, plages sauvages et rencontres avec les communautés locales, cette excursion privilégie l’observation, la nature et la découverte des traditions sérères.',
@@ -75,6 +78,7 @@ export const featuredExcursions: Excursion[] = [
   },
   {
     id: 'parc-djoudj',
+    type: 'excursion',
     titre: 'Parc national des oiseaux du Djoudj',
     description: 'Observez les pélicans, flamants et oiseaux migrateurs dans l’un des grands sanctuaires ornithologiques d’Afrique de l’Ouest.',
     descriptionComplete: 'Classé au patrimoine mondial de l’UNESCO, le parc du Djoudj est une étape majeure pour des millions d’oiseaux migrateurs. Une sortie en pirogue permet d’approcher les colonies de pélicans et de découvrir les marais du delta du fleuve Sénégal avec un guide.',
@@ -99,6 +103,7 @@ export const featuredExcursions: Excursion[] = [
   },
   {
     id: 'accrobaobab',
+    type: 'excursion',
     titre: 'Accrobaobab Adventure',
     description: 'Vivez une aventure aérienne entre les baobabs de Sindia, avec parcours suspendus, ponts de singe et tyroliennes sécurisées.',
     descriptionComplete: 'Accrobaobab Adventure propose une expérience sportive au cœur des baobabs de Sindia. Les parcours, adaptés à plusieurs niveaux, alternent passerelles, filets et tyroliennes. Une sortie idéale pour les familles, les groupes et les amateurs de sensations en pleine nature.',
@@ -122,6 +127,7 @@ export const featuredExcursions: Excursion[] = [
   },
   {
     id: 'kedougou-dindefelo',
+    type: 'excursion',
     titre: 'Kédougou & cascade de Dindéfelo',
     description: 'Prenez la route du Sénégal oriental pour découvrir les contreforts du Fouta Djallon et la spectaculaire cascade de Dindéfelo.',
     descriptionComplete: 'Cette escapade au départ de Kédougou associe paysages de collines, villages du pays bassari et marche vers la cascade de Dindéfelo. Au pied des falaises, la fraîcheur du bassin et la végétation luxuriante offrent un contraste saisissant avec les plaines du Sénégal oriental.',

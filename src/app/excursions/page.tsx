@@ -6,6 +6,8 @@ import { fetchPublicCollection } from '@/lib/public-data';
 import type { Excursion } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
+import { featuredExcursions } from '@/data/featured-excursions';
+import { excursionEnrichments } from '@/data/excursion-enrichments';
 
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504521/hero-section-excursions.jpg';
 
@@ -48,7 +50,7 @@ export default async function CircuitsExcursionsPage() {
                 Choisissez entre nos excursions à la journée et nos circuits de plusieurs jours pour explorer les merveilles du Sénégal.
               </p>
             </div>
-            <ExcursionsGrid initialItems={excursionItems} />
+            <ExcursionsGrid initialItems={excursionItems} staticItems={featuredExcursions} enrichments={excursionEnrichments} />
           </div>
         </section>
 
