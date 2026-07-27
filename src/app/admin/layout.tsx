@@ -1,14 +1,8 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { Loader2, LogOut } from 'lucide-react';
-import { getAuthInstance } from '@/lib/firebase';
-import { adminGuard } from '@/lib/guard';
-import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { User } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 
 interface AdminLayoutProps {
@@ -17,19 +11,30 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{ email: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = getAuthInstance().onAuthStateChanged((currentUser) => {
-      setLoading(false);
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.push('/admin/login');
-      }
-    });
-    return () => unsubscribe();
+    let cancelled = false;
+    (async () => {
+      const { getAuthInstance } = await import('@/lib/firebase');
+      const { onAuthStateChanged } = await import('firebase/auth');
+      const auth = getAuthInstance();
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        if (cancelled) return;
+        setLoading(false);
+        if (currentUser) {
+          setUser({ email: currentUser.email });
+        } else {
+          router.push('/admin/login');
+        }
+      });
+      // Clean up
+      return () => {
+        cancelled = true;
+        unsubscribe();
+      };
+    })();
   }, [router]);
 
   if (loading) {
@@ -44,13 +49,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return null;
   }
 
-  // Admin guard – doit être mouhopap@gmail.com
-  if (!adminGuard()) {
-    router.push('/admin/login');
-    return null;
-  }
-
   const handleLogout = async () => {
+    const { getAuthInstance } = await import('@/lib/firebase');
+    const { signOut } = await import('firebase/auth');
     await signOut(getAuthInstance());
     router.push('/admin/login');
   };
@@ -72,5 +73,5 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </div>
     </div>
   );
-  }
+}
 

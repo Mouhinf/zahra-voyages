@@ -1,6 +1,10 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import {
+  getFirestore, Firestore,
+  collection, query, orderBy, Timestamp,
+  where, limit, getDocs, addDoc, doc, setDoc,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyD6jQBcC97mljSHrQU0JPjUxuT4TPrrGRw',
@@ -33,7 +37,6 @@ export function getDbInstance(): Firestore {
 }
 
 // ---------- Analytics helpers ----------
-import { collection, query, orderBy, Timestamp } from 'firebase/firestore';
 
 /**
  * Returns total visits (documents in analytics).
@@ -301,7 +304,6 @@ export const seedDashboard = async (): Promise<void> => {
   const collections = ['destinations', 'hebergements', 'transports', 'voyages', 'excursions', 'offresAffaires', 'partenaires'];
   for (const coll of collections) {
     const offer = {
-      id: `seed-${coll}-${Date.now()}`,
       titre: `${coll.charAt(0).toUpperCase() + coll.slice(1)} offre test`,
       description: 'Description de test',
       prix: '1000',
@@ -310,14 +312,13 @@ export const seedDashboard = async (): Promise<void> => {
       disponible: true,
       ordre: 1,
     };
-    await setDoc(collection(db, coll), offer);
+    await addDoc(collection(db, coll), offer);
   }
 
   // 100 bookings
   for (let i = 1; i <= 100; i++) {
     const amount = Math.random() * 200000;
     const booking = {
-      id: `seed-booking-${i}`,
       userId: uid ?? `test-${i}`,
       transportId: `seed-transport-${Math.floor(Math.random() * 5)}`,
       titre: `Réservation ${i}`,
@@ -327,7 +328,7 @@ export const seedDashboard = async (): Promise<void> => {
       status: 'confirmed',
       createdAt: Timestamp.fromDate(new Date(today.getTime() - Math.random() * 86400000)),
     };
-    await setDoc(collection(db, 'bookings'), booking);
+    await addDoc(collection(db, 'bookings'), booking);
   }
 
   // 2000 logs analytics
@@ -336,7 +337,7 @@ export const seedDashboard = async (): Promise<void> => {
     const page = logPages[Math.floor(Math.random() * logPages.length)];
     const source = Math.random() < 0.2 ? 'facebook' : Math.random() < 0.1 ? 'google' : 'direct';
     const referrer = source === 'direct' ? null : `https://${source}.com`;
-    await setDoc(collection(db, 'analytics'), {
+    await addDoc(collection(db, 'analytics'), {
       page,
       timestamp: Timestamp.fromDate(new Date(yesterday.getTime() + Math.random() * 86400000)),
       source,
@@ -382,29 +383,18 @@ type AnalyticsSummary = {
 export const getDocsOrdered = async (
   collectionRef: any,
   orderByField: string,
-  limit = 100,
+  maxResults = 100,
 ): Promise<any[]> => {
-  const q = query(collection(collectionRef), orderBy(orderByField));
-  const snapshot = await q.limit(limit).get();
+  const q = query(collectionRef, orderBy(orderByField), limit(maxResults));
+  const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 };
 
 /**
- * Helper to count distinct values on a field (simplified).
+ * Helper to add a document to a collection (auto-generated ID).
  */
-export const countDistinct = async (
-  collectionRef: any,
-  field: string,
-): Promise<number> => {
-  const query = query(collection(collectionRef), orderBy(field), distinct(true));
-  const snapshot = await query.limit(100).get();
-  return snapshot.size;
-};
-
-/**
- * Helper to add a document.
- */
-export const setDoc = async (ref: any, data: any): Promise<void> => {
-  return ref.set(data, { merge: false });
+export const addDocToCollection = async (collectionRef: any, data: any): Promise<string> => {
+  const docRef = await addDoc(collectionRef, data);
+  return docRef.id;
 };
 

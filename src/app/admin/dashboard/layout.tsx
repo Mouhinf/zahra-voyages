@@ -2,8 +2,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAuthInstance } from '@/lib/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
@@ -13,19 +11,28 @@ interface AdminDashboardLayoutProps {
 
 export default function AdminDashboardLayout({ children }: AdminDashboardLayoutProps) {
   const router = useRouter();
-  const [user, setUser] = useState<import('firebase/auth').User | null>(null);
+  const [user, setUser] = useState<{ email: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(getAuthInstance(), (currentUser) => {
-      setLoading(false);
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.push('/admin/login');
-      }
-    });
-    return () => unsubscribe();
+    let cancelled = false;
+    (async () => {
+      const { getAuthInstance } = await import('@/lib/firebase');
+      const { onAuthStateChanged } = await import('firebase/auth');
+      const unsubscribe = onAuthStateChanged(getAuthInstance(), (currentUser) => {
+        if (cancelled) return;
+        setLoading(false);
+        if (currentUser) {
+          setUser({ email: currentUser.email });
+        } else {
+          router.push('/admin/login');
+        }
+      });
+      return () => {
+        cancelled = true;
+        unsubscribe();
+      };
+    })();
   }, [router]);
 
   if (loading) {
