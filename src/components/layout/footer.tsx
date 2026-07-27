@@ -42,7 +42,7 @@ export default function Footer() {
               <li><Link href="/hebergement" className="inline-block py-1.5 hover:text-primary">Hébergement</Link></li>
               <li><Link href="/transport" className="inline-block py-1.5 hover:text-primary">Transport</Link></li>
               <li><Link href="/voyages-croisieres" className="inline-block py-1.5 hover:text-primary">Voyages & Croisières</Link></li>
-              <li><Link href="/excursions" className="inline-block py-1.5 hover:text-primary">Excursions</Link></li>
+              <li><Link href="/excursions" className="inline-block py-1.5 hover:text-primary">Circuits et Excursions</Link></li>
               <li><Link href="/tourisme-affaires" className="inline-block py-1.5 hover:text-primary">Tourisme d'Affaires</Link></li>
               <li><Link href="/contact" className="inline-block py-1.5 hover:text-primary">Contact</Link></li>
               <li><Link href="/about" className="inline-block py-1.5 hover:text-primary">À propos</Link></li>
