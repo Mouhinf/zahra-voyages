@@ -16,7 +16,7 @@ export const metadata = {
 const assistanceServices = [
   {
     icon: <FileText className="h-8 w-8 text-primary" />,
-    title: 'Assistance Visas',
+    title: 'Assistance Voyage',
     description: "Notre équipe d'experts vous accompagne pas à pas dans l'obtention de vos visas pour toutes les destinations. Nous vous aidons à constituer votre dossier, vérifier les pièces requises et suivre votre demande auprès des ambassades et consulats.",
   },
   {
