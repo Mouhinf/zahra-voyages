@@ -5,10 +5,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { Hebergement } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
+import { featuredHebergements } from '@/data/featured-hebergements';
+import { hideOrDeleteCatalogItem, mergeWithFeatured, patchCatalogItem, saveCatalogItem } from '@/lib/catalog-admin';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -24,7 +26,9 @@ import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
-import { hebergementEnrichments } from '@/data/hebergement-enrichments';
+import PageContentEditor from '@/components/admin/page-content-editor';
+
+const featuredHebergementIds = new Set(featuredHebergements.map((item) => item.id));
 
 const formSchema = z.object({
   titre: z.string().optional(),
@@ -55,6 +59,7 @@ export default function HebergementsManager() {
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [persistedIds, setPersistedIds] = useState<Set<string>>(new Set());
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -68,9 +73,14 @@ export default function HebergementsManager() {
   useEffect(() => {
     const q = query(collection(getDbInstance(), 'hebergements'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
-      const data: Hebergement[] = [];
-      snap.forEach((doc) => data.push({ id: doc.id, ...doc.data(), ...hebergementEnrichments[doc.id] } as Hebergement));
-      setItems(data);
+      const firestoreItems = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as Hebergement));
+      setPersistedIds(new Set(firestoreItems.map((item) => item.id)));
+      setItems(mergeWithFeatured(firestoreItems, featuredHebergements));
+      setIsLoading(false);
+    }, (error) => {
+      console.error('Erreur chargement hébergements admin:', error);
+      setPersistedIds(new Set());
+      setItems(featuredHebergements);
       setIsLoading(false);
     });
     return () => unsubscribe();
@@ -154,13 +164,19 @@ export default function HebergementsManager() {
         images: galleryImages,
       };
 
-      if (editingItem) {
-        await updateDoc(doc(getDbInstance(), 'hebergements', editingItem.id), dataToSave);
-        toast({ title: 'Succès !', description: "L'hébergement a été modifié." });
-      } else {
-        await addDoc(collection(getDbInstance(), 'hebergements'), dataToSave);
-        toast({ title: 'Succès !', description: "L'hébergement a été ajouté." });
-      }
+      const db = getDbInstance();
+      await saveCatalogItem(
+        db,
+        'hebergements',
+        dataToSave,
+        editingItem?.id ?? null,
+        featuredHebergementIds,
+        persistedIds
+      );
+      toast({
+        title: 'Succès !',
+        description: editingItem ? "L'hébergement a été modifié." : "L'hébergement a été ajouté.",
+      });
 
       form.reset();
       setGalleryFiles([]);
@@ -180,15 +196,33 @@ export default function HebergementsManager() {
     if (!editingItem?.images) return;
     const newImages = editingItem.images.filter((_, i) => i !== idx);
     setEditingItem({ ...editingItem, images: newImages });
-    await updateDoc(doc(getDbInstance(), 'hebergements', editingItem.id), { images: newImages });
+    await patchCatalogItem(
+      getDbInstance(),
+      'hebergements',
+      editingItem.id,
+      { images: newImages },
+      featuredHebergementIds,
+      persistedIds
+    );
   }
 
   async function handleDelete(id: string, public_id: string) {
     setDeletingId(id);
     try {
-      if (public_id) await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(getDbInstance(), 'hebergements', id));
-      toast({ title: 'Supprimé', description: "L'hébergement a été supprimé." });
+      const result = await hideOrDeleteCatalogItem(
+        getDbInstance(),
+        'hebergements',
+        id,
+        featuredHebergementIds,
+        persistedIds
+      );
+      if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
+      toast({
+        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+        description: result === 'hidden'
+          ? "L'hébergement a été masqué du site public."
+          : "L'hébergement a été supprimé.",
+      });
     } catch (error) {
       console.error('Erreur :', error);
       toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
@@ -199,6 +233,7 @@ export default function HebergementsManager() {
 
   return (
     <div>
+      <PageContentEditor pageSlug="hebergement" pageLabel="Hébergement" showFaq />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Gérer les Hébergements</h2>

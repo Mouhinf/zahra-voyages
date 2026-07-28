@@ -5,10 +5,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { Excursion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
+import { featuredExcursions } from '@/data/featured-excursions';
+import { hideOrDeleteCatalogItem, mergeWithFeatured, patchCatalogItem, saveCatalogItem } from '@/lib/catalog-admin';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,9 @@ import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
+import PageContentEditor from '@/components/admin/page-content-editor';
+
+const featuredExcursionIds = new Set(featuredExcursions.map((item) => item.id));
 
 // Schéma pour les deux types : excursion et circuit
 const formSchema = z.object({
@@ -107,6 +112,7 @@ export default function ExcursionsCircuitsManager() {
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'excursion' | 'circuit'>('excursion');
+  const [persistedIds, setPersistedIds] = useState<Set<string>>(new Set());
 
   const [fieldVisibility, setFieldVisibility] = useState(getFieldsVisibility('excursion'));
 
@@ -122,9 +128,14 @@ export default function ExcursionsCircuitsManager() {
   useEffect(() => {
     const q = query(collection(getDbInstance(), 'excursions'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
-      const data: Excursion[] = [];
-      snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Excursion));
-      setItems(data);
+      const firestoreItems = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as Excursion));
+      setPersistedIds(new Set(firestoreItems.map((item) => item.id)));
+      setItems(mergeWithFeatured(firestoreItems, featuredExcursions));
+      setIsLoading(false);
+    }, (error) => {
+      console.error('Erreur chargement excursions admin:', error);
+      setPersistedIds(new Set());
+      setItems(featuredExcursions);
       setIsLoading(false);
     });
     return () => unsubscribe();
@@ -223,13 +234,18 @@ export default function ExcursionsCircuitsManager() {
         images: galleryImages,
       };
 
-      if (editingItem) {
-        await updateDoc(doc(getDbInstance(), 'excursions', editingItem.id), dataToSave);
-        toast({ title: 'Succès !', description: "L'élément a été modifié." });
-      } else {
-        await addDoc(collection(getDbInstance(), 'excursions'), dataToSave);
-        toast({ title: 'Succès !', description: "L'élément a été ajouté." });
-      }
+      await saveCatalogItem(
+        getDbInstance(),
+        'excursions',
+        dataToSave,
+        editingItem?.id ?? null,
+        featuredExcursionIds,
+        persistedIds
+      );
+      toast({
+        title: 'Succès !',
+        description: editingItem ? "L'élément a été modifié." : "L'élément a été ajouté.",
+      });
 
       form.reset();
       setGalleryFiles([]);
@@ -249,15 +265,33 @@ export default function ExcursionsCircuitsManager() {
     if (!editingItem?.images) return;
     const newImages = editingItem.images.filter((_, i) => i !== idx);
     setEditingItem({ ...editingItem, images: newImages });
-    await updateDoc(doc(getDbInstance(), 'excursions', editingItem.id), { images: newImages });
+    await patchCatalogItem(
+      getDbInstance(),
+      'excursions',
+      editingItem.id,
+      { images: newImages },
+      featuredExcursionIds,
+      persistedIds
+    );
   }
 
   async function handleDelete(id: string, public_id: string) {
     setDeletingId(id);
     try {
-      if (public_id) await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(getDbInstance(), 'excursions', id));
-      toast({ title: 'Supprimé', description: "L'élément a été supprimé." });
+      const result = await hideOrDeleteCatalogItem(
+        getDbInstance(),
+        'excursions',
+        id,
+        featuredExcursionIds,
+        persistedIds
+      );
+      if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
+      toast({
+        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+        description: result === 'hidden'
+          ? "L'élément a été masqué du site public."
+          : "L'élément a été supprimé.",
+      });
     } catch (error) {
       console.error('Erreur :', error);
       toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
@@ -268,6 +302,7 @@ export default function ExcursionsCircuitsManager() {
 
   return (
     <div>
+      <PageContentEditor pageSlug="excursions" pageLabel="Circuits et Excursions" />
       {/* Sous-onglets Excursions / Circuits */}
       <div className="flex gap-2 mb-4">
         <div className="flex border rounded-md overflow-hidden">

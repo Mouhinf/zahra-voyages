@@ -5,10 +5,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { OffreAffaires } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
+import { featuredTourismeOffers } from '@/data/featured-tourisme';
+import { hideOrDeleteCatalogItem, mergeWithFeatured, patchCatalogItem, saveCatalogItem } from '@/lib/catalog-admin';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,9 @@ import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
+import PageContentEditor from '@/components/admin/page-content-editor';
+
+const featuredTourismeIds = new Set(featuredTourismeOffers.map((item) => item.id));
 
 const formSchema = z.object({
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
@@ -54,6 +59,7 @@ export default function OffresAffairesManager() {
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [persistedIds, setPersistedIds] = useState<Set<string>>(new Set());
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -67,9 +73,14 @@ export default function OffresAffairesManager() {
   useEffect(() => {
     const q = query(collection(getDbInstance(), 'offresAffaires'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
-      const data: OffreAffaires[] = [];
-      snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as OffreAffaires));
-      setItems(data);
+      const firestoreItems = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as OffreAffaires));
+      setPersistedIds(new Set(firestoreItems.map((item) => item.id)));
+      setItems(mergeWithFeatured(firestoreItems, featuredTourismeOffers));
+      setIsLoading(false);
+    }, (error) => {
+      console.error('Erreur chargement tourisme admin:', error);
+      setPersistedIds(new Set());
+      setItems(featuredTourismeOffers);
       setIsLoading(false);
     });
     return () => unsubscribe();
@@ -153,13 +164,18 @@ export default function OffresAffairesManager() {
         images: galleryImages,
       };
 
-      if (editingItem) {
-        await updateDoc(doc(getDbInstance(), 'offresAffaires', editingItem.id), dataToSave);
-        toast({ title: 'Succès !', description: "L'offre a été modifiée." });
-      } else {
-        await addDoc(collection(getDbInstance(), 'offresAffaires'), dataToSave);
-        toast({ title: 'Succès !', description: "L'offre a été ajoutée." });
-      }
+      await saveCatalogItem(
+        getDbInstance(),
+        'offresAffaires',
+        dataToSave,
+        editingItem?.id ?? null,
+        featuredTourismeIds,
+        persistedIds
+      );
+      toast({
+        title: 'Succès !',
+        description: editingItem ? "L'offre a été modifiée." : "L'offre a été ajoutée.",
+      });
 
       form.reset();
       setGalleryFiles([]);
@@ -179,15 +195,33 @@ export default function OffresAffairesManager() {
     if (!editingItem?.images) return;
     const newImages = editingItem.images.filter((_, i) => i !== idx);
     setEditingItem({ ...editingItem, images: newImages });
-    await updateDoc(doc(getDbInstance(), 'offresAffaires', editingItem.id), { images: newImages });
+    await patchCatalogItem(
+      getDbInstance(),
+      'offresAffaires',
+      editingItem.id,
+      { images: newImages },
+      featuredTourismeIds,
+      persistedIds
+    );
   }
 
   async function handleDelete(id: string, public_id: string) {
     setDeletingId(id);
     try {
-      if (public_id) await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(getDbInstance(), 'offresAffaires', id));
-      toast({ title: 'Supprimé', description: "L'offre a été supprimée." });
+      const result = await hideOrDeleteCatalogItem(
+        getDbInstance(),
+        'offresAffaires',
+        id,
+        featuredTourismeIds,
+        persistedIds
+      );
+      if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
+      toast({
+        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+        description: result === 'hidden'
+          ? "L'offre a été masquée du site public."
+          : "L'offre a été supprimée.",
+      });
     } catch (error) {
       console.error('Erreur :', error);
       toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
@@ -203,6 +237,7 @@ export default function OffresAffairesManager() {
 
   return (
     <div>
+      <PageContentEditor pageSlug="tourisme-affaires" pageLabel="Tourisme" />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Gérer le Tourisme</h2>

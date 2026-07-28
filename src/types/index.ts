@@ -104,3 +104,37 @@ export type Partenaire = {
   public_id: string;
   ordre: number;
 };
+
+export type PageSlug = 'hebergement' | 'transport' | 'excursions' | 'tourisme-affaires';
+
+export type FaqItem = {
+  question: string;
+  reponse: string;
+};
+
+export type PageContent = {
+  id: PageSlug;
+  metaTitle: string;
+  metaDescription: string;
+  hero: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    image: string;
+    public_id?: string;
+  };
+  gridSection: {
+    badge: string;
+    title: string;
+    description: string;
+  };
+  ctaSection: {
+    title: string;
+    description: string;
+  };
+  faq?: {
+    title: string;
+    subtitle: string;
+    items: FaqItem[];
+  };
+};

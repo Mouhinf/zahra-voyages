@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, setDoc, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where } from 'firebase/firestore';
 import { Transport } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
@@ -24,7 +24,11 @@ import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Loader2, Trash2, Pencil, X, Car } from 'lucide-react';
 import { ImagePreview } from '@/components/admin/image-preview';
+import PageContentEditor from '@/components/admin/page-content-editor';
 import { featuredDestinations } from '@/data/featured-destinations';
+import { featuredTransfertsAeroport } from '@/data/featured-transferts';
+import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
+import { hideOrDeleteCatalogItem, mergeWithFeatured, patchCatalogItem, saveCatalogItem } from '@/lib/catalog-admin';
 
 const formSchema = z.object({
   titre: z.string().min(2, 'Le titre doit contenir au moins 2 caractères.'),
@@ -55,7 +59,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   location_voiture: 'Location voiture (avec chauffeur)',
 };
 
-const featuredDestinationIds = new Set(featuredDestinations.map((destination) => destination.id));
+const featuredTransportOffers = [
+  ...featuredDestinations,
+  ...featuredTransfertsAeroport,
+  ...featuredTransfertsPlage,
+];
+const featuredTransportIds = new Set(featuredTransportOffers.map((item) => item.id));
 
 export default function TransportsManager() {
   const { toast } = useToast();
@@ -85,16 +94,14 @@ export default function TransportsManager() {
   useEffect(() => {
     const q = query(collection(getDbInstance(), 'transports'), orderBy('ordre', 'asc'));
     const unsubscribe = onSnapshot(q, (snap) => {
-      const data: Transport[] = [];
-      snap.forEach((doc) => data.push({ id: doc.id, ...doc.data() } as Transport));
-      setPersistedIds(new Set(data.map((item) => item.id)));
-      const existingIds = new Set(data.map((item) => item.id));
-      setItems([...data, ...featuredDestinations.filter((item) => !existingIds.has(item.id))]);
+      const firestoreItems = snap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as Transport));
+      setPersistedIds(new Set(firestoreItems.map((item) => item.id)));
+      setItems(mergeWithFeatured(firestoreItems, featuredTransportOffers));
       setIsLoading(false);
     }, (error) => {
       console.error('Erreur chargement transports admin:', error);
       setPersistedIds(new Set());
-      setItems(featuredDestinations);
+      setItems(featuredTransportOffers);
       setIsLoading(false);
     });
     return () => unsubscribe();
@@ -197,17 +204,18 @@ export default function TransportsManager() {
         dataToSave.carburantInclus = values.carburantInclus;
       }
 
-      if (editingItem) {
-        if (featuredDestinationIds.has(editingItem.id) && !persistedIds.has(editingItem.id)) {
-          await setDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
-        } else {
-          await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), dataToSave);
-        }
-        toast({ title: 'Succès !', description: 'Le transport a été modifié.' });
-      } else {
-        await addDoc(collection(getDbInstance(), 'transports'), dataToSave);
-        toast({ title: 'Succès !', description: 'Le transport a été ajouté.' });
-      }
+      await saveCatalogItem(
+        getDbInstance(),
+        'transports',
+        dataToSave,
+        editingItem?.id ?? null,
+        featuredTransportIds,
+        persistedIds
+      );
+      toast({
+        title: 'Succès !',
+        description: editingItem ? 'Le transport a été modifié.' : 'Le transport a été ajouté.',
+      });
 
       form.reset();
       setGalleryFiles([]);
@@ -227,15 +235,33 @@ export default function TransportsManager() {
     if (!editingItem?.images) return;
     const newImages = editingItem.images.filter((_, i) => i !== idx);
     setEditingItem({ ...editingItem, images: newImages });
-    await updateDoc(doc(getDbInstance(), 'transports', editingItem.id), { images: newImages });
+    await patchCatalogItem(
+      getDbInstance(),
+      'transports',
+      editingItem.id,
+      { images: newImages },
+      featuredTransportIds,
+      persistedIds
+    );
   }
 
   async function handleDelete(id: string, public_id: string) {
     setDeletingId(id);
     try {
-      if (public_id) await deleteImageFromCloudinary(public_id);
-      await deleteDoc(doc(getDbInstance(), 'transports', id));
-      toast({ title: 'Supprimé', description: 'Le transport a été supprimé.' });
+      const result = await hideOrDeleteCatalogItem(
+        getDbInstance(),
+        'transports',
+        id,
+        featuredTransportIds,
+        persistedIds
+      );
+      if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
+      toast({
+        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+        description: result === 'hidden'
+          ? 'Le transport a été masqué du site public.'
+          : 'Le transport a été supprimé.',
+      });
     } catch (error) {
       console.error('Erreur :', error);
       toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
@@ -317,6 +343,7 @@ export default function TransportsManager() {
 
   return (
     <div>
+      <PageContentEditor pageSlug="transport" pageLabel="Transport" />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Gérer les Transports</h2>
