@@ -14,6 +14,7 @@ import VoyagesCroisieresManager from '@/components/admin/voyages-croisieres-mana
 import ExcursionsCircuitsManager from '@/components/admin/excursions-circuits-manager';
 import OffresAffairesManager from '@/components/admin/offres-affaires-manager';
 import PartenairesManager from '@/components/admin/partenaires-manager';
+import AdminDashboardPage from '@/components/admin/dashboard-page';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);

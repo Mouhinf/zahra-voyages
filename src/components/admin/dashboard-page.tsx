@@ -30,8 +30,16 @@ interface AnalyticsSummary {
   topUniqueVisitorsPerDay: Array<{ date: string; count: number }>;
 }
 
+const fetcher = async (url: string): Promise<AnalyticsSummary> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.error || 'Failed to fetch data');
+  }
+  return res.json();
+};
+
 export default function AdminDashboardPage() {
-  const router = useRouter();
   const [alerts, setAlerts] = useState({ revenue: false, visits: false });
   const { data: summary, mutate, isLoading } = useSWR<AnalyticsSummary>('/api/dashboard/stats', fetcher, {
     refreshInterval: 300000,
@@ -43,20 +51,6 @@ export default function AdminDashboardPage() {
       }
     },
   });
-
-  const fetcher = async (url: string): Promise<AnalyticsSummary> => {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch data');
-      }
-      return await res.json();
-    } catch (err) {
-      console.error('SWR fetch error:', err);
-      throw err;
-    }
-  };
 
   const handleSeed = async () => {
     try {
