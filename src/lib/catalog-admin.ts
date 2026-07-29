@@ -68,24 +68,21 @@ export async function hideOrDeleteCatalogItem(
   featuredIds: Set<string>,
   persistedIds: Set<string>
 ): Promise<'hidden' | 'deleted'> {
-  // Si l'item n'est présent que dans la liste "featured" (pas encore persistant en base),
-  // on le supprime réellement. Cela évite que le bouton "Supprimer" ne fasse rien.
+  // Si l'item est uniquement featured (pas encore persistant en base),
+  // on le masque (disponible = false) pour qu'il ne réapparaisse pas après rechargement.
   if (isFeaturedOnly(id, featuredIds, persistedIds)) {
-    try {
-      await deleteDoc(doc(db, collectionName, id));
-    } catch (_) {
-      // L'item peut ne pas exister encore dans Firestore – on l'ignore.
-    }
-    return 'deleted';
+    await setDoc(doc(db, collectionName, id), { disponible: false }, { merge: true });
+    return 'hidden';
   }
 
-  // Si l'item est présent dans les featured et déjà persistant, on le masque (disponible = false).
+  // Si l'item est featured ET persistant, on le masque (disponible = false) (car on ne veut pas le supprimer définitivement).
+  // Sinon, on le supprime définitivement.
   if (featuredIds.has(id)) {
     await setDoc(doc(db, collectionName, id), { disponible: false }, { merge: true });
     return 'hidden';
   }
 
-  // Sinon, on le supprime définitivement.
+  // Sinon (non‑featured), on le supprime définitivement.
   await deleteDoc(doc(db, collectionName, id));
   return 'deleted';
 }

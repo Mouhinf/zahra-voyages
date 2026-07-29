@@ -217,9 +217,9 @@ export default function OffresAffairesManager() {
         );
         if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
         toast({
-          title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+          title: 'Supprimé',
           description: result === 'hidden'
-            ? "L'offre a été masquée du site public."
+            ? "L'offre ne sera plus visible sur le site."
             : "L'offre a été supprimée.",
         });
         // Mettre à jour l'affichage : retirer l'item supprimé de la liste locale
@@ -394,8 +394,8 @@ export default function OffresAffairesManager() {
           <TableBody>
             {isLoading ? (
               <TableRow><TableCell colSpan={7} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
-            ) : items.length > 0 ? (
-              items.map((item) => (
+            ) : items.filter(item => item.disponible !== false).length > 0 ? (
+              items.filter(item => item.disponible !== false).map((item) => (
                 <TableRow key={item.id}>
                   <TableCell><Image src={item.image} alt={item.titre} width={64} height={64} className="rounded-md object-cover h-16 w-16" /></TableCell>
                   <TableCell className="font-medium">{item.titre}</TableCell>
