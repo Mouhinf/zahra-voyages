@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AreaChart, BarChart, LineChart, PieChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
-import { getAnalyticsSummary } from '@/lib/firebase';
+import { getAnalyticsSummary, getAuthInstance } from '@/lib/firebase';
 
 // Types from firebase helpers
 interface AnalyticsSummary {
@@ -31,7 +31,9 @@ interface AnalyticsSummary {
 }
 
 const fetcher = async (url: string): Promise<AnalyticsSummary> => {
-  const res = await fetch(url);
+  const auth = getAuthInstance();
+  const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
+  const res = await fetch(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
   if (!res.ok) {
     const errorData = await res.json();
     throw new Error(errorData.error || 'Failed to fetch data');
@@ -41,7 +43,7 @@ const fetcher = async (url: string): Promise<AnalyticsSummary> => {
 
 export default function AdminDashboardPage() {
   const [alerts, setAlerts] = useState({ revenue: false, visits: false });
-  const { data: summary, mutate, isLoading } = useSWR<AnalyticsSummary>('/api/dashboard/stats', fetcher, {
+  const { data: summary, mutate, isLoading } = useSWR<AnalyticsSummary>('/admin/dashboard/api/stats', fetcher, {
     refreshInterval: 300000,
     revalidateOnFocus: true,
     onSuccess: (data) => {
@@ -54,7 +56,12 @@ export default function AdminDashboardPage() {
 
   const handleSeed = async () => {
     try {
-      const res = await fetch('/admin/dashboard/api/seed', { method: 'POST' });
+      const auth = getAuthInstance();
+      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
+      const res = await fetch('/admin/dashboard/api/seed', {
+        method: 'POST',
+        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+      });
       if (res.ok) {
         toast.success('Données de test générées');
         mutate();
@@ -68,7 +75,12 @@ export default function AdminDashboardPage() {
 
   const handleExport = async () => {
     try {
-      const res = await fetch('/admin/dashboard/api/export', { method: 'POST' });
+      const auth = getAuthInstance();
+      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
+      const res = await fetch('/admin/dashboard/api/export', {
+        method: 'POST',
+        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+      });
       if (res.ok) {
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
