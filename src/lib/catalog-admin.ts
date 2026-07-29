@@ -71,14 +71,14 @@ export async function hideOrDeleteCatalogItem(
   // Si l'item est uniquement featured (pas encore persistant en base),
   // on le masque (disponible = false) pour qu'il ne réapparaisse pas après rechargement.
   if (isFeaturedOnly(id, featuredIds, persistedIds)) {
-    await setDoc(doc(db, collectionName, id), { disponible: false }, { merge: true });
+    await setDoc(doc(db, collectionName, id), { disponible: false, ordre: -1 }, { merge: true });
     return 'hidden';
   }
 
   // Si l'item est featured ET persistant, on le masque (disponible = false) (car on ne veut pas le supprimer définitivement).
   // Sinon, on le supprime définitivement.
   if (featuredIds.has(id)) {
-    await setDoc(doc(db, collectionName, id), { disponible: false }, { merge: true });
+    await setDoc(doc(db, collectionName, id), { disponible: false, ordre: -1 }, { merge: true });
     return 'hidden';
   }
 

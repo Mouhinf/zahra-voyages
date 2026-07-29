@@ -215,7 +215,7 @@ export default function OffresAffairesManager() {
         } catch (_) {
           // Le document n'existe pas encore (item featured only) -> on l'ignore.
         }
-        await setDoc(docRef, { disponible: false }, { merge: true });
+        await setDoc(docRef, { disponible: false, ordre: -1 }, { merge: true });
         if (public_id) await deleteImageFromCloudinary(public_id);
         toast({ title: 'Supprimé', description: "L'offre ne sera plus visible sur le site." });
         setItems((prev) => prev.filter((i) => i.id !== id));
