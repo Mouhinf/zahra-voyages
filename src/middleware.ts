@@ -1,31 +1,16 @@
 // src/middleware.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
-// Middleware qui enregistre chaque requête dans Firestore (collection "analytics").
-// Enregistre :
-//   - page (pathname)
-//   - timestamp
-//   - source (direct, facebook, google, googlebot, referral)
-//   - referrer (url d'origine)
-//   - userId (null côté serveur, rempli côté client)
-//   - method (GET/POST/etc)
-//
-// On ignore les requêtes OPTIONS (preflight CORS).
+export const config = {
+  matcher: [
+    '/((?!_next|api|favicon|[\\w-]+\\.\\w+).*)',
+  ],
+};
 
-export async function middleware(req: Request) {
-  // Clone de l'URL pour préserver l'original
-  const url = req.nextUrl.clone();
-
-  // Exécute la requête (middleware suivant)
-  await NextResponse.next();
-
-  // Si c'est une requête OPTIONS (preflight CORS), on ne logge pas
-  if (req.method === 'OPTIONS') {
-    return NextResponse.next();
-  }
-
+export async function middleware(req: NextRequest) {
+  const url = req.nextUrl;
   const db = getDbInstance();
   const analyticsCol = collection(db, 'analytics');
 
