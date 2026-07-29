@@ -89,7 +89,3 @@ export async function hideOrDeleteCatalogItem(
   await deleteDoc(doc(db, collectionName, id));
   return 'deleted';
 }
-
-  await deleteDoc(doc(db, collectionName, id));
-  return 'deleted';
-}
