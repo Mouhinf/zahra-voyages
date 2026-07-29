@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, deleteDoc, getDocs, where, addDoc } from 'firebase/firestore';
 import { Transport } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
@@ -646,8 +646,8 @@ export default function TransportsManager() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDelete(item.id, item.public_id)}
-                        disabled={deletingId === item.id || (featuredDestinationIds.has(item.id) && !persistedIds.has(item.id))}
-                        title={featuredDestinationIds.has(item.id) && !persistedIds.has(item.id) ? 'Enregistrez cette destination avant de la supprimer' : 'Supprimer'}
+                        disabled={deletingId === item.id || (featuredTransportIds.has(item.id) && !persistedIds.has(item.id))}
+                        title={featuredTransportIds.has(item.id) && !persistedIds.has(item.id) ? 'Enregistrez cette destination avant de la supprimer' : 'Supprimer'}
                       >
                         {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
                       </Button>

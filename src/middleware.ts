@@ -1,7 +1,5 @@
 // src/middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 export const config = {
   matcher: [
@@ -11,8 +9,6 @@ export const config = {
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
-  const db = getDbInstance();
-  const analyticsCol = collection(db, 'analytics');
 
   // Détermine la source
   const ua = req.headers.get('user-agent') || '';
@@ -29,23 +25,19 @@ export async function middleware(req: NextRequest) {
     else source = 'referral';
   }
 
-  // L'ID utilisateur sera ajouté côté client (via client‑side logging)
-  const userId = null;
-
-  const analyticsDoc = {
+  const analyticsPayload = {
     page: url.pathname,
-    timestamp: Timestamp.now(),
     source,
-    referrer,
-    userId,
+    referrer: referrer || null,
+    userId: null,
     method: req.method,
   };
 
-  try {
-    await addDoc(analyticsCol, analyticsDoc);
-  } catch (e) {
-    console.error('Erreur lors de l\'écriture d\'un log analytics:', e);
-  }
+  fetch(`${url.origin}/api/analytics/log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(analyticsPayload),
+  }).catch(() => {});
 
   return NextResponse.next();
 }

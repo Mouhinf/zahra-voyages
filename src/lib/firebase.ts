@@ -1,7 +1,7 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
 import {
-  getFirestore, Firestore,
+  getFirestore, type Firestore,
   collection, query, orderBy, Timestamp,
   where, limit, getDocs, addDoc, doc, setDoc,
 } from 'firebase/firestore';
@@ -15,25 +15,25 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1068036954211:web:857db1c86c589491220056',
 };
 
-let app: ReturnType<typeof initializeApp> | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
+let appInstance: any = null;
+let authInstance: any = null;
+let dbInstance: any = null;
 
 function getAppInstance() {
-  if (!app) {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  if (!appInstance) {
+    appInstance = initializeApp(firebaseConfig);
   }
-  return app;
+  return appInstance;
 }
 
-export function getAuthInstance(): Auth {
-  if (!auth) auth = getAuth(getAppInstance());
-  return auth!;
+export function getAuthInstance() {
+  if (!authInstance) authInstance = getAuth(getAppInstance());
+  return authInstance;
 }
 
-export function getDbInstance(): Firestore {
-  if (!db) db = getFirestore(getAppInstance());
-  return db!;
+export function getDbInstance() {
+  if (!dbInstance) dbInstance = getFirestore(getAppInstance());
+  return dbInstance;
 }
 
 // ---------- Analytics helpers ----------
@@ -42,7 +42,7 @@ export function getDbInstance(): Firestore {
  * Returns total visits (documents in analytics).
  */
 export const totalVisits = async (): Promise<number> => {
-  const snapshot = await collection(getDbInstance(), 'analytics').get();
+  const snapshot = await getDocs(collection(getDbInstance(), 'analytics'));
   return snapshot.size;
 };
 
@@ -50,7 +50,7 @@ export const totalVisits = async (): Promise<number> => {
  * Returns total bookings.
  */
 export const totalBookings = async (): Promise<number> => {
-  const snapshot = await collection(getDbInstance(), 'bookings').get();
+  const snapshot = await getDocs(collection(getDbInstance(), 'bookings'));
   return snapshot.size;
 };
 
@@ -58,7 +58,7 @@ export const totalBookings = async (): Promise<number> => {
  * Returns total revenue from bookings.
  */
 export const totalRevenue = async (): Promise<number> => {
-  const snapshot = await collection(getDbInstance(), 'bookings').get();
+  const snapshot = await getDocs(collection(getDbInstance(), 'bookings'));
   let total = 0;
   snapshot.forEach((doc) => {
     const amount = Number(doc.data().amount);
@@ -83,10 +83,10 @@ export const totalOffers = async (): Promise<number> => {
 /**
  * Returns conversion rate: bookings / visits * 100.
  */
-export const conversionRate = async (): Promise<number> => {
-  const visits = await totalVisits();
-  const bookings = await totalBookings();
-  return (bookings / visits) * 100;
+export const conversionRate = async (visits?: number, bookings?: number): Promise<number> => {
+  const v = visits ?? await totalVisits();
+  const b = bookings ?? await totalBookings();
+  return v === 0 ? 0 : (b / v) * 100;
 };
 
 /**
@@ -188,7 +188,7 @@ export const analyticsPerDay = async (): Promise<Array<{ date: string; count: nu
   const now = new Date();
   const start = new Date(now.setDate(now.getDate() - 30));
   const q = query(collection(getDbInstance(), 'analytics'), where('timestamp', '>=', Timestamp.fromDate(start)), where('timestamp', '<=', Timestamp.fromDate(now)), orderBy('timestamp', 'desc'));
-  const snapshot = await q.get();
+  const snapshot = await getDocs(q);
   const daily: Record<string, number> = {};
   snapshot.forEach((doc) => {
     const date = doc.data().timestamp.toDate().toISOString().split('T')[0];
@@ -204,7 +204,7 @@ export const bookingsPerDay = async (): Promise<Array<{ date: string; count: num
   const now = new Date();
   const start = new Date(now.setDate(now.getDate() - 30));
   const q = query(collection(getDbInstance(), 'bookings'), where('createdAt', '>=', Timestamp.fromDate(start)), where('createdAt', '<=', Timestamp.fromDate(now)), orderBy('createdAt', 'desc'));
-  const snapshot = await q.get();
+  const snapshot = await getDocs(q);
   const daily: Record<string, number> = {};
   snapshot.forEach((doc) => {
     const date = doc.data().createdAt.toDate().toISOString().split('T')[0];
@@ -220,7 +220,7 @@ export const revenuePerDay = async (): Promise<Array<{ date: string; revenue: nu
   const now = new Date();
   const start = new Date(now.setDate(now.getDate() - 30));
   const q = query(collection(getDbInstance(), 'bookings'), where('createdAt', '>=', Timestamp.fromDate(start)), where('createdAt', '<=', Timestamp.fromDate(now)), orderBy('createdAt', 'desc'));
-  const snapshot = await q.get();
+  const snapshot = await getDocs(q);
   const dailyRevenue: Record<string, number> = {};
   snapshot.forEach((doc) => {
     const date = doc.data().createdAt.toDate().toISOString().split('T')[0];
@@ -237,7 +237,7 @@ export const uniqueVisitorsPerDay = async (): Promise<Array<{ date: string; coun
   const now = new Date();
   const start = new Date(now.setDate(now.getDate() - 30));
   const q = query(collection(getDbInstance(), 'analytics'), where('timestamp', '>=', Timestamp.fromDate(start)), where('timestamp', '<=', Timestamp.fromDate(now)), orderBy('timestamp', 'desc'));
-  const snapshot = await q.get();
+  const snapshot = await getDocs(q);
   const daily: Record<string, Set<string>> = {};
   snapshot.forEach((doc) => {
     const date = doc.data().timestamp.toDate().toISOString().split('T')[0];
@@ -252,40 +252,57 @@ export const uniqueVisitorsPerDay = async (): Promise<Array<{ date: string; coun
  * Returns a summary object with all key metrics.
  */
 export const getAnalyticsSummary = async (): Promise<AnalyticsSummary> => {
-  const visits = await totalVisits();
-  const bookings = await totalBookings();
-  const conversionRate = await conversionRate();
-  const revenue = await totalRevenue();
-  const uniqueVisitors = await totalUniqueVisitors();
-  const pages = await topPagesDetailed();
-  const sources = await topSourcesDetailed();
-  const topTransports = await topTransportsDetailed();
-  const topDestinations = await topDestinations();
-  const topOffers = await totalOffers();
-  const topBookings = await bookingsPerDay();
-  const topVisitsPerDay = await analyticsPerDay();
-  const topRevenuePerDay = await revenuePerDay();
-  const topBookingsPerDay = await bookingsPerDay();
-  const topUniqueVisitorsPerDay = await uniqueVisitorsPerDay();
-  const topTransportsByVisits = await topTransportsByVisits();
+  const [
+    totalVisitsVal,
+    totalBookingsVal,
+    revenueVal,
+    uniqueVisitorsVal,
+    pagesVal,
+    sourcesVal,
+    topTransportsVal,
+    topDestinationsVal,
+    topOffersVal,
+    bookingsPerDayVal,
+    topVisitsPerDayVal,
+    topRevenuePerDayVal,
+    topUniqueVisitorsPerDayVal,
+    topTransportsByVisitsVal,
+  ] = await Promise.all([
+    totalVisits(),
+    totalBookings(),
+    totalRevenue(),
+    totalUniqueVisitors(),
+    topPagesDetailed(),
+    topSourcesDetailed(),
+    topTransportsDetailed(),
+    topDestinations(),
+    totalOffers(),
+    bookingsPerDay(),
+    analyticsPerDay(),
+    revenuePerDay(),
+    uniqueVisitorsPerDay(),
+    topTransportsByVisits(),
+  ]);
+
+  const conversionRateVal = await conversionRate(totalVisitsVal, totalBookingsVal);
 
   return {
-    totalVisits,
-    totalBookings,
-    conversionRate,
-    revenue,
-    uniqueVisitors,
-    pages,
-    sources,
-    topTransports,
-    topDestinations,
-    topOffers,
-    topBookings,
-    topVisitsPerDay,
-    topRevenuePerDay,
-    topBookingsPerDay,
-    topUniqueVisitorsPerDay,
-    topTransportsByVisits,
+    totalVisits: totalVisitsVal,
+    totalBookings: totalBookingsVal,
+    conversionRate: conversionRateVal,
+    revenue: revenueVal,
+    uniqueVisitors: uniqueVisitorsVal,
+    pages: pagesVal,
+    sources: sourcesVal,
+    topTransports: topTransportsVal,
+    topDestinations: topDestinationsVal,
+    topOffers: topOffersVal,
+    topBookings: bookingsPerDayVal,
+    topVisitsPerDay: topVisitsPerDayVal,
+    topRevenuePerDay: topRevenuePerDayVal,
+    topBookingsPerDay: bookingsPerDayVal,
+    topUniqueVisitorsPerDay: topUniqueVisitorsPerDayVal,
+    topTransportsByVisits: topTransportsByVisitsVal,
   } as const;
 };
 
@@ -351,13 +368,13 @@ export const seedDashboard = async (): Promise<void> => {
 export const deleteAllAnalytics = async (): Promise<void> => {
   const db = getDbInstance();
   const analyticsCol = collection(db, 'analytics');
-  const snapshot = await analyticsCol.get();
+  const snapshot = await getDocs(analyticsCol);
   const batch = db.batch();
   snapshot.forEach((doc) => batch.delete(doc.ref));
   await batch.commit();
 };
 
-type AnalyticsSummary = {
+export type AnalyticsSummary = {
   totalVisits: number;
   totalBookings: number;
   conversionRate: number;
@@ -367,9 +384,8 @@ type AnalyticsSummary = {
   sources: Array<{ source: string; count: number }>;
   topTransports: Array<{ type: string; count: number }>;
   topDestinations: Array<{ destination: string; visits: number }>;
-  topOffersPerCollection: Array<{ category: string; count: number }>;
   topOffers: number;
-  topBookings: Array<{ category: string; count: number }>;
+  topBookings: Array<{ date: string; count: number }>;
   topVisitsPerDay: Array<{ date: string; count: number }>;
   topRevenuePerDay: Array<{ date: string; revenue: number }>;
   topBookingsPerDay: Array<{ date: string; count: number }>;
@@ -387,7 +403,7 @@ export const getDocsOrdered = async (
 ): Promise<any[]> => {
   const q = query(collectionRef, orderBy(orderByField), limit(maxResults));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() as Record<string, unknown> }));
 };
 
 /**
