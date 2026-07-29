@@ -205,30 +205,32 @@ export default function OffresAffairesManager() {
     );
   }
 
-  async function handleDelete(id: string, public_id: string) {
-    setDeletingId(id);
-    try {
-      const result = await hideOrDeleteCatalogItem(
-        getDbInstance(),
-        'offresAffaires',
-        id,
-        featuredTourismeIds,
-        persistedIds
-      );
-      if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
-      toast({
-        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
-        description: result === 'hidden'
-          ? "L'offre a été masquée du site public."
-          : "L'offre a été supprimée.",
-      });
-    } catch (error) {
-      console.error('Erreur :', error);
-      toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
-    } finally {
-      setDeletingId(null);
+    async function handleDelete(id: string, public_id: string) {
+      setDeletingId(id);
+      try {
+        const result = await hideOrDeleteCatalogItem(
+          getDbInstance(),
+          'offresAffaires',
+          id,
+          featuredTourismeIds,
+          persistedIds
+        );
+        if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
+        toast({
+          title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+          description: result === 'hidden'
+            ? "L'offre a été masquée du site public."
+            : "L'offre a été supprimée.",
+        });
+        // Mettre à jour l'affichage : retirer l'item supprimé de la liste locale
+        setItems((prev) => prev.filter((i) => i.id !== id));
+      } catch (error) {
+        console.error('Erreur :', error);
+        toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
+      } finally {
+        setDeletingId(null);
+      }
     }
-  }
 
   const typeLabels: Record<string, string> = {
     tourisme_religieux: 'Tourisme religieux', tourisme_local: 'Tourisme local', tourisme_linguistique: 'Tourisme linguistique', tourisme_affaires: "Tourisme d'affaires",
