@@ -257,9 +257,9 @@ export default function TransportsManager() {
       );
       if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
       toast({
-        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+        title: 'Supprimé',
         description: result === 'hidden'
-          ? 'Le transport a été masqué du site public.'
+          ? 'Le transport ne sera plus visible sur le site.'
           : 'Le transport a été supprimé.',
       });
     } catch (error) {
@@ -626,8 +626,8 @@ export default function TransportsManager() {
           <TableBody>
             {isLoading ? (
               <TableRow><TableCell colSpan={5} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
-            ) : items.length > 0 ? (
-              items.map((item) => (
+            ) : items.filter(item => item.disponible !== false).length > 0 ? (
+              items.filter(item => item.disponible !== false).map((item) => (
                 <TableRow key={item.id}>
                   <TableCell><Image src={item.image} alt={item.titre} width={64} height={64} className="rounded-md object-cover h-16 w-16" /></TableCell>
                   <TableCell className="font-medium">{item.titre}</TableCell>
@@ -646,8 +646,7 @@ export default function TransportsManager() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDelete(item.id, item.public_id)}
-                        disabled={deletingId === item.id || (featuredTransportIds.has(item.id) && !persistedIds.has(item.id))}
-                        title={featuredTransportIds.has(item.id) && !persistedIds.has(item.id) ? 'Enregistrez cette destination avant de la supprimer' : 'Supprimer'}
+                        disabled={deletingId === item.id}
                       >
                         {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 text-destructive" />}
                       </Button>

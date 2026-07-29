@@ -473,8 +473,8 @@ export default function VoyagesCroisieresManager() {
           <TableBody>
             {isLoading ? (
               <TableRow><TableCell colSpan={7} className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" /></TableCell></TableRow>
-            ) : items.length > 0 ? (
-              items.map((item) => (
+            ) : items.filter(item => item.disponible !== false).length > 0 ? (
+              items.filter(item => item.disponible !== false).map((item) => (
                 <TableRow key={item.id}>
                   <TableCell><Image src={item.image} alt={item.titre} width={64} height={64} className="rounded-md object-cover h-16 w-16" /></TableCell>
                   <TableCell className="font-medium">{item.titre}</TableCell>

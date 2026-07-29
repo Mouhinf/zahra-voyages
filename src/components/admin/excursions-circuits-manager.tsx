@@ -141,7 +141,7 @@ export default function ExcursionsCircuitsManager() {
     return () => unsubscribe();
   }, []);
 
-  const filteredItems = items.filter((item) => item.type === activeTab);
+  const filteredItems = items.filter((item) => item.type === activeTab && item.disponible !== false);
 
   function openAddDialog() {
     setEditingItem(null);
@@ -287,9 +287,9 @@ export default function ExcursionsCircuitsManager() {
       );
       if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
       toast({
-        title: result === 'hidden' ? 'Masqué' : 'Supprimé',
+        title: 'Supprimé',
         description: result === 'hidden'
-          ? "L'élément a été masqué du site public."
+          ? "L'élément ne sera plus visible sur le site."
           : "L'élément a été supprimé.",
       });
     } catch (error) {
