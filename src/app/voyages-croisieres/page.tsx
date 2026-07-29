@@ -17,7 +17,8 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function VoyagesCroisieresPage() {
-  const voyageItems = await fetchPublicCollection<VoyageCroisiere>('voyagesCroisieres');
+  const rawItems = await fetchPublicCollection<VoyageCroisiere>('voyagesCroisieres');
+  const voyageItems = rawItems.filter((item) => item.disponible !== false);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

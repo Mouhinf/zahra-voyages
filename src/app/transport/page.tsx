@@ -20,10 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TransportPage() {
-  const [transportItems, content] = await Promise.all([
+  const [rawItems, content] = await Promise.all([
     fetchPublicCollection<Transport>('transports'),
     fetchPageContent('transport'),
   ]);
+  const transportItems = rawItems.filter((item) => item.disponible !== false);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
