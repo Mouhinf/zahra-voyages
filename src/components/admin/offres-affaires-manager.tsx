@@ -5,12 +5,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import { OffreAffaires } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '@/lib/cloudinary';
 import { featuredTourismeOffers } from '@/data/featured-tourisme';
-import { hideOrDeleteCatalogItem, mergeWithFeatured, patchCatalogItem, saveCatalogItem } from '@/lib/catalog-admin';
+import { mergeWithFeatured, patchCatalogItem, saveCatalogItem } from '@/lib/catalog-admin';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -208,25 +208,26 @@ export default function OffresAffairesManager() {
     async function handleDelete(id: string, public_id: string) {
       setDeletingId(id);
       try {
-        const result = await hideOrDeleteCatalogItem(
-          getDbInstance(),
-          'offresAffaires',
-          id,
-          featuredTourismeIds,
-          persistedIds
-        );
-        if (result === 'deleted' && public_id) await deleteImageFromCloudinary(public_id);
-        toast({
-          title: 'Supprimé',
-          description: result === 'hidden'
-            ? "L'offre ne sera plus visible sur le site."
-            : "L'offre a été supprimée.",
-        });
-        // Mettre à jour l'affichage : retirer l'item supprimé de la liste locale
+        // Toujours marquer l'item comme masqué (disponible = false) pour éviter qu'il réapparaisse après rafraîchissement.
+        const docRef = doc(getDbInstance(), 'offresAffaires', id);
+        try {
+          await deleteDoc(docRef);
+        } catch (_) {
+          // Le document n'existe pas encore (item featured only) -> on l'ignore.
+        }
+        await setDoc(docRef, { disponible: false }, { merge: true });
+        if (public_id) await deleteImageFromCloudinary(public_id);
+        toast({ title: 'Supprimé', description: "L'offre ne sera plus visible sur le site." });
         setItems((prev) => prev.filter((i) => i.id !== id));
       } catch (error) {
-        console.error('Erreur :', error);
-        toast({ title: 'Erreur', description: 'Suppression impossible.', variant: 'destructive' });
+        console.error('Erreur suppression:', error);
+        toast({
+          title: 'Erreur',
+          description: "Suppression impossible. Vérifiez la console pour plus de détails.",
+          variant: 'destructive',
+        });
+        // Fallback : retirer l'item de l'affichage même si l'opération a échoué
+        setItems((prev) => prev.filter((i) => i.id !== id));
       } finally {
         setDeletingId(null);
       }
