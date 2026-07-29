@@ -38,7 +38,7 @@ const CATEGORIES = [
 export default function TransportGrid({ initialItems = [] }: { initialItems?: Offre[] }) {
   const items = useMemo(() => {
     const availableItems = initialItems.filter((item) => item.disponible !== false);
-    const existingIds = new Set(availableItems.map((item) => item.id));
+    const existingIds = new Set(initialItems.map((item) => item.id));
     return [
       ...availableItems,
       ...featuredTransportOffers.filter((item) => !existingIds.has(item.id)),

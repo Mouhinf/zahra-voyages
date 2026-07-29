@@ -33,7 +33,7 @@ const CATEGORIES = [
 export default function ExcursionsGrid({ initialItems = [], staticItems = [], enrichments = {} }: { initialItems?: Offre[]; staticItems?: Offre[]; enrichments?: Record<string, any> }) {
   const items = useMemo(() => {
     const availableItems = initialItems.filter((item) => item.disponible !== false);
-    const existingIds = new Set(availableItems.map((item) => item.id));
+    const existingIds = new Set(initialItems.map((item) => item.id));
     return [
       ...availableItems,
       ...staticItems.filter((item) => !existingIds.has(item.id)),

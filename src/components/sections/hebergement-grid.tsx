@@ -35,7 +35,7 @@ export default function HebergementGrid({ initialItems = [] }: { initialItems?: 
     const availableItems = initialItems
       .filter((item) => item.disponible !== false)
       .map((item) => ({ ...item, ...hebergementEnrichments[item.id] }));
-    const existingIds = new Set(availableItems.map((item) => item.id));
+    const existingIds = new Set(initialItems.map((item) => item.id));
     return [
       ...availableItems,
       ...featuredHebergements.filter((item) => !existingIds.has(item.id)),

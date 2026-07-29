@@ -21,11 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HebergementPage() {
-  const [rawItems, content] = await Promise.all([
+  const [hebergementItems, content] = await Promise.all([
     fetchPublicCollection<Hebergement>('hebergements'),
     fetchPageContent('hebergement'),
   ]);
-  const hebergementItems = rawItems.filter((item) => item.disponible !== false);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

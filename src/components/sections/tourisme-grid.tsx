@@ -32,7 +32,7 @@ export default function TourismeGrid({ initialItems = [] }: { initialItems?: Off
       .map((offer) => legacyBusinessTypes.has(offer.type) || offer.type === 'tourisme_affaires'
         ? ({ id: offer.id, ...withBusinessOfferImage(offer) } as Offre)
         : offer);
-    const existingIds = new Set(availableItems.map((item) => item.id));
+    const existingIds = new Set(initialItems.map((item) => item.id));
     return [
       ...availableItems,
       ...featuredTourismeOffers.filter((item) => !existingIds.has(item.id)),
