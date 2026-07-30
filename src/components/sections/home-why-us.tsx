@@ -19,7 +19,7 @@ const argumentsList = [
     icon: Headset,
     title: 'Accompagnement Personnalisé',
     description: "Un interlocuteur dédié à votre écoute, de la conception à votre retour. Chaque itinéraire est pensé sur mesure selon vos envies, votre rythme et votre budget.",
-    image: 'https://images.unsplash.com/photo-2EGNqazbAMk?w=600&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=600&h=400&fit=crop',
   },
   {
     icon: Clock,
