@@ -43,7 +43,7 @@ const fetcher = async (url: string): Promise<AnalyticsSummary> => {
 
 export default function AdminDashboardPage() {
   const [alerts, setAlerts] = useState({ revenue: false, visits: false });
-  const { data: summary, mutate, isLoading } = useSWR<AnalyticsSummary>('/admin/dashboard/api/stats', fetcher, {
+  const { data: summary, mutate, isLoading } = useSWR<AnalyticsSummary>('/api/dashboard/stats', fetcher, {
     refreshInterval: 300000,
     revalidateOnFocus: true,
     onSuccess: (data) => {
