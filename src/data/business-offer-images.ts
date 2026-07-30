@@ -13,8 +13,9 @@ export const getBusinessOfferImage = (type: string) =>
   optimizeBusinessImage(businessImages[type as keyof typeof businessImages] || businessImages.tourisme_affaires);
 
 export const withBusinessOfferImage = <T extends { type: string; image?: string; images?: string[] }>(offer: T): T => {
-  // Les offres historiques contiennent parfois des URLs expirées ou non autorisées.
-  // On utilise systématiquement le visuel Cloudinary associé au type pour garantir son affichage.
+  if (offer.image && offer.image.startsWith('http')) {
+    return offer;
+  }
   const image = getBusinessOfferImage(offer.type);
   return {
     ...offer,
