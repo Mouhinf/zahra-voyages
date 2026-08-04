@@ -38,6 +38,7 @@ CONSIGNES DE RÉPONSE:
 - Ne promets jamais un service que nous n'offrons pas`;
 
 export async function POST(req: NextRequest) {
+  // Basic request validation + origin check + rate limiting
   try {
     const { messages } = await req.json();
 
@@ -52,6 +53,42 @@ export async function POST(req: NextRequest) {
     const totalLength = messages.reduce((acc: number, m: any) => acc + (m?.content?.length || 0), 0);
     if (totalLength > 20000) {
       return NextResponse.json({ error: 'Requête trop volumineuse' }, { status: 413 });
+    }
+
+    // origin/referer allow list
+    const allowedOrigins = [process.env.NEXT_PUBLIC_BASE_URL || 'https://slaac-voyages.vercel.app'];
+    const refererHeader = req.headers.get('referer') || req.headers.get('origin') || '';
+    if (refererHeader) {
+      try {
+        const refererOrigin = new URL(refererHeader).origin;
+        if (!allowedOrigins.some(o => refererOrigin.startsWith(o))) {
+          return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+        }
+      } catch (err) {
+        // malformed referer — continue (do not block)
+      }
+    }
+
+    // best-effort in-memory rate limiter (per IP) — ephemeral on Edge
+    const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+    const RATE_LIMIT_MAX = 30; // max requests per window per IP
+    // attach store on global to survive warm invocations in same worker
+    // @ts-ignore
+    const store: Map<string, { count: number; start: number }> = (global as any)._chat_rate_limiter || new Map();
+    // @ts-ignore
+    (global as any)._chat_rate_limiter = store;
+
+    const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || req.headers.get('x-real-ip') || 'unknown';
+    const now = Date.now();
+    const entry = store.get(ip) || { count: 0, start: now };
+    if (now - entry.start > RATE_LIMIT_WINDOW) {
+      entry.count = 0;
+      entry.start = now;
+    }
+    entry.count += 1;
+    store.set(ip, entry);
+    if (entry.count > RATE_LIMIT_MAX) {
+      return NextResponse.json({ error: 'Trop de requêtes, essayez plus tard' }, { status: 429 });
     }
 
     const apiMessages = [
@@ -74,10 +111,9 @@ export async function POST(req: NextRequest) {
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${OPENROUTER_KEY}`,
-            'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
+            'Authorization': 'Bearer ' + OPENROUTER_KEY,
             'Content-Type': 'application/json',
-            'Referer': 'https://slaac-voyages.vercel.app',
+            'Referer': process.env.NEXT_PUBLIC_BASE_URL || 'https://slaac-voyages.vercel.app',
             'X-Title': 'SLAAC Voyages Assistant',
           },
           body: JSON.stringify({
