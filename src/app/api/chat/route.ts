@@ -41,8 +41,17 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
 
-    if (!messages || !Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: 'Messages requis' }, { status: 400 });
+    }
+
+    if (messages.length > 10) {
+      return NextResponse.json({ error: 'Trop de messages' }, { status: 413 });
+    }
+
+    const totalLength = messages.reduce((acc: number, m: any) => acc + (m?.content?.length || 0), 0);
+    if (totalLength > 20000) {
+      return NextResponse.json({ error: 'Requête trop volumineuse' }, { status: 413 });
     }
 
     const apiMessages = [
@@ -51,6 +60,12 @@ export async function POST(req: NextRequest) {
     ];
 
     const models = ['openai/gpt-oss-20b:free', 'tencent/hy3:free', 'nvidia/nemotron-nano-9b-v2:free'];
+    const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
+    if (!OPENROUTER_KEY) {
+      console.error('OpenRouter API key missing');
+      return NextResponse.json({ error: 'OpenRouter API key non configurée' }, { status: 500 });
+    }
+
     let data: any = null;
     let lastError = '';
 
@@ -59,9 +74,10 @@ export async function POST(req: NextRequest) {
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            'Authorization': `Bearer ${OPENROUTER_KEY}`,
+            'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
             'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://slaac-voyages.vercel.app',
+            'Referer': 'https://slaac-voyages.vercel.app',
             'X-Title': 'SLAAC Voyages Assistant',
           },
           body: JSON.stringify({
