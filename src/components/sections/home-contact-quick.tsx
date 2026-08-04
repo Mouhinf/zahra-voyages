@@ -59,7 +59,7 @@ export default function HomeContactQuick() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
     toast({
       title: 'Message envoyé !',
       description: 'Merci de nous avoir contactés. Nous reviendrons vers vous sous 24h.',

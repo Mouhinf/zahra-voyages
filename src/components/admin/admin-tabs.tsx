@@ -1,14 +1,16 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DestinationsManager from '@/components/admin/destinations-manager';
-import HebergementsManager from '@/components/admin/hebergements-manager';
-import TransportsManager from '@/components/admin/transports-manager';
-import VoyagesCroisieresManager from '@/components/admin/voyages-croisieres-manager';
-import ExcursionsCircuitsManager from '@/components/admin/excursions-circuits-manager';
-import OffresAffairesManager from '@/components/admin/offres-affaires-manager';
-import PartenairesManager from '@/components/admin/partenaires-manager';
-import AdminDashboardPage from '@/components/admin/dashboard-page';
+import React, { Suspense } from 'react';
+const DestinationsManager = React.lazy(() => import('@/components/admin/destinations-manager'));
+const HebergementsManager = React.lazy(() => import('@/components/admin/hebergements-manager'));
+const TransportsManager = React.lazy(() => import('@/components/admin/transports-manager'));
+const VoyagesCroisieresManager = React.lazy(() => import('@/components/admin/voyages-croisieres-manager'));
+const ExcursionsCircuitsManager = React.lazy(() => import('@/components/admin/excursions-circuits-manager'));
+const OffresAffairesManager = React.lazy(() => import('@/components/admin/offres-affaires-manager'));
+const PartenairesManager = React.lazy(() => import('@/components/admin/partenaires-manager'));
+const AdminDashboardPage = React.lazy(() => import('@/components/admin/dashboard-page'));
+
 
 export default function AdminTabs() {
   return (

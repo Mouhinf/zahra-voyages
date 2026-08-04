@@ -88,7 +88,7 @@ export function QuoteRequestModal({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
     toast({
       title: 'Devis demandé !',
       description: 'Merci ! Votre demande de devis a bien été envoyée. Nous reviendrons vers vous rapidement.',
