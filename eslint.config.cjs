@@ -10,8 +10,7 @@ module.exports = [
     languageOptions: {
       parser: require('@typescript-eslint/parser'),
       ecmaVersion: 2021,
-      sourceType: 'module',
-      ecmaFeatures: { jsx: true }
+      sourceType: 'module'
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
