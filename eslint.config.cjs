@@ -1,8 +1,30 @@
-const fs = require('fs');
-const path = require('path');
+// Flat ESLint config that loads plugins and basic recommended rules so ESLint v9 can run in CI
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const reactPlugin = require('eslint-plugin-react');
+const hooksPlugin = require('eslint-plugin-react-hooks');
 
-// Load legacy .eslintrc.json and export as flat config for ESLint CLI compatibility
-const raw = fs.readFileSync(path.resolve(__dirname, '.eslintrc.json'), 'utf8');
-const config = JSON.parse(raw);
-
-module.exports = config;
+module.exports = [
+  { ignores: ['.next/', 'node_modules/'] },
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      parser: require.resolve('@typescript-eslint/parser'),
+      ecmaVersion: 2021,
+      sourceType: 'module',
+      ecmaFeatures: { jsx: true }
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      react: reactPlugin,
+      'react-hooks': hooksPlugin
+    },
+    rules: {
+      'no-console': 'off',
+      // include recommended rules from @typescript-eslint
+      ...tsPlugin.configs.recommended.rules
+    },
+    settings: {
+      react: { version: 'detect' }
+    }
+  }
+];
