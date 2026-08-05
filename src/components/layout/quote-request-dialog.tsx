@@ -33,16 +33,37 @@ import { format } from 'date-fns';
 import { Calendar } from '../ui/calendar';
 import { fr } from 'date-fns/locale';
 
-const formSchema = z.object({
+const ServiceEnum = z.enum(['hebergement','transport','voyages-croisieres','excursions','tourisme-affaires','reservation-express']);
+
+const baseSchema = z.object({
+  service: ServiceEnum.default('hebergement'),
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
   email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }).optional().or(z.literal('')),
   phone: z.string().min(1, { message: 'Veuillez entrer un numéro de téléphone.' }),
   destination: z.string().min(2, { message: 'Veuillez préciser une destination.'}),
-  departureDate: z.date({
-    required_error: "Une date de départ est requise.",
-  }),
-  travelers: z.coerce.number().min(1, { message: 'Il doit y avoir au moins 1 voyageur.'}),
+  departureDate: z.date({ required_error: "Une date de départ est requise." }).optional(),
+  travelers: z.coerce.number().min(1, { message: 'Il doit y avoir au moins 1 voyageur.'}).optional(),
   message: z.string().optional(),
+});
+
+// Extended conditional fields per service (all optional at root level, validated client-side before send)
+const formSchema = baseSchema.extend({
+  // hébergement
+  nights: z.coerce.number().optional(),
+  roomType: z.enum(['standard','deluxe','suite']).optional(),
+  // transport
+  transportClass: z.enum(['economy','business','first']).optional(),
+  roundTrip: z.boolean().optional(),
+  returnDate: z.date().optional(),
+  // voyages-croisieres
+  durationDays: z.coerce.number().optional(),
+  cabinType: z.enum(['inside','oceanview','balcony','suite']).optional(),
+  // excursions
+  excursionDate: z.date().optional(),
+  pickupLocation: z.string().optional(),
+  // tourisme-affaires
+  attendees: z.coerce.number().optional(),
+  eventType: z.string().optional(),
 });
 
 export function QuoteRequestDialog({
@@ -78,28 +99,68 @@ export function QuoteRequestModal({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      service: 'hebergement',
       name: '',
       email: '',
       phone: '',
       destination: defaultDestination ?? '',
       travelers: 1,
       message: '',
+      nights: undefined,
+      roomType: undefined,
+      transportClass: undefined,
+      roundTrip: false,
+      returnDate: undefined,
+      durationDays: undefined,
+      cabinType: undefined,
+      excursionDate: undefined,
+      pickupLocation: undefined,
+      attendees: undefined,
+      eventType: undefined,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const service = form.watch('service');
 
-    toast({
-      title: 'Devis demandé !',
-      description: 'Merci ! Votre demande de devis a bien été envoyée. Nous reviendrons vers vous rapidement.',
-    });
-    form.reset();
-    onOpenChange(false);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      // Prepare payload (convert Dates to ISO)
+      const payload: any = { ...values };
+      ['departureDate','returnDate','excursionDate'].forEach((k) => {
+        const v = (values as any)[k];
+        if (v instanceof Date) payload[k] = v.toISOString();
+      });
+
+      const res = await fetch('/api/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(()=>({}));
+        throw new Error(body?.error || 'Erreur serveur');
+      }
+
+      toast({
+        title: 'Devis demandé !',
+        description: 'Merci ! Votre demande de devis a bien été envoyée. Nous reviendrons vers vous rapidement.',
+      });
+      form.reset();
+      onOpenChange(false);
+    } catch (err: any) {
+      console.error('Quote submit error:', err);
+      toast({
+        title: 'Erreur',
+        description: err?.message || 'Impossible d’envoyer la demande, réessayez plus tard.',
+        variant: 'destructive',
+      });
+    }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>Demander un devis</DialogTitle>
           <DialogDescription>
@@ -108,6 +169,27 @@ export function QuoteRequestModal({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="service"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quel service souhaitez-vous ?</FormLabel>
+                  <FormControl>
+                    <select {...field} className="w-full rounded-md border px-3 py-2">
+                      <option value="hebergement">Hébergement</option>
+                      <option value="transport">Transport</option>
+                      <option value="voyages-croisieres">Voyages & Croisières</option>
+                      <option value="excursions">Excursions</option>
+                      <option value="tourisme-affaires">Tourisme d'affaires</option>
+                      <option value="reservation-express">Réservation Express</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="name"
@@ -160,66 +242,146 @@ export function QuoteRequestModal({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
-               <FormField
-                control={form.control}
-                name="departureDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Date de départ</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP", { locale: fr })
-                            ) : (
-                              <span>Choisissez une date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date < new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                          locale={fr}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="travelers"
-                render={({ field }) => (
+
+            {/* Conditional fields based on selected service */}
+            {service === 'hebergement' && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="nights" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Voyageurs</FormLabel>
+                    <FormLabel>Nombre de nuits</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input type="number" placeholder="1" className="pl-8" {...field} />
-                      </div>
+                      <Input type="number" placeholder="Ex: 3" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
-                )}
-              />
-            </div>
+                )} />
+                <FormField control={form.control} name="roomType" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de chambre</FormLabel>
+                    <FormControl>
+                      <select {...field} className="w-full rounded-md border px-3 py-2">
+                        <option value="standard">Standard</option>
+                        <option value="deluxe">Deluxe</option>
+                        <option value="suite">Suite</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            )}
+
+            {service === 'transport' && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="transportClass" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Classe</FormLabel>
+                    <FormControl>
+                      <select {...field} className="w-full rounded-md border px-3 py-2">
+                        <option value="economy">Économique</option>
+                        <option value="business">Business</option>
+                        <option value="first">First</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="roundTrip" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Aller-retour ?</FormLabel>
+                    <FormControl>
+                      <input type="checkbox" {...field} className="mr-2" />
+                      <span>Oui</span>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="returnDate" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date de retour (si aller-retour)</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            )}
+
+            {service === 'voyages-croisieres' && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="durationDays" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Durée (jours)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Ex: 7" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="cabinType" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de cabine</FormLabel>
+                    <FormControl>
+                      <select {...field} className="w-full rounded-md border px-3 py-2">
+                        <option value="inside">Inside</option>
+                        <option value="oceanview">Ocean View</option>
+                        <option value="balcony">Balcony</option>
+                        <option value="suite">Suite</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            )}
+
+            {service === 'excursions' && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="excursionDate" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date de l'excursion</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="pickupLocation" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Point de départ</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Hôtel, Aéroport..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            )}
+
+            {service === 'tourisme-affaires' && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="attendees" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre de participants</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Ex: 50" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="eventType" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type d'événement</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Séminaire, Incentive..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="message"
