@@ -8,7 +8,7 @@ module.exports = [
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
-      parser: require.resolve('@typescript-eslint/parser'),
+      parser: require('@typescript-eslint/parser'),
       ecmaVersion: 2021,
       sourceType: 'module',
       ecmaFeatures: { jsx: true }
