@@ -1,11 +1,64 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent, ReactNode } from 'react';
-import { MessageCircle, X, Send, Loader2, Bot, User } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Bot, User, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/@/lib/utils';
 
-type Message = { role: 'user' | 'assistant'; content: string };
+type Message = { role: 'user' | 'assistant'; content: string; timestamp?: number };
+
+// Message component with React.memo for performance
+const MessageBubble = React.memo(function MessageBubble({
+  msg,
+  isTyping,
+}: {
+  msg: Message;
+  isTyping?: boolean;
+}) {
+  const timeStr = msg.timestamp
+    ? new Date(msg.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    : '';
+
+  return (
+    <div
+      className={cn(
+        'flex gap-2 max-w-[85%] animate-in fade-in slide-in-from-bottom-2 duration-200',
+        msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''
+      )}
+    >
+      <div
+        className={cn(
+          'w-7 h-7 rounded-full flex items-center justify-center shrink-0',
+          msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-primary/15 text-primary'
+        )}
+      >
+        {msg.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+      </div>
+      <div
+        className={cn(
+          'rounded-2xl px-3 py-2 text-sm space-y-1 max-w-[calc(100%-3rem)]',
+          msg.role === 'user'
+            ? 'bg-primary text-primary-foreground rounded-tr-sm'
+            : 'bg-card border rounded-tl-sm'
+        )}
+      >
+        {isTyping ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Assistant écrit...</span>
+          </div>
+        ) : (
+          <>
+            {renderMarkdown(msg.content)}
+            {timeStr && (
+              <span className="text-xs opacity-60 block mt-1">{timeStr}</span>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+});
 
 function renderMarkdown(text: string): ReactNode[] {
   const lines = text.split('\n');
@@ -82,9 +135,36 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const analyticsRef = useRef<{ messagesCount: number; startTime: number } | null>(null);
 
+  // Analytics: track when chat is opened
+  useEffect(() => {
+    if (isOpen) {
+      analyticsRef.current = { messagesCount: 0, startTime: Date.now() };
+    }
+  }, [isOpen]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+  }, [input]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoading]);
+
+  // Initial message
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([
@@ -96,22 +176,26 @@ export default function Chatbot() {
     }
   }, [isOpen, messages.length]);
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const text = input.trim();
     if (!text || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: text };
+    const userMessage: Message = {
+      role: 'user',
+      content: text,
+      timestamp: Date.now(),
+    };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
+    setError(null);
     setIsLoading(true);
+
+    // Analytics
+    if (analyticsRef.current) {
+      analyticsRef.current.messagesCount++;
+    }
 
     try {
       const res = await fetch('/api/chat', {
@@ -122,14 +206,29 @@ export default function Chatbot() {
         }),
       });
 
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `Erreur HTTP ${res.status}`);
+      }
+
       const data = await res.json();
       const reply = data.reply || data.error || "Désolé, une erreur est survenue.";
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
-    } catch {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: "Désolé, je ne peux pas répondre pour le moment. Contactez-nous au +221 77 312 90 90." },
+        { role: 'assistant', content: reply, timestamp: Date.now() },
+      ]);
+    } catch (err) {
+      console.error('Chat error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Erreur de connexion';
+      setError(errorMessage);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `Désolé, je n'ai pas pu répondre. (${errorMessage})`,
+          timestamp: Date.now(),
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -138,10 +237,15 @@ export default function Chatbot() {
 
   function handleSuggestion(text: string) {
     setInput(text);
-    if (scrollAreaRef.current) {
-      const textarea = scrollAreaRef.current.querySelector('textarea');
-      textarea?.focus();
-    }
+    // Focus textarea after suggestion
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+    });
+  }
+
+  function handleReset() {
+    setMessages([]);
+    setError(null);
   }
 
   return (
@@ -183,56 +287,44 @@ export default function Chatbot() {
               <p className="font-semibold text-sm">Assistant SLAAC Voyages</p>
               <p className="text-xs text-primary-foreground/80">En ligne · Répond en quelques secondes</p>
             </div>
+            {messages.length > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+                onClick={handleReset}
+                aria-label="Réinitialiser la conversation"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
-          {/* Zone messages */}
-          <div ref={scrollAreaRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/30">
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  'flex gap-2 max-w-[85%]',
-                  msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''
-                )}
-              >
-                <div
-                  className={cn(
-                    'w-7 h-7 rounded-full flex items-center justify-center shrink-0',
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-primary/15 text-primary'
-                  )}
-                >
-                  {msg.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                </div>
-                <div
-                  className={cn(
-                    'rounded-2xl px-3 py-2 text-sm space-y-1',
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                      : 'bg-card border rounded-tl-sm'
-                  )}
-                >
-                  {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
-                </div>
-              </div>
+          {/* Zone messages avec aria-live */}
+          <div
+            ref={scrollAreaRef}
+            className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/30"
+            role="log"
+            aria-live="polite"
+            aria-label="Zone de discussion"
+          >
+            {messages.map((msg) => (
+              <MessageBubble key={`${msg.role}-${msg.timestamp}`} msg={msg} />
             ))}
 
-            {isLoading && (
-              <div className="flex gap-2">
-                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                  <Bot className="h-4 w-4 text-primary" />
-                </div>
-                <div className="bg-card border rounded-2xl rounded-tl-sm px-3 py-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                </div>
+            {isLoading && <MessageBubble msg={{ role: 'assistant', content: '' }} isTyping />}
+
+            {/* Erreur */}
+            {error && (
+              <div className="mx-auto max-w-[85%] bg-destructive/10 border border-destructive/20 rounded-2xl p-3 text-sm text-destructive">
+                {error}
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggestions rapides (visible si peu de messages) */}
+          {/* Suggestions rapides */}
           {messages.length <= 1 && !isLoading && (
             <div className="px-3 pb-2 flex flex-wrap gap-2">
               {SUGGESTIONS.map((s) => (
@@ -249,13 +341,14 @@ export default function Chatbot() {
 
           {/* Formulaire */}
           <form onSubmit={handleSubmit} className="p-3 border-t bg-card flex gap-2">
-            <input
-              type="text"
+            <textarea
+              ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Posez votre question..."
               disabled={isLoading}
-              className="flex-1 rounded-full bg-background border border-input px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              rows={1}
+              className="flex-1 rounded-full bg-background border border-input px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none max-h-[120px]"
             />
             <Button
               type="submit"
