@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, FormEvent, ReactNode } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot, User, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/@/lib/utils';
+import { cn } from '@/lib/utils';
 
 type Message = { role: 'user' | 'assistant'; content: string; timestamp?: number };
 
