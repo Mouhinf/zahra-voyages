@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect, FormEvent, ReactNode } from 'react';
+import { useState, useRef, useEffect, FormEvent, ReactNode, memo } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot, User, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type Message = { role: 'user' | 'assistant'; content: string; timestamp?: number };
 
-// Message component with React.memo for performance
-const MessageBubble = React.memo(function MessageBubble({
+// Message component with memo for performance
+const MessageBubble = memo(function MessageBubble({
   msg,
   isTyping,
 }: {
