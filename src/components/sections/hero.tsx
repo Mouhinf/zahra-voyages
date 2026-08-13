@@ -83,7 +83,7 @@ export default function Hero() {
           Découvrez des destinations incroyables et vivez des expériences uniques avec SLAAC Voyages.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/destinations">
+          <Link href="/transport">
             <Button size="lg" variant="default" className="w-full sm:w-auto">
               Explorer les Destinations
             </Button>
