@@ -10,6 +10,13 @@ export const config = {
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
 
+  // Les pages d'administration ne sont pas du trafic public : pas de
+  // journalisation analytics (et pas de pollution des stats par les
+  // visites répétées du back-office).
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    return NextResponse.next();
+  }
+
   // Détermine la source
   const ua = req.headers.get('user-agent') || '';
   let source = 'direct';

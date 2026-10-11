@@ -50,33 +50,52 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Trop de messages' }, { status: 413 });
     }
 
-    const totalLength = messages.reduce((acc: number, m: any) => acc + (m?.content?.length || 0), 0);
+    // Sanitisation : seuls les rôles user/assistant sont conservés (un client
+    // ne doit pas pouvoir injecter un message "system" qui court-circuite les
+    // consignes), contenu converti en chaîne bornée.
+    const safeMessages = messages
+      .map((m: { role?: unknown; content?: unknown }) => ({
+        role: m?.role === 'assistant' ? 'assistant' : 'user',
+        content: typeof m?.content === 'string' ? m.content.slice(0, 4000) : '',
+      }))
+      .filter((m: { role: string; content: string }) => m.content.length > 0);
+
+    if (safeMessages.length === 0) {
+      return NextResponse.json({ error: 'Messages requis' }, { status: 400 });
+    }
+
+    const totalLength = safeMessages.reduce((acc: number, m: { content: string }) => acc + m.content.length, 0);
     if (totalLength > 20000) {
       return NextResponse.json({ error: 'Requête trop volumineuse' }, { status: 413 });
     }
 
-    // origin/referer allow list
-    const allowedOrigins = [process.env.NEXT_PUBLIC_BASE_URL || 'https://slaac-voyages.vercel.app'];
+    // origin/referer allow list — comparaison EXACTE de l'origine
+    // (startsWith autoriserait https://slaac-voyages.vercel.app.evil.com)
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_BASE_URL || 'https://slaac-voyages.vercel.app',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+    ];
     const refererHeader = req.headers.get('referer') || req.headers.get('origin') || '';
     if (refererHeader) {
       try {
         const refererOrigin = new URL(refererHeader).origin;
-        if (!allowedOrigins.some(o => refererOrigin.startsWith(o))) {
+        if (!allowedOrigins.includes(refererOrigin)) {
           return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
         }
-      } catch (err) {
-        // malformed referer — continue (do not block)
+      } catch {
+        // referer malformé — on continue (pas de blocage)
       }
     }
 
     // best-effort in-memory rate limiter (per IP) — ephemeral on Edge
     const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
     const RATE_LIMIT_MAX = 30; // max requests per window per IP
-    // attach store on global to survive warm invocations in same worker
-    // @ts-ignore
-    const store: Map<string, { count: number; start: number }> = (global as any)._chat_rate_limiter || new Map();
-    // @ts-ignore
-    (global as any)._chat_rate_limiter = store;
+    // le store est attaché à globalThis pour survivre aux invocations
+    // à chaud dans le même worker Edge
+    const store: Map<string, { count: number; start: number }> =
+      ((globalThis as typeof globalThis & { _chat_rate_limiter?: Map<string, { count: number; start: number }> })._chat_rate_limiter) ?? new Map();
+    (globalThis as typeof globalThis & { _chat_rate_limiter?: Map<string, { count: number; start: number }> })._chat_rate_limiter = store;
 
     const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || req.headers.get('x-real-ip') || 'unknown';
     const now = Date.now();
@@ -93,7 +112,7 @@ export async function POST(req: NextRequest) {
 
     const apiMessages = [
       { role: 'system', content: SYSTEM_PROMPT },
-      ...messages,
+      ...safeMessages,
     ];
 
     const models = ['openai/gpt-oss-20b:free', 'tencent/hy3:free', 'nvidia/nemotron-nano-9b-v2:free'];
@@ -103,7 +122,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'OpenRouter API key non configurée' }, { status: 500 });
     }
 
-    let data: any = null;
+    let data: { choices?: Array<{ message?: { content?: string } }> } | null = null;
     let lastError = '';
 
     for (const model of models) {
@@ -132,8 +151,8 @@ export async function POST(req: NextRequest) {
           lastError = `${model}: ${response.status}`;
           console.error('OpenRouter error:', lastError, err);
         }
-      } catch (e: any) {
-        lastError = `${model}: ${e.message}`;
+      } catch (e) {
+        lastError = `${model}: ${e instanceof Error ? e.message : String(e)}`;
         console.error('Fetch error:', lastError);
       }
     }
