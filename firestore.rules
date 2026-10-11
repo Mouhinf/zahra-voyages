@@ -1,25 +1,101 @@
 rules_version = '2';
 
-// Cloud Firestore Security Rules for SLAAC Voyages
-// Public read access for all collections (website content)
-// Write access restricted to authenticated admin users
+// ============================================================================
+// Cloud Firestore Security Rules — SLAAC Voyages
+//
+// Principes appliqués :
+//   1. Lecture publique UNIQUEMENT sur les collections de catalogue publiées
+//      (contenus marketing destinés aux visiteurs du site).
+//   2. Écriture / modification / suppression réservées aux administrateurs,
+//      identifiés par le custom claim Firebase `admin: true`
+//      (voir scripts/set-admin-claim.mjs) OU par un email vérifié explicitement
+//      autorisé dans la liste ADMIN_EMAILS ci-dessous.
+//   3. Toutes les données privées (devis, contacts, analytics, réservations,
+//      newsletter, utilisateurs) sont INACCESSIBLES depuis le client :
+//      elles transitent uniquement par les endpoints serveur sécurisés
+//      (SDK Admin, hors périmètre des règles).
+//   4. Refus explicite par défaut : toute collection non listée est refusée.
+//   5. Limitation de la taille des documents écrits (anti-abus).
+// ============================================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
+    // Emails d'administrateurs autorisés (l'email doit être vérifié dans Firebase Auth).
+    // Le mécanisme recommandé reste le custom claim `admin: true`.
+    function isAdmin() {
+      return request.auth != null
+        && (
+          request.auth.token.admin == true
+          || (
+            request.auth.token.email in [
+              'mouhopap@gmail.com'
+            ]
+            && request.auth.token.email_verified == true
+          )
+        );
     }
 
-    // Public collections: readable by anyone, writable by authenticated users
-    match /{collectionName} {
-      // Hébergements, Transports, Voyages & Croisières, Excursions, Offres d'Affaires, Destinations
-      match /{documentId} {
-        allow read: if true;
-        allow write: if isAuthenticated();
-        allow delete: if isAuthenticated();
-      }
+    // Collections dont le contenu est public (catalogue du site).
+    function isPublicCatalogCollection(collectionName) {
+      return collectionName in [
+        'destinations',
+        'hebergements',
+        'transports',
+        'voyages',
+        'excursions',
+        'offresAffaires',
+        'partenaires',
+        'pageContents'
+      ];
+    }
+
+    // Garde anti-abus sur les écritures : nombre de champs limité.
+    function isSaneWrite() {
+      return request.resource.data is map
+        && request.resource.data.size() <= 40;
+    }
+
+    // ------------------------------------------------------------------
+    // Règle générique : refus par défaut, sauf collections listées.
+    // Couvre aussi bien get/list que create/update/delete.
+    // ------------------------------------------------------------------
+    match /{collectionName}/{documentId} {
+      allow get, list: if isPublicCatalogCollection(collectionName);
+      allow create, update: if isPublicCatalogCollection(collectionName)
+        && isAdmin()
+        && isSaneWrite();
+      allow delete: if isPublicCatalogCollection(collectionName)
+        && isAdmin();
+    }
+
+    // ------------------------------------------------------------------
+    // Données privées : AUCUN accès client (lecture ou écriture).
+    // quotes, contacts, leads, analytics, bookings, newsletter, users…
+    // Le SDK Admin (routes serveur authentifiées) n'est pas soumis aux règles.
+    // L'absence de bloc match = refus implicite ; ces rappels explicites
+    // documentent l'intention et protègent contre toute régression du bloc générique.
+    // ------------------------------------------------------------------
+    match /quotes/{doc} {
+      allow read, write: if false;
+    }
+    match /contacts/{doc} {
+      allow read, write: if false;
+    }
+    match /leads/{doc} {
+      allow read, write: if false;
+    }
+    match /analytics/{doc} {
+      allow read, write: if false;
+    }
+    match /bookings/{doc} {
+      allow read, write: if false;
+    }
+    match /newsletter/{doc} {
+      allow read, write: if false;
+    }
+    match /users/{doc} {
+      allow read, write: if false;
     }
   }
 }
