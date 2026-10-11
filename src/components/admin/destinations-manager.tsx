@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getDbInstance } from '@/lib/firebase';
-import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { uploadImageToCloudinary } from '@/lib/cloudinary';
 import { Destination } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -70,26 +71,11 @@ export default function DestinationsManager() {
     setUploadProgress(0);
 
     const imageFile = values.image[0];
-    const formData = new FormData();
-    formData.append('file', imageFile);
-    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
     try {
       // Simulating progress
       setUploadProgress(50);
-      const uploadResponse = await fetch(url, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Image upload failed');
-      }
-
-      const { secure_url, public_id } = await uploadResponse.json();
+      const { secure_url, public_id } = await uploadImageToCloudinary(imageFile);
       setUploadProgress(100);
 
       await addDoc(collection(getDbInstance(), 'destinations'), {
