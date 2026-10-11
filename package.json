@@ -4,7 +4,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "test:rules": "bash scripts/test-rules.sh"
+    "test:rules": "bash scripts/test-rules.sh",
+    "test:api": "node tests/api-integration.test.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
