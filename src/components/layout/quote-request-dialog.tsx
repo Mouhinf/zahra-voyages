@@ -24,6 +24,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
 import React, { useState } from 'react';
@@ -200,13 +204,18 @@ export function QuoteRequestModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Quel service souhaitez-vous ?</FormLabel>
-                  <FormControl>
-                    <select {...field} className="w-full rounded-md border px-3 py-2">
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choisir un service" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
                       {SERVICE_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                       ))}
-                    </select>
-                  </FormControl>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -297,13 +306,18 @@ export function QuoteRequestModal({
                 <FormField control={form.control} name="roomType" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type de chambre</FormLabel>
-                    <FormControl>
-                      <select {...field} className="w-full rounded-md border px-3 py-2">
-                        <option value="standard">Standard</option>
-                        <option value="deluxe">Deluxe</option>
-                        <option value="suite">Suite</option>
-                      </select>
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choisir" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard</SelectItem>
+                        <SelectItem value="deluxe">Deluxe</SelectItem>
+                        <SelectItem value="suite">Suite</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -315,30 +329,32 @@ export function QuoteRequestModal({
                 <FormField control={form.control} name="transportClass" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Classe</FormLabel>
-                    <FormControl>
-                      <select {...field} className="w-full rounded-md border px-3 py-2">
-                        <option value="economy">Économique</option>
-                        <option value="business">Business</option>
-                        <option value="first">First</option>
-                      </select>
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choisir" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="economy">Économique</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                        <SelectItem value="first">First</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="roundTrip" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Aller-retour ?</FormLabel>
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                     <FormControl>
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={Boolean(field.value)}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                        onBlur={field.onBlur}
-                        className="mr-2"
+                        onCheckedChange={(checked) => field.onChange(checked === true)}
                       />
-                      <span>Oui</span>
                     </FormControl>
-                    <FormMessage />
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Aller-retour</FormLabel>
+                    </div>
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="returnDate" render={({ field }) => (
@@ -367,14 +383,19 @@ export function QuoteRequestModal({
                 <FormField control={form.control} name="cabinType" render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type de cabine</FormLabel>
-                    <FormControl>
-                      <select {...field} className="w-full rounded-md border px-3 py-2">
-                        <option value="inside">Inside</option>
-                        <option value="oceanview">Ocean View</option>
-                        <option value="balcony">Balcony</option>
-                        <option value="suite">Suite</option>
-                      </select>
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choisir" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="inside">Intérieure</SelectItem>
+                        <SelectItem value="oceanview">Vue mer</SelectItem>
+                        <SelectItem value="balcony">Balcon</SelectItem>
+                        <SelectItem value="suite">Suite</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
