@@ -10,12 +10,25 @@ const LazyQuoteRequestModal = React.lazy(() =>
 );
 
 type QuoteRequestButtonProps = Omit<ButtonProps, 'onClick' | 'type'> & {
+  /** Service préselectionné dans le formulaire (ex. depuis une page d'offre). */
+  defaultService?:
+    | 'hebergement'
+    | 'transport'
+    | 'voyages-croisieres'
+    | 'excursions'
+    | 'tourisme-affaires'
+    | 'reservation-express'
+    | 'assistance-visa'
+    | 'assurance-voyage'
+    | 'preinscription-universitaire'
+    | 'prise-de-rendez-vous';
   defaultDestination?: string;
   /** Traçabilité commerciale : page / contexte à l'origine de la demande. */
   source?: string;
 };
 
 export function QuoteRequestButton({
+  defaultService,
   defaultDestination,
   source,
   children,
@@ -40,6 +53,7 @@ export function QuoteRequestButton({
           <LazyQuoteRequestModal
             open={open}
             onOpenChange={setOpen}
+            defaultService={defaultService}
             defaultDestination={defaultDestination}
             source={source}
           />

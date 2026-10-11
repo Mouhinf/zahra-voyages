@@ -15,6 +15,7 @@ const navLinks = [
   { href: '/excursions', label: 'Circuits et Excursions' },
   { href: '/tourisme-affaires', label: 'Tourisme' },
   { href: '/assistance-voyage', label: 'Assistance voyage' },
+  { href: '/about', label: 'À propos' },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -28,7 +29,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
               src="/logo-slaac.png"
@@ -41,7 +42,7 @@ export default function Header() {
             <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
           </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 flex-nowrap ml-4">
+        <nav className="hidden lg:flex items-center gap-1 flex-nowrap ml-4" aria-label="Navigation principale">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -53,15 +54,19 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-            <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp">
-                <Button variant="outline" size="icon" className="hidden sm:flex h-9 w-9">
-                    <WhatsAppIcon className="h-5 w-5 fill-current" />
-                    <span className="sr-only">Contacter sur WhatsApp</span>
+        <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="https://wa.me/221773129090"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:block"
+            >
+                <Button variant="outline" size="sm" className="h-9">
+                    <WhatsAppIcon className="h-4 w-4 fill-current text-green-700" /> WhatsApp
                 </Button>
             </a>
-            <QuoteRequestButton className="hidden sm:flex" variant="default" size="icon">
-                  <Send className="h-4 w-4" />
+            <QuoteRequestButton className="hidden sm:flex" variant="gold" size="sm">
+                  <Send className="h-4 w-4" /> Demander un devis
             </QuoteRequestButton>
           <Sheet>
             <SheetTrigger asChild>
@@ -84,7 +89,7 @@ export default function Header() {
                   <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
                   </Link>
                 </SheetClose>
-                <nav className="grid gap-4">
+                <nav className="grid gap-4" aria-label="Navigation mobile">
                   {navLinks.map((link) => (
                     <SheetClose asChild key={link.href}>
                       <Link href={link.href} className="rounded-md py-1 text-lg font-medium transition-colors hover:text-primary">
@@ -93,13 +98,13 @@ export default function Header() {
                     </SheetClose>
                   ))}
                 </nav>
-                <div className="flex gap-2">
-                  <QuoteRequestButton className="flex-1" variant="default">
-                      <Send className="mr-2 h-4 w-4" /> Devis
+                <div className="flex flex-col gap-2">
+                  <QuoteRequestButton variant="gold">
+                      <Send className="mr-2 h-4 w-4" /> Demander un devis
                   </QuoteRequestButton>
-                  <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp" className="flex-1">
+                  <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" aria-label="Contacter SLAAC Voyages sur WhatsApp" className="w-full">
                       <Button variant="outline" className="w-full">
-                          <WhatsAppIcon className="mr-2 h-5 w-5 fill-current" /> WhatsApp
+                          <WhatsAppIcon className="mr-2 h-5 w-5 fill-current text-green-700" /> Discuter sur WhatsApp
                       </Button>
                   </a>
                 </div>

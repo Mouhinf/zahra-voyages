@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 const ServiceEnum = z.enum([
   'hebergement',
@@ -88,21 +88,23 @@ const formSchema = baseSchema.extend({
 
 export function QuoteRequestDialog({
   children,
+  defaultService,
   defaultDestination,
   source,
 }: {
   children: React.ReactNode;
+  defaultService?: z.infer<typeof ServiceEnum>;
   defaultDestination?: string;
   source?: string;
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
       </Dialog>
-      <QuoteRequestModal open={open} onOpenChange={setOpen} defaultDestination={defaultDestination} source={source} />
+      <QuoteRequestModal open={open} onOpenChange={setOpen} defaultService={defaultService} defaultDestination={defaultDestination} source={source} />
     </>
   );
 }
@@ -110,11 +112,13 @@ export function QuoteRequestDialog({
 export function QuoteRequestModal({
   open,
   onOpenChange,
+  defaultService,
   defaultDestination,
   source,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultService?: z.infer<typeof ServiceEnum>;
   defaultDestination?: string;
   source?: string;
 }) {
@@ -124,7 +128,7 @@ export function QuoteRequestModal({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      service: 'hebergement',
+      service: defaultService ?? 'hebergement',
       name: '',
       email: '',
       phone: '',

@@ -4,34 +4,30 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 
+// Destination = idée de voyage : chaque tuile ouvre un devis prérempli avec
+// la destination. Pas de prix affiché ici : les tarifs réels sont donnés dans
+// le devis (les « à partir de » génériques, invérifiables, ont été retirés).
 const destinations = [
   {
     name: 'Paris, France',
-    price: 'À partir de  300 000 XOF',
-    image: 'https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?q=80&w=400&h=500&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    hint: 'paris france',
+    image: 'https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?q=80&w=600&h=750&fit=crop',
     tag: 'Europe',
   },
   {
     name: 'Dubaï, EAU',
-    price: 'À partir de  600 000 XOF',
-    image: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=400&h=500&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    hint: 'dubai city',
+    image: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=600&h=750&fit=crop',
     tag: 'Orient',
   },
   {
     name: 'New York, USA',
-    price: 'À partir de  750 000 XOF',
-    image: 'https://images.unsplash.com/photo-1546436836-07a91091f160?q=80&w=400&h=500&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    hint: 'new york usa',
+    image: 'https://images.unsplash.com/photo-1546436836-07a91091f160?q=80&w=600&h=750&fit=crop',
     tag: 'Amérique',
   },
   {
     name: 'Casamance, Sénégal',
-    price: 'À partir de  45 000 XOF',
     image: '/casamance.webp',
-    hint: 'senegal beach',
     tag: 'Afrique',
   },
 ];
@@ -41,15 +37,24 @@ export default function HomeDestinations() {
     <section id="destinations" className="py-16 sm:py-24 bg-secondary">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Des Destinations qui Font Rêver</h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Que vous soyez en quête d'aventure, de détente ou de découvertes culturelles, nous avons la destination parfaite pour vous. Laissez-vous inspirer.
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Destinations</span>
+          <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Des Destinations qui Font Rêver</h2>
+          <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
+            Aventure, détente ou découvertes culturelles : dites-nous où vous rêvez d'aller, nous construisons le séjour autour de votre budget.
           </p>
         </div>
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {destinations.map((dest) => (
-            <Card key={dest.name} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <Link href="/destinations">
+            <QuoteRequestButton
+              key={dest.name}
+              asChild
+              defaultService="voyages-croisieres"
+              defaultDestination={dest.name}
+              source="accueil-destinations"
+              className="group text-left cursor-pointer"
+            >
+              <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 p-0 h-full">
                 <div className="relative h-64">
                   <Image
                     src={dest.image}
@@ -57,16 +62,17 @@ export default function HomeDestinations() {
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    data-ai-hint={dest.hint}
                   />
                   <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground">{dest.tag}</Badge>
                 </div>
                 <CardContent className="p-4">
                   <h3 className="text-lg font-semibold text-primary">{dest.name}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{dest.price}</p>
+                  <p className="text-sm text-primary/70 mt-1 inline-flex items-center gap-1">
+                    Devis sur mesure <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                  </p>
                 </CardContent>
-              </Link>
-            </Card>
+              </Card>
+            </QuoteRequestButton>
           ))}
         </div>
         <div className="text-center mt-12">
