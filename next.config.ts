@@ -3,9 +3,9 @@ import type {NextConfig} from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
   transpilePackages: ['firebase'],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // Vérification TypeScript activée au build (0 erreur au 2026-10-11).
+  // ESLint reste ignoré ici : le dépôt comporte ~7 400 erreurs historiques
+  // à traiter séparément.
   eslint: {
     ignoreDuringBuilds: true,
   },

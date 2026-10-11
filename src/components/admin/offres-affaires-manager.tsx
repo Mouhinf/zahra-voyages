@@ -108,7 +108,11 @@ export default function OffresAffairesManager() {
       descriptionComplete: item.descriptionComplete || '',
       prix: item.prix,
       tag: item.tag,
-      type: ['seminaire', 'incentive', 'mice', 'mission_sur_mesure'].includes(item.type) ? 'tourisme_affaires' : item.type,
+      // Les types historiques (seminaire, incentive…) sont normalisés vers
+      // tourisme_affaires ; les valeurs restantes sont les 4 types valides.
+      type: (['seminaire', 'incentive', 'mice', 'mission_sur_mesure'].includes(item.type)
+        ? 'tourisme_affaires'
+        : item.type) as 'tourisme_affaires' | 'tourisme_religieux' | 'tourisme_local' | 'tourisme_linguistique',
       capacite: item.capacite,
       lieu: item.lieu,
       duree: item.duree,

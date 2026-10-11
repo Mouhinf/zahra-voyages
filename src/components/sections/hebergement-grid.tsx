@@ -134,7 +134,7 @@ export default function HebergementGrid({ initialItems = [] }: { initialItems?: 
         </div>
       ) : (
         <div className="text-center py-16">
-          <activeCat.icon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+          {activeCat && <activeCat.icon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />}
           <p className="text-muted-foreground">
             Aucun hébergement dans la catégorie "{activeCat?.label}" pour le moment. Contactez-nous pour une recherche personnalisée.
           </p>

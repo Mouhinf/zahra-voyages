@@ -1,17 +1,18 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, RefreshCw, Download, AlertCircle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AreaChart, Area, BarChart, LineChart, PieChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { getAuthInstance } from '@/lib/firebase';
+
+// Palette des graphiques (sources de trafic notamment).
+const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 // Types from firebase helpers
 interface AnalyticsSummary {
@@ -58,7 +59,7 @@ export default function AdminDashboardPage() {
     try {
       const auth = getAuthInstance();
       const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
-      const res = await fetch('/admin/dashboard/api/seed', {
+      const res = await fetch('/api/admin/dashboard/seed', {
         method: 'POST',
         ...(token && { headers: { Authorization: `Bearer ${token}` } }),
       });
@@ -68,7 +69,7 @@ export default function AdminDashboardPage() {
       } else {
         toast.error('Erreur lors du seed');
       }
-    } catch (e) {
+    } catch {
       toast.error('Erreur réseau');
     }
   };
@@ -77,7 +78,7 @@ export default function AdminDashboardPage() {
     try {
       const auth = getAuthInstance();
       const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
-      const res = await fetch('/admin/dashboard/api/export', {
+      const res = await fetch('/api/admin/dashboard/export', {
         method: 'POST',
         ...(token && { headers: { Authorization: `Bearer ${token}` } }),
       });
@@ -95,7 +96,7 @@ export default function AdminDashboardPage() {
       } else {
         toast.error('Erreur lors de l\'export');
       }
-    } catch (e) {
+    } catch {
       toast.error('Erreur réseau');
     }
   };
@@ -110,6 +111,14 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={handleSeed}>
+          <RefreshCw className="mr-2 h-4 w-4" /> Données de test
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleExport}>
+          <Download className="mr-2 h-4 w-4" /> Exporter CSV
+        </Button>
+      </div>
       {alerts.revenue && (
         <Badge variant="destructive" className="mb-4">
           <AlertCircle className="mr-2 h-4 w-4" />
@@ -119,7 +128,7 @@ export default function AdminDashboardPage() {
       {alerts.visits && (
         <Badge variant="destructive" className="mb-4">
           <AlertCircle className="mr-2 h-4 w-4" />
-          Plus de 1 000 visites aujourd\'hui
+          Plus de 1 000 visites aujourd&apos;hui
         </Badge>
       )}
 
@@ -187,7 +196,48 @@ export default function AdminDashboardPage() {
               <YAxis />
               <Tooltip />
               <Legend />
+              <Line type="monotone" dataKey="revenue" name="Chiffre d'affaires (FCFA)" stroke="#f59e0b" strokeWidth={2} />
             </LineChart>
+          </ResponsiveContainer>
+        </TabsContent>
+
+        <TabsContent value="sources" className="mt-4">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie data={summary.sources} dataKey="count" nameKey="source" cx="50%" cy="50%" outerRadius={100} label>
+                {summary.sources.map((entry, index) => (
+                  <Cell key={entry.source} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </TabsContent>
+
+        <TabsContent value="pages" className="mt-4">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={summary.pages}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="page" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" name="Visites" fill="#3b82f6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </TabsContent>
+
+        <TabsContent value="destinations" className="mt-4">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={summary.topDestinations}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="destination" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="visits" name="Visites" fill="#10b981" />
+            </BarChart>
           </ResponsiveContainer>
         </TabsContent>
       </Tabs>

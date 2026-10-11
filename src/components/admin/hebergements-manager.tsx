@@ -156,7 +156,7 @@ export default function HebergementsManager() {
         localisation: values.localisation,
         nombreEtoiles: values.nombreEtoiles,
         capacite: values.capacite,
-        equipements: values.equipements.split(',').map((s) => s.trim()).filter(Boolean),
+        equipements: (values.equipements ?? '').split(',').map((s) => s.trim()).filter(Boolean),
         disponible: values.disponible,
         ordre: values.ordre,
         image: imageUrl,
