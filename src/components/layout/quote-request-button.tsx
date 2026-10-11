@@ -11,10 +11,13 @@ const LazyQuoteRequestModal = React.lazy(() =>
 
 type QuoteRequestButtonProps = Omit<ButtonProps, 'onClick' | 'type'> & {
   defaultDestination?: string;
+  /** Traçabilité commerciale : page / contexte à l'origine de la demande. */
+  source?: string;
 };
 
 export function QuoteRequestButton({
   defaultDestination,
+  source,
   children,
   disabled,
   ...buttonProps
@@ -38,6 +41,7 @@ export function QuoteRequestButton({
             open={open}
             onOpenChange={setOpen}
             defaultDestination={defaultDestination}
+            source={source}
           />
         </React.Suspense>
       ) : null}

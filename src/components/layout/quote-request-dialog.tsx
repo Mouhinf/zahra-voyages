@@ -25,23 +25,43 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Send, CalendarIcon, Users } from 'lucide-react';
+import { Send } from 'lucide-react';
 import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { Calendar } from '../ui/calendar';
-import { fr } from 'date-fns/locale';
 
-const ServiceEnum = z.enum(['hebergement','transport','voyages-croisieres','excursions','tourisme-affaires','reservation-express']);
+const ServiceEnum = z.enum([
+  'hebergement',
+  'transport',
+  'voyages-croisieres',
+  'excursions',
+  'tourisme-affaires',
+  'reservation-express',
+  // Services d'assistance commercialisés sur /assistance-voyage.
+  'assistance-visa',
+  'assurance-voyage',
+  'preinscription-universitaire',
+  'prise-de-rendez-vous',
+]);
+
+const SERVICE_OPTIONS: Array<{ value: z.infer<typeof ServiceEnum>; label: string }> = [
+  { value: 'hebergement', label: 'Hébergement' },
+  { value: 'transport', label: 'Transport' },
+  { value: 'voyages-croisieres', label: 'Voyages & Croisières' },
+  { value: 'excursions', label: 'Excursions' },
+  { value: 'tourisme-affaires', label: 'Tourisme d\'affaires' },
+  { value: 'reservation-express', label: 'Réservation Express' },
+  { value: 'assistance-visa', label: 'Assistance visa' },
+  { value: 'assurance-voyage', label: 'Assurance voyage' },
+  { value: 'preinscription-universitaire', label: 'Préinscription universitaire' },
+  { value: 'prise-de-rendez-vous', label: 'Prise de rendez-vous' },
+];
 
 const baseSchema = z.object({
   service: ServiceEnum.default('hebergement'),
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
   email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }).optional().or(z.literal('')),
   phone: z.string().min(1, { message: 'Veuillez entrer un numéro de téléphone.' }),
-  destination: z.string().min(2, { message: 'Veuillez préciser une destination.'}),
-  departureDate: z.date({ required_error: "Une date de départ est requise." }).optional(),
+  destination: z.string().min(2, { message: 'Veuillez préciser une destination.'}).optional(),
+  departureDate: z.string().optional(),
   travelers: z.coerce.number().min(1, { message: 'Il doit y avoir au moins 1 voyageur.'}).optional(),
   message: z.string().optional(),
 });
@@ -54,12 +74,12 @@ const formSchema = baseSchema.extend({
   // transport
   transportClass: z.enum(['economy','business','first']).optional(),
   roundTrip: z.boolean().optional(),
-  returnDate: z.date().optional(),
+  returnDate: z.string().optional(),
   // voyages-croisieres
   durationDays: z.coerce.number().optional(),
   cabinType: z.enum(['inside','oceanview','balcony','suite']).optional(),
   // excursions
-  excursionDate: z.date().optional(),
+  excursionDate: z.string().optional(),
   pickupLocation: z.string().optional(),
   // tourisme-affaires
   attendees: z.coerce.number().optional(),
@@ -69,9 +89,11 @@ const formSchema = baseSchema.extend({
 export function QuoteRequestDialog({
   children,
   defaultDestination,
+  source,
 }: {
   children: React.ReactNode;
   defaultDestination?: string;
+  source?: string;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -80,7 +102,7 @@ export function QuoteRequestDialog({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
       </Dialog>
-      <QuoteRequestModal open={open} onOpenChange={setOpen} defaultDestination={defaultDestination} />
+      <QuoteRequestModal open={open} onOpenChange={setOpen} defaultDestination={defaultDestination} source={source} />
     </>
   );
 }
@@ -89,12 +111,15 @@ export function QuoteRequestModal({
   open,
   onOpenChange,
   defaultDestination,
+  source,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultDestination?: string;
+  source?: string;
 }) {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -123,38 +148,34 @@ export function QuoteRequestModal({
   const service = form.watch('service');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     try {
-      // Prepare payload (convert Dates to ISO)
-      const payload: any = { ...values };
-      ['departureDate','returnDate','excursionDate'].forEach((k) => {
-        const v = (values as any)[k];
-        if (v instanceof Date) payload[k] = v.toISOString();
-      });
-
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...values, source }),
       });
 
-      if (!res.ok) {
-        const body = await res.json().catch(()=>({}));
-        throw new Error(body?.error || 'Erreur serveur');
-      }
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
 
       toast({
         title: 'Devis demandé !',
-        description: 'Merci ! Votre demande de devis a bien été envoyée. Nous reviendrons vers vous rapidement.',
+        description: body?.reference
+          ? `Votre référence : ${body.reference}. Notre équipe vous recontacte rapidement.`
+          : 'Merci ! Votre demande de devis a bien été envoyée. Nous reviendrons vers vous rapidement.',
       });
       form.reset();
       onOpenChange(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Quote submit error:', err);
       toast({
         title: 'Erreur',
-        description: err?.message || 'Impossible d’envoyer la demande, réessayez plus tard.',
+        description: (err instanceof Error && err.message) || 'Impossible d’envoyer la demande, réessayez plus tard.',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -177,12 +198,9 @@ export function QuoteRequestModal({
                   <FormLabel>Quel service souhaitez-vous ?</FormLabel>
                   <FormControl>
                     <select {...field} className="w-full rounded-md border px-3 py-2">
-                      <option value="hebergement">Hébergement</option>
-                      <option value="transport">Transport</option>
-                      <option value="voyages-croisieres">Voyages & Croisières</option>
-                      <option value="excursions">Excursions</option>
-                      <option value="tourisme-affaires">Tourisme d'affaires</option>
-                      <option value="reservation-express">Réservation Express</option>
+                      {SERVICE_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
                     </select>
                   </FormControl>
                   <FormMessage />
@@ -229,19 +247,36 @@ export function QuoteRequestModal({
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="destination"
-              render={({ field }) => (
+            {/* Destination générique — masquée pour les services qui ont
+                leur propre formulation (visa, assurance) ou pas de
+                destination (rendez-vous, préinscription). */}
+            {!['assistance-visa', 'assurance-voyage', 'prise-de-rendez-vous', 'preinscription-universitaire'].includes(service) && (
+              <FormField
+                control={form.control}
+                name="destination"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Destination</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Paris, Dubaï..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {service === 'preinscription-universitaire' && (
+              <FormField control={form.control} name="destination" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Destination</FormLabel>
+                  <FormLabel>Pays / ville d'études visé</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Paris, Dubaï..." {...field} />
+                    <Input placeholder="Ex: France, Canada, Maroc..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+              )} />
+            )}
 
             {/* Conditional fields based on selected service */}
             {service === 'hebergement' && (
@@ -290,7 +325,13 @@ export function QuoteRequestModal({
                   <FormItem>
                     <FormLabel>Aller-retour ?</FormLabel>
                     <FormControl>
-                      <input type="checkbox" {...field} className="mr-2" />
+                      <input
+                        type="checkbox"
+                        checked={Boolean(field.value)}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        onBlur={field.onBlur}
+                        className="mr-2"
+                      />
                       <span>Oui</span>
                     </FormControl>
                     <FormMessage />
@@ -382,6 +423,30 @@ export function QuoteRequestModal({
               </div>
             )}
 
+            {service === 'assistance-visa' && (
+              <FormField control={form.control} name="destination" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pays de destination du visa</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: France, Canada, États-Unis..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            )}
+
+            {service === 'assurance-voyage' && (
+              <FormField control={form.control} name="destination" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zone de couverture souhaitée</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: Schengen, Monde..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            )}
+
             <FormField
               control={form.control}
               name="message"
@@ -401,12 +466,12 @@ export function QuoteRequestModal({
             />
             <DialogFooter>
                 <DialogClose asChild>
-                    <Button type="button" variant="secondary">
+                    <Button type="button" variant="secondary" disabled={isSubmitting}>
                         Annuler
                     </Button>
                 </DialogClose>
-                <Button type="submit">
-                    Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Envoi en cours…' : <>Envoyer ma demande <Send className="ml-2 h-4 w-4" /></>}
                 </Button>
             </DialogFooter>
           </form>

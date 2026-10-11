@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as z from 'zod';
-import { adminApp } from '@/lib/firebase-admin';
+import { adminApp, assertAdminConfigured, ConfigError } from '@/lib/firebase-admin';
 import { clientIpFromHeaders, rateLimit } from '@/lib/rate-limit';
+import { sendAgencyEmail } from '@/lib/notify';
 
 export const runtime = 'nodejs';
 
@@ -17,22 +18,69 @@ export const runtime = 'nodejs';
 // - reCAPTCHA (optionnel, activé si RECAPTCHA_SECRET est défini).
 // - Écriture via SDK Admin (les règles Firestore interdisent l'écriture
 //   client sur `quotes`).
+//
+// Fiabilité :
+// - 200 uniquement si le document est écrit ; référence lisible unique
+//   (ex. DV-20261011-4821) renvoyée au client et stockée.
+// - Notification email best-effort, statut consigné dans le document.
 // ---------------------------------------------------------------------------
+
+// Services réellement commercialisés (catalogue + page /assistance-voyage).
+const SERVICE_VALUES = [
+  'hebergement',
+  'transport',
+  'voyages-croisieres',
+  'excursions',
+  'tourisme-affaires',
+  'reservation-express',
+  'assistance-visa',
+  'assurance-voyage',
+  'preinscription-universitaire',
+  'prise-de-rendez-vous',
+] as const;
 
 const quoteSchema = z.object({
   name: z.string().trim().min(2, 'Nom requis').max(100),
   phone: z.string().trim().min(6, 'Téléphone requis').max(30),
   email: z.string().trim().email().max(150).optional().or(z.literal('').transform(() => undefined)),
-  service: z.string().trim().max(80).optional(),
+  service: z.enum(SERVICE_VALUES).default('reservation-express'),
   destination: z.string().trim().max(120).optional(),
   departureCountry: z.string().trim().max(80).optional(),
   preferredCurrency: z.enum(['XOF', 'EUR', 'USD']).optional(),
   travelers: z.string().trim().max(30).optional(),
   message: z.string().trim().max(2000).optional(),
+  // Champs conditionnels par service (bornés, tous optionnels).
+  nights: z.coerce.number().int().min(1).max(365).optional(),
+  roomType: z.enum(['standard', 'deluxe', 'suite']).optional(),
+  transportClass: z.enum(['economy', 'business', 'first']).optional(),
+  roundTrip: z.boolean().optional(),
+  departureDate: z.string().trim().max(30).optional(),
+  returnDate: z.string().trim().max(30).optional(),
+  durationDays: z.coerce.number().int().min(1).max(365).optional(),
+  cabinType: z.enum(['inside', 'oceanview', 'balcony', 'suite']).optional(),
+  excursionDate: z.string().trim().max(30).optional(),
+  pickupLocation: z.string().trim().max(120).optional(),
+  attendees: z.coerce.number().int().min(1).max(10000).optional(),
+  eventType: z.string().trim().max(120).optional(),
+  // Traçabilité commerciale : page / bouton à l'origine de la demande.
+  source: z.string().trim().max(60).optional(),
   captchaToken: z.string().max(2000).optional(),
 });
 
 type QuoteInput = z.infer<typeof quoteSchema>;
+
+const SERVICE_LABELS: Record<string, string> = {
+  'hebergement': 'Hébergement',
+  'transport': 'Transport',
+  'voyages-croisieres': 'Voyages & Croisières',
+  'excursions': 'Excursions',
+  'tourisme-affaires': 'Tourisme d\'affaires',
+  'reservation-express': 'Réservation Express',
+  'assistance-visa': 'Assistance visa',
+  'assurance-voyage': 'Assurance voyage',
+  'preinscription-universitaire': 'Préinscription universitaire',
+  'prise-de-rendez-vous': 'Prise de rendez-vous',
+};
 
 async function verifyRecaptcha(token?: string) {
   const secret = process.env.RECAPTCHA_SECRET;
@@ -43,6 +91,7 @@ async function verifyRecaptcha(token?: string) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(token)}`,
+      signal: AbortSignal.timeout(5000),
     });
     const j = await res.json();
     return j.success === true && j.score && j.score >= 0.3;
@@ -52,34 +101,14 @@ async function verifyRecaptcha(token?: string) {
   }
 }
 
-async function sendNotificationEmail(quote: Record<string, unknown>) {
-  const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-  const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL;
-  const FROM_EMAIL = process.env.FROM_EMAIL || 'no-reply@' + (process.env.NEXT_PUBLIC_BASE_URL?.replace(/^https?:\/\//, '') || 'slaac-voyages');
-  if (!SENDGRID_API_KEY || !NOTIFY_EMAIL) return;
-
-  const payload = { ...quote };
-  delete payload.captchaToken;
-  const content = Object.entries(payload).map(([k, v]) => `- ${k}: ${String(v ?? '')}`).join('\n');
-  const body = {
-    personalizations: [{ to: [{ email: NOTIFY_EMAIL }] }],
-    from: { email: FROM_EMAIL },
-    subject: `Nouveau devis SLAAC Voyages — ${quote.service || 'devis'}`,
-    content: [{ type: 'text/plain', value: `Nouveau devis reçu:\n\n${content}` }],
-  };
-
-  try {
-    await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${SENDGRID_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-  } catch (e) {
-    console.error('SendGrid error', e);
-  }
+/** Référence lisible et unique : DV-AAAAMMJJ-XXXX (identifiant aléatoire). */
+function buildReference(): string {
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(now.getUTCDate()).padStart(2, '0');
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `DV-${y}${m}${d}-${rand}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -115,22 +144,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Vérification captcha échouée' }, { status: 400 });
     }
 
+    assertAdminConfigured();
     const db = getFirestore(adminApp);
     const record = { ...quote };
     delete record.captchaToken;
+
+    const reference = buildReference();
     const docRef = await db.collection('quotes').add({
       ...record,
+      reference,
       ip: ip === 'unknown' ? null : ip,
       createdAt: new Date().toISOString(),
       status: 'new',
+      notifyStatus: 'pending',
     });
 
-    // send notification email if configured (best-effort)
-    sendNotificationEmail({ id: docRef.id, ...record }).catch(() => {});
+    // Notification best-effort — un échec n'invalide pas la demande,
+    // mais le statut est consigné pour l'administration.
+    const emailPayload: Array<[string, unknown]> = Object.entries({ reference, ...record }).map(
+      ([k, v]) => [k, typeof v === 'boolean' ? (v ? 'oui' : 'non') : (v ?? '—')],
+    );
+    const notify = await sendAgencyEmail(
+      `Nouveau devis ${reference} — ${SERVICE_LABELS[quote.service] ?? quote.service}`,
+      emailPayload,
+    );
+    const notifyStatus = notify.sent ? 'sent' : `failed:${notify.reason ?? 'unknown'}`;
+    await docRef.update({ notifyStatus }).catch(() => {});
 
-    return NextResponse.json({ ok: true, id: docRef.id });
+    return NextResponse.json({
+      ok: true,
+      id: docRef.id,
+      reference,
+      emailWarning: !notify.sent && notify.reason !== 'not-configured',
+    });
   } catch (err: unknown) {
+    if (err instanceof ConfigError) {
+      console.error('Quote API config:', err.message);
+      return NextResponse.json({ error: err.message }, { status: err.statusCode });
+    }
     console.error('Quote API error:', err);
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    return NextResponse.json({ error: 'Impossible d\'enregistrer la demande pour le moment. Réessayez ou contactez-nous sur WhatsApp.' }, { status: 500 });
   }
 }
+
