@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -21,6 +21,31 @@ export default function AdminLoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Un administrateur déjà connecté est redirigé directement vers le
+  // tableau de bord (pas besoin de se reconnecter).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { getAuthInstance } = await import('@/lib/firebase');
+      const { onAuthStateChanged } = await import('firebase/auth');
+      onAuthStateChanged(getAuthInstance(), async (user) => {
+        if (cancelled || !user) return;
+        try {
+          const token = await user.getIdToken();
+          const res = await fetch('/api/admin/session', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!cancelled && res.ok) router.replace('/admin');
+        } catch {
+          // pas admin ou erreur — rester sur la page de connexion
+        }
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

@@ -35,6 +35,35 @@ function getAdminApp() {
   );
 }
 
+/**
+ * Vrai si le SDK Admin est réellement configuré (compte de service présent
+ * OU émulateur Firestore détecté). En production sans clé, les écritures
+ * Firestore échouent — les routes publiques doivent renvoyer un 503 clair
+ * plutôt qu'un 500 opaque.
+ */
+export function isAdminConfigured(): boolean {
+  return (
+    !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
+    !!process.env.FIRESTORE_EMULATOR_HOST
+  );
+}
+
+/** Erreur de configuration serveur — distinguée des erreurs d'auth. */
+export class ConfigError extends Error {
+  constructor(message: string, public statusCode = 503) {
+    super(message);
+  }
+}
+
+/** Lève ConfigError si le SDK Admin n'est pas utilisable dans cet environnement. */
+export function assertAdminConfigured(): void {
+  if (!isAdminConfigured()) {
+    throw new ConfigError(
+      'Service non configuré : FIREBASE_SERVICE_ACCOUNT_KEY est manquant (voir .env.example — Configuration Vercel)',
+    );
+  }
+}
+
 export const adminApp = getAdminApp();
 export const adminAuth = getAuth(adminApp);
 
