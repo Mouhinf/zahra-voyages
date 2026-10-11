@@ -207,12 +207,25 @@ export default function Chatbot() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || `Erreur HTTP ${res.status}`);
+        const errorData = await res.json().catch(() => ({}));
+        // Fournisseur IA indisponible (503 fallback) : repli honnête vers
+        // le contact humain — jamais de fausse réponse automatique.
+        if (res.status === 503 || errorData?.fallback) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content: 'Désolé, je suis momentanément indisponible. Pour une réponse immédiate, écrivez-nous directement sur **WhatsApp au +221 77 312 90 90** — notre équipe vous répond vite !',
+              timestamp: Date.now(),
+            },
+          ]);
+          return;
+        }
+        throw new Error(errorData?.error || `Erreur HTTP ${res.status}`);
       }
 
       const data = await res.json();
-      const reply = data.reply || data.error || "Désolé, une erreur est survenue.";
+      const reply = data.reply || "Désolé, une erreur est survenue.";
 
       setMessages((prev) => [
         ...prev,
@@ -226,7 +239,7 @@ export default function Chatbot() {
         ...prev,
         {
           role: 'assistant',
-          content: `Désolé, je n'ai pas pu répondre. (${errorMessage})`,
+          content: `Désolé, je n'ai pas pu répondre. Vous pouvez nous écrire sur **WhatsApp au +221 77 312 90 90**.`,
           timestamp: Date.now(),
         },
       ]);
