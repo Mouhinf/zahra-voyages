@@ -1,244 +1,241 @@
 'use client';
 
-import { useState } from 'react';
+// ---------------------------------------------------------------------------
+// Tableau de bord admin — uniquement des données RÉELLES :
+//   - prospects / demandes (CRM) : total, en attente, non traités > 48 h,
+//     confirmés, services les plus demandés, évolution sur 30 jours
+//   - offres publiées par module
+//   - visites réelles (balise analytics), pages et sources
+// Aucune « réservation » ni revenu fictif : ces indicateurs provenaient d'un
+// seed de données de test et ont été retirés.
+// ---------------------------------------------------------------------------
+
 import useSWR from 'swr';
-import { Loader2, RefreshCw, Download, AlertCircle } from 'lucide-react';
+import { Loader2, RefreshCw, AlertCircle, Inbox, Plane, Eye, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { toast } from 'sonner';
+import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { serviceLabel } from '@/lib/lead-labels';
 import { getAuthInstance } from '@/lib/firebase';
 
-// Palette des graphiques (sources de trafic notamment).
-const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6'];
 
-// Types from firebase helpers
-interface AnalyticsSummary {
-  totalVisits: number;
-  totalBookings: number;
-  conversionRate: number;
-  revenue: number;
-  uniqueVisitors: number;
-  pages: Array<{ page: string; count: number }>;
-  sources: Array<{ source: string; count: number }>;
-  topTransports: Array<{ type: string; count: number }>;
-  topDestinations: Array<{ destination: string; visits: number }>;
-  topOffers: number;
-  topVisitsPerDay: Array<{ date: string; count: number }>;
-  topRevenuePerDay: Array<{ date: string; revenue: number }>;
-  topUniqueVisitorsPerDay: Array<{ date: string; count: number }>;
-}
-
-const fetcher = async (url: string): Promise<AnalyticsSummary> => {
-  const auth = getAuthInstance();
-  const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
-  const res = await fetch(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.error || 'Failed to fetch data');
-  }
-  return res.json();
+type Overview = {
+  crm: {
+    totalLeads: number;
+    quotes: number;
+    contacts: number;
+    statusCounts: Record<string, number>;
+    unhandled: number;
+    topServices: Array<{ service: string; count: number }>;
+  };
+  offers: Array<{ key: string; label: string; published: number }>;
+  analytics: {
+    totalVisits: number;
+    pages: Array<{ page: string; count: number }>;
+    sources: Array<{ source: string; count: number }>;
+    perDay: Array<{ date: string; count: number }>;
+  };
+  leadsPerDay: Array<{ date: string; count: number }>;
 };
 
+const fetcher = async (url: string): Promise<Overview> => {
+  const auth = getAuthInstance();
+  const user = auth?.currentUser;
+  if (!user) throw new Error('Non connecté');
+  const token = await user.getIdToken();
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error((body as { error?: string })?.error || `Erreur ${res.status}`);
+  return body as Overview;
+};
+
+// Complète une série journalière sur 30 jours (zéro pour les jours sans donnée).
+function zeroFill30(series: Array<{ date: string; count: number }>): Array<{ date: string; count: number }> {
+  const map = new Map(series.map((p) => [p.date, p.count]));
+  const out: Array<{ date: string; count: number }> = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    out.push({ date: key.slice(5), count: map.get(key) ?? 0 });
+  }
+  return out;
+}
+
+function KpiTile({
+  title, value, icon: Icon, sub, alert = false,
+}: {
+  title: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  sub?: string;
+  alert?: boolean;
+}) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className={`h-4 w-4 ${alert ? 'text-destructive' : 'text-muted-foreground'}`} />
+      </CardHeader>
+      <CardContent>
+        <div className={`text-2xl font-bold ${alert ? 'text-destructive' : ''}`}>{value.toLocaleString('fr-FR')}</div>
+        {sub && <p className={`text-xs ${alert ? 'text-destructive' : 'text-muted-foreground'}`}>{sub}</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminDashboardPage() {
-  const [alerts, setAlerts] = useState({ revenue: false, visits: false });
-  const { data: summary, mutate, isLoading } = useSWR<AnalyticsSummary>('/api/dashboard/stats', fetcher, {
+  const { data, error, mutate, isLoading } = useSWR<Overview>('/api/admin/dashboard/overview', fetcher, {
     refreshInterval: 300000,
     revalidateOnFocus: true,
-    onSuccess: (data) => {
-      if (data?.revenue && data.revenue > 5000) setAlerts(prev => ({ ...prev, revenue: true }));
-      if (data?.topVisitsPerDay && data.topVisitsPerDay[0]?.count && data.topVisitsPerDay[0].count > 1000) {
-        setAlerts(prev => ({ ...prev, visits: true }));
-      }
-    },
   });
 
-  const handleSeed = async () => {
-    try {
-      const auth = getAuthInstance();
-      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
-      const res = await fetch('/api/admin/dashboard/seed', {
-        method: 'POST',
-        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
-      });
-      if (res.ok) {
-        toast.success('Données de test générées');
-        mutate();
-      } else {
-        toast.error('Erreur lors du seed');
-      }
-    } catch {
-      toast.error('Erreur réseau');
-    }
-  };
-
-  const handleExport = async () => {
-    try {
-      const auth = getAuthInstance();
-      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : undefined;
-      const res = await fetch('/api/admin/dashboard/export', {
-        method: 'POST',
-        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
-      });
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `dashboard-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        toast.success('Export CSV réussi');
-      } else {
-        toast.error('Erreur lors de l\'export');
-      }
-    } catch {
-      toast.error('Erreur réseau');
-    }
-  };
-
-  if (isLoading || !summary) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
+  if (error || !data) {
+    return (
+      <Card className="border-destructive">
+        <CardContent className="pt-6 flex items-center justify-between gap-4">
+          <span className="text-destructive">{error instanceof Error ? error.message : 'Chargement impossible'}</span>
+          <Button onClick={() => mutate()} variant="outline" size="sm">
+            <RefreshCw className="mr-2 h-4 w-4" /> Réessayer
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const { crm, offers, analytics } = data;
+  const pending = crm.statusCounts?.nouveau ?? 0;
+  const confirmed = crm.statusCounts?.confirme ?? 0;
+  const topServices = crm.topServices.map((s) => ({ name: serviceLabel(s.service), count: s.count }));
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={handleSeed}>
-          <RefreshCw className="mr-2 h-4 w-4" /> Données de test
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleExport}>
-          <Download className="mr-2 h-4 w-4" /> Exporter CSV
+      <div className="flex justify-end">
+        <Button onClick={() => mutate()} variant="outline" size="sm">
+          <RefreshCw className="mr-2 h-4 w-4" /> Rafraîchir
         </Button>
       </div>
-      {alerts.revenue && (
-        <Badge variant="destructive" className="mb-4">
-          <AlertCircle className="mr-2 h-4 w-4" />
-          Revenu supérieur à 5 000 FCFA
-        </Badge>
-      )}
-      {alerts.visits && (
-        <Badge variant="destructive" className="mb-4">
-          <AlertCircle className="mr-2 h-4 w-4" />
-          Plus de 1 000 visites aujourd&apos;hui
-        </Badge>
-      )}
 
+      {/* Indicateurs réels */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Visites Totales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.totalVisits.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Réservations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.totalBookings.toLocaleString()}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Chiffre d'Affaires</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.revenue.toLocaleString()} FCFA</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold">Taux de Conversion</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{summary.conversionRate.toFixed(2)}%</div>
-          </CardContent>
-        </Card>
+        <KpiTile title="Prospects (demandes)" value={crm.totalLeads} icon={Inbox} sub={`${crm.quotes} devis · ${crm.contacts} messages`} />
+        <KpiTile title="Nouvelles demandes" value={pending} icon={Plane} sub="En attente de premier contact" />
+        <KpiTile
+          title="Non traitées > 48 h"
+          value={crm.unhandled}
+          icon={AlertCircle}
+          alert={crm.unhandled > 0}
+          sub={crm.unhandled > 0 ? 'À relancer en priorité' : 'Rien à signaler'}
+        />
+        <KpiTile title="Devis confirmés" value={confirmed} icon={CheckCircle2} sub={`${confirmed}/${crm.totalLeads} demandes`} />
+        <KpiTile title="Visites (site)" value={analytics.totalVisits} icon={Eye} sub="Mesures anonymisées" />
       </div>
 
-      <Tabs defaultValue="visits" className="w-full">
-        <TabsList>
-          <TabsTrigger value="visits">Visites par Jour</TabsTrigger>
-          <TabsTrigger value="revenue">Chiffre d'Affaires par Jour</TabsTrigger>
-          <TabsTrigger value="sources">Sources de Trafic</TabsTrigger>
-          <TabsTrigger value="pages">Pages Populaires</TabsTrigger>
-          <TabsTrigger value="destinations">Destinations</TabsTrigger>
+      {/* Offres publiées par module */}
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Offres publiées par module</CardTitle></CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          {offers.map((o) => (
+            <Badge key={o.key} variant="outline" className="text-sm px-3 py-1">
+              {o.label} : {o.published}
+            </Badge>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="demandes" className="w-full">
+        <TabsList className="flex flex-wrap h-auto gap-1">
+          <TabsTrigger value="demandes">Demandes (30 j)</TabsTrigger>
+          <TabsTrigger value="services">Services demandés</TabsTrigger>
+          <TabsTrigger value="visites">Visites (30 j)</TabsTrigger>
+          <TabsTrigger value="sources">Sources de trafic</TabsTrigger>
+          <TabsTrigger value="pages">Pages populaires</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="visits" className="mt-4">
+        <TabsContent value="demandes" className="mt-4">
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={summary.topVisitsPerDay}>
+            <AreaChart data={zeroFill30(data.leadsPerDay)}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
+              <XAxis dataKey="date" fontSize={12} />
+              <YAxis allowDecimals={false} fontSize={12} />
               <Tooltip />
-              <Area type="monotone" dataKey="count" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+              <Area type="monotone" dataKey="count" name="Demandes" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
             </AreaChart>
           </ResponsiveContainer>
         </TabsContent>
 
-        <TabsContent value="revenue" className="mt-4">
+        <TabsContent value="services" className="mt-4">
+          {topServices.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">Aucune demande enregistrée pour le moment.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={Math.max(220, topServices.length * 48)}>
+              <BarChart data={topServices} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" allowDecimals={false} fontSize={12} />
+                <YAxis type="category" dataKey="name" width={180} fontSize={12} />
+                <Tooltip />
+                <Bar dataKey="count" name="Demandes" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </TabsContent>
+
+        <TabsContent value="visites" className="mt-4">
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={summary.topRevenuePerDay}>
+            <AreaChart data={zeroFill30(analytics.perDay)}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
+              <XAxis dataKey="date" fontSize={12} />
+              <YAxis allowDecimals={false} fontSize={12} />
               <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="revenue" name="Chiffre d'affaires (FCFA)" stroke="#f59e0b" strokeWidth={2} />
-            </LineChart>
+              <Area type="monotone" dataKey="count" name="Visites" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
+            </AreaChart>
           </ResponsiveContainer>
         </TabsContent>
 
         <TabsContent value="sources" className="mt-4">
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={summary.sources} dataKey="count" nameKey="source" cx="50%" cy="50%" outerRadius={100} label>
-                {summary.sources.map((entry, index) => (
-                  <Cell key={entry.source} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          {analytics.sources.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">Aucune visite enregistrée pour le moment.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie data={analytics.sources} dataKey="count" nameKey="source" cx="50%" cy="50%" outerRadius={100} label>
+                  {analytics.sources.map((entry, index) => (
+                    <Cell key={entry.source} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </TabsContent>
 
         <TabsContent value="pages" className="mt-4">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={summary.pages}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="page" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" name="Visites" fill="#3b82f6" />
-            </BarChart>
-          </ResponsiveContainer>
-        </TabsContent>
-
-        <TabsContent value="destinations" className="mt-4">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={summary.topDestinations}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="destination" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="visits" name="Visites" fill="#10b981" />
-            </BarChart>
-          </ResponsiveContainer>
+          {analytics.pages.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-8 text-center">Aucune visite enregistrée pour le moment.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={analytics.pages}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="page" fontSize={12} />
+                <YAxis allowDecimals={false} fontSize={12} />
+                <Tooltip />
+                <Bar dataKey="count" name="Visites" fill="#10b981" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </TabsContent>
       </Tabs>
     </div>

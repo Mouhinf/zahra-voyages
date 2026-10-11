@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { getAuthInstance } from '@/lib/firebase';
+import { serviceLabel } from '@/lib/lead-labels';
 
 type Row = Record<string, unknown> & { id: string };
 
@@ -45,14 +46,6 @@ const STATUS: Array<{ value: CrmStatus; label: string; badgeClass: string }> = [
 ];
 
 const STATUS_LABEL: Record<string, string> = Object.fromEntries(STATUS.map((s) => [s.value, s.label]));
-
-// Libellés des services devis (miroir de /api/quotes).
-const SERVICE_LABELS: Record<string, string> = {
-  hebergement: 'Hébergement', transport: 'Transport', 'voyages-croisieres': 'Voyages & Croisières',
-  excursions: 'Excursions', 'tourisme-affaires': "Tourisme d'affaires", 'reservation-express': 'Réservation Express',
-  'assistance-visa': 'Assistance visa', 'assurance-voyage': 'Assurance voyage',
-  'preinscription-universitaire': 'Préinscription universitaire', 'prise-de-rendez-vous': 'Prise de rendez-vous',
-};
 
 function str(v: unknown): string {
   return typeof v === 'string' ? v : v == null ? '' : String(v);
@@ -181,7 +174,7 @@ function LeadSheet({
 
   const detailRows = (kind === 'quotes'
     ? [
-        ['Service', SERVICE_LABELS[str(lead.service)] ?? str(lead.service)],
+        ['Service', serviceLabel(str(lead.service))],
         ['Destination', str(lead.destination) || '—'],
         ['Voyageurs', str(lead.travelers) || '—'],
         ['Départ', str(lead.departureDate) || '—'],
@@ -422,7 +415,7 @@ function LeadTable({
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge value={status} />
                   <span className="font-semibold">{str(it.name)}</span>
-                  {kind === 'quotes' && <Badge variant="outline">{SERVICE_LABELS[str(it.service)] ?? (str(it.service) || '—')}</Badge>}
+                  {kind === 'quotes' && <Badge variant="outline">{serviceLabel(str(it.service))}</Badge>}
                   {kind === 'quotes' && <span className="text-xs text-muted-foreground">{str(it.reference)}</span>}
                   {isUnhandled(it) && <Badge variant="destructive" className="gap-1"><AlertTriangle className="h-3 w-3" /> &gt; 48 h</Badge>}
                   <NotifyBadge value={it.notifyStatus} />
