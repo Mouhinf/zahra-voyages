@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Facebook, Instagram } from 'lucide-react';
+import { useState } from 'react';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -14,16 +15,35 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Footer() {
     const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleNewsletterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleNewsletterSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const email = event.currentTarget.email.value;
-        if (email) {
+        if (!email) return;
+        setIsSubmitting(true);
+        try {
+            const res = await fetch('/api/newsletter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
+
             toast({
-                title: 'Merci pour votre inscription !',
+                title: body?.already ? 'Déjà inscrit !' : 'Merci pour votre inscription !',
                 description: 'Vous recevrez bientôt nos meilleures offres.',
             });
             event.currentTarget.reset();
+        } catch (err: unknown) {
+            toast({
+                title: 'Inscription impossible',
+                description: (err instanceof Error && err.message) || 'Réessayez dans un instant.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -59,7 +79,9 @@ export default function Footer() {
                 className="bg-background border-border"
                 required
               />
-              <Button type="submit" variant="default">S'inscrire</Button>
+              <Button type="submit" variant="default" disabled={isSubmitting}>
+                {isSubmitting ? '…' : 'S\'inscrire'}
+              </Button>
             </form>
           </div>
           <div>
