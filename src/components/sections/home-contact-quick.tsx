@@ -34,6 +34,7 @@ const formSchema = z.object({
 export default function HomeContactQuick() {
   const { toast } = useToast();
   const [agenceImg, setAgenceImg] = useState<string>(FALLBACK_AGENCY);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -58,13 +59,35 @@ export default function HomeContactQuick() {
     defaultValues: { name: '', email: '', phone: '', message: '' },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...values,
+          website: '', // pot de miel anti-robots (doit rester vide)
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
 
-    toast({
-      title: 'Message envoyé !',
-      description: 'Merci de nous avoir contactés. Nous reviendrons vers vous sous 24h.',
-    });
-    form.reset();
+      toast({
+        title: 'Message envoyé !',
+        description: 'Merci de nous avoir contactés. Nous reviendrons vers vous sous 24h.',
+      });
+      form.reset();
+    } catch (err: unknown) {
+      console.error('Contact submit error:', err);
+      toast({
+        title: 'Envoi impossible',
+        description: (err instanceof Error && err.message) || 'Votre message n\'a pas pu être enregistré. Réessayez ou écrivez-nous sur WhatsApp.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -206,8 +229,8 @@ export default function HomeContactQuick() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full" size="lg">
-                    Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                  <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                    {isSubmitting ? 'Envoi en cours…' : <>Envoyer ma demande <Send className="ml-2 h-4 w-4" /></>}
                   </Button>
                 </form>
               </Form>

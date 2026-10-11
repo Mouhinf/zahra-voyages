@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Mail, Send } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -27,6 +28,7 @@ const formSchema = z.object({
 
 export default function Contact() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,13 +40,35 @@ export default function Contact() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-  
-    toast({
-      title: 'Message envoyé !',
-      description: 'Merci de nous avoir contactés. Nous reviendrons vers vous rapidement.',
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...values,
+          website: '', // pot de miel anti-robots (doit rester vide)
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
+
+      toast({
+        title: 'Message envoyé !',
+        description: 'Merci de nous avoir contactés. Nous reviendrons vers vous rapidement.',
+      });
+      form.reset();
+    } catch (err: unknown) {
+      console.error('Contact submit error:', err);
+      toast({
+        title: 'Envoi impossible',
+        description: (err instanceof Error && err.message) || 'Votre message n\'a pas pu être enregistré. Réessayez ou écrivez-nous sur WhatsApp.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -153,8 +177,8 @@ export default function Contact() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" size="lg">
-                        Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                    <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                        {isSubmitting ? 'Envoi en cours…' : <>Envoyer ma demande <Send className="ml-2 h-4 w-4" /></>}
                     </Button>
                   </form>
                 </Form>
