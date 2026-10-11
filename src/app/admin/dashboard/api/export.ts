@@ -1,5 +1,5 @@
 import { verifyAdminToken, AuthError } from '@/lib/firebase-admin';
-import { getAnalyticsSummary } from '@/lib/firebase';
+import { getAnalyticsSummary } from '@/lib/admin-db';
 
 export async function POST(request: Request) {
   try {

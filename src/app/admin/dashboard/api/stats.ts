@@ -1,7 +1,7 @@
 // src/app/admin/dashboard/api/stats.ts
 'use server';
 
-import { getAnalyticsSummary } from '@/lib/firebase';
+import { getAnalyticsSummary } from '@/lib/admin-db';
 import { verifyAdminToken, AuthError } from '@/lib/firebase-admin';
 
 export async function GET(request: Request) {

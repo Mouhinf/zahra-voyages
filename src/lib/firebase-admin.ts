@@ -3,6 +3,17 @@ import { getAuth } from 'firebase-admin/auth';
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'slaac-voyages';
 
+/**
+ * Emails considérés comme administrateurs : variable d'environnement ADMIN_EMAILS
+ * (séparés par des virgules). L'email doit être vérifié dans Firebase Auth.
+ * Le mécanisme recommandé reste le custom claim `admin: true`
+ * (voir scripts/set-admin-claim.mjs).
+ */
+const ADMIN_EMAILS: string[] = (process.env.ADMIN_EMAILS || 'mouhopap@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
 function getAdminApp() {
   if (getApps().length) {
     return getApps()[0];
@@ -12,6 +23,11 @@ function getAdminApp() {
     ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
     : undefined;
 
+  // Sans clé de service explicite : initialisation minimale.
+  // - En local avec les émulateurs Firebase (FIREBASE_AUTH_EMULATOR_HOST /
+  //   FIRESTORE_EMULATOR_HOST), ce mode fonctionne.
+  // - En production (Vercel), FIREBASE_SERVICE_ACCOUNT_KEY est requis :
+  //   verifyIdToken() échouera sinon avec une erreur explicite.
   return initializeApp(
     serviceAccount
       ? { credential: cert(serviceAccount), projectId }
@@ -22,15 +38,18 @@ function getAdminApp() {
 export const adminApp = getAdminApp();
 export const adminAuth = getAuth(adminApp);
 
-const ADMIN_EMAIL = 'mouhopap@gmail.com';
-
 export class AuthError extends Error {
   constructor(message: string, public statusCode: number) {
     super(message);
   }
 }
 
-export async function verifyAdminToken(request: Request): Promise<{ uid: string }> {
+/**
+ * Vérifie que la requête provient d'un administrateur authentifié :
+ * en-tête `Authorization: Bearer <Firebase ID token>` valide, non révoqué,
+ * avec custom claim `admin: true` OU email vérifié présent dans ADMIN_EMAILS.
+ */
+export async function verifyAdminToken(request: Request): Promise<{ uid: string; email?: string }> {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     throw new AuthError('Token manquant', 401);
@@ -38,10 +57,16 @@ export async function verifyAdminToken(request: Request): Promise<{ uid: string 
 
   const idToken = authHeader.substring(7);
   try {
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    // `true` : vérifie également que le token n'a pas été révoqué
+    // (déconnexion / changement de mot de passe).
+    const decodedToken = await adminAuth.verifyIdToken(idToken, true);
 
-    if (decodedToken.admin || decodedToken.email === ADMIN_EMAIL) {
-      return { uid: decodedToken.uid };
+    const email = (decodedToken.email || '').toLowerCase();
+    const isAdminEmail =
+      !!decodedToken.email_verified && ADMIN_EMAILS.includes(email);
+
+    if (decodedToken.admin === true || isAdminEmail) {
+      return { uid: decodedToken.uid, email: decodedToken.email };
     }
 
     throw new AuthError('Rôle admin requis', 403);

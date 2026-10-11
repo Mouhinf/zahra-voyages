@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AreaChart, Area, BarChart, LineChart, PieChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
-import { getAnalyticsSummary, getAuthInstance } from '@/lib/firebase';
+import { getAuthInstance } from '@/lib/firebase';
 
 // Types from firebase helpers
 interface AnalyticsSummary {
