@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import React, { Suspense } from 'react';
+import React from 'react';
 const DestinationsManager = React.lazy(() => import('@/components/admin/destinations-manager'));
 const HebergementsManager = React.lazy(() => import('@/components/admin/hebergements-manager'));
 const TransportsManager = React.lazy(() => import('@/components/admin/transports-manager'));
@@ -10,6 +10,7 @@ const ExcursionsCircuitsManager = React.lazy(() => import('@/components/admin/ex
 const OffresAffairesManager = React.lazy(() => import('@/components/admin/offres-affaires-manager'));
 const PartenairesManager = React.lazy(() => import('@/components/admin/partenaires-manager'));
 const AdminDashboardPage = React.lazy(() => import('@/components/admin/dashboard-page'));
+const RequestsManager = React.lazy(() => import('@/components/admin/requests-manager'));
 
 
 export default function AdminTabs() {
@@ -23,6 +24,7 @@ export default function AdminTabs() {
         <TabsTrigger value="excursions">Excursions et circuits</TabsTrigger>
         <TabsTrigger value="affaires">Tourisme d&apos;Affaires</TabsTrigger>
         <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
+        <TabsTrigger value="demandes">Demandes</TabsTrigger>
         <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
       </TabsList>
       <TabsContent value="destinations"><DestinationsManager /></TabsContent>
@@ -32,6 +34,11 @@ export default function AdminTabs() {
       <TabsContent value="excursions"><ExcursionsCircuitsManager /></TabsContent>
       <TabsContent value="affaires"><OffresAffairesManager /></TabsContent>
       <TabsContent value="partenaires"><PartenairesManager /></TabsContent>
+      <TabsContent value="demandes">
+        <div className="min-h-[400px]">
+          <RequestsManager />
+        </div>
+      </TabsContent>
       <TabsContent value="dashboard">
         <div className="min-h-[600px]">
           <AdminDashboardPage />
