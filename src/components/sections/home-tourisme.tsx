@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { Briefcase, Users, Building2, CalendarCheck } from 'lucide-react';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
