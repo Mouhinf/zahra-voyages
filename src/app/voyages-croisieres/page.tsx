@@ -11,7 +11,7 @@ const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_aut
 
 export const metadata = {
   title: 'Voyages & Croisières - SLAAC Voyages',
-  description: 'Voyages sur mesure et croisières vers des destinations de rêve. Réservez votre prochaine aventure avec SLAAC Voyages.',
+  description: 'Voyages sur mesure et croisières vers des destinations de rêve. Préparez votre prochaine aventure avec SLAAC Voyages.',
 };
 
 export const revalidate = 300;

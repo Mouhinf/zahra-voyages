@@ -9,10 +9,11 @@ import { Transport } from '@/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { SimilarOffers } from '@/components/sections/similar-offers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, Check, X, Fuel, User, MessageCircle, Plane } from 'lucide-react';
+import { ArrowLeft, Users, Loader2, ChevronLeft, ChevronRight, X, Fuel, User, MessageCircle, Plane } from 'lucide-react';
 import { featuredDestinations } from '@/data/featured-destinations';
 import { featuredTransfertsAeroport } from '@/data/featured-transferts';
 import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
@@ -255,8 +256,8 @@ export default function TransportDetailPage() {
                     </div>
                   </div>
 
-                  <QuoteRequestButton defaultDestination={item.titre} className="w-full" size="lg" disabled={!item.disponible}>
-                      Demander un devis
+                  <QuoteRequestButton defaultService="transport" defaultDestination={item.titre} source="offre-transport" variant={item.disponible ? 'gold' : 'default'} className="w-full" size="lg">
+                      {item.disponible ? 'Demander un devis' : 'Sur demande — nous consulter'}
                   </QuoteRequestButton>
                   <a
                     href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Bonjour, je souhaiterais obtenir un devis pour ${item.titre}.`)}`}
@@ -278,6 +279,9 @@ export default function TransportDetailPage() {
         </section>
       </main>
       <Footer />
+
+      {/* Offres similaires du même module */}
+      <SimilarOffers collectionName="transports" basePath="/transport" excludeId={params?.id as string} />
 
       {lightboxOpen && (
         <div

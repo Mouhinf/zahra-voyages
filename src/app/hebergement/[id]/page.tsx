@@ -11,6 +11,7 @@ import { getFeaturedHebergement } from '@/data/featured-hebergements';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { SimilarOffers } from '@/components/sections/similar-offers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -250,8 +251,15 @@ export default function HebergementDetailPage() {
                     </div>
                   </div>
 
-                  <QuoteRequestButton defaultDestination={item.titre} className="w-full" size="lg" disabled={!item.disponible}>
-                      Demander un devis
+                  <QuoteRequestButton
+                    defaultService="hebergement"
+                    defaultDestination={item.titre}
+                    source="offre-hebergement"
+                    variant={item.disponible ? 'gold' : 'default'}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {item.disponible ? 'Demander un devis' : 'Sur demande — nous consulter'}
                   </QuoteRequestButton>
                   <a
                     href={`https://wa.me/221773129090?text=${encodeURIComponent(`Bonjour, je souhaite des informations sur ${item.titre}.`)}`}
@@ -271,6 +279,9 @@ export default function HebergementDetailPage() {
         </section>
       </main>
       <Footer />
+
+      {/* Offres similaires du même module */}
+      <SimilarOffers collectionName="hebergements" basePath="/hebergement" excludeId={params?.id as string} />
 
       {/* Lightbox */}
       {lightboxOpen && (

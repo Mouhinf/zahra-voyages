@@ -11,6 +11,7 @@ import { getExcursionEnrichment } from '@/data/excursion-enrichments';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { SimilarOffers } from '@/components/sections/similar-offers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -218,7 +219,7 @@ export default function ExcursionDetailPage() {
                     </div>
                   </div>
 
-                  <QuoteRequestButton defaultDestination={item.titre} className="w-full" size="lg" disabled={!item.disponible}>Demander un devis</QuoteRequestButton>
+                  <QuoteRequestButton defaultService="excursions" defaultDestination={item.titre} source="offre-excursion" variant={item.disponible ? 'gold' : 'default'} className="w-full" size="lg">{item.disponible ? 'Demander un devis' : 'Sur demande — nous consulter'}</QuoteRequestButton>
                   <p className="text-xs text-center text-muted-foreground mt-3">Réponse sous 24h · Devis gratuit et sans engagement</p>
                 </div>
               </div>
@@ -227,6 +228,9 @@ export default function ExcursionDetailPage() {
         </section>
       </main>
       <Footer />
+
+      {/* Offres similaires du même module */}
+      <SimilarOffers collectionName="excursions" basePath="/excursions" excludeId={params?.id as string} />
 
       {lightboxOpen && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={closeLightbox}>

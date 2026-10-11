@@ -8,7 +8,7 @@ const services = [
   {
     icon: <Plane className="h-8 w-8 text-primary" />,
     title: 'Billetterie Aérienne',
-    description: "Réservez vos vols vers toutes les destinations du monde aux meilleurs tarifs.",
+    description: "Vos billets d'avion vers toutes les destinations du monde, aux meilleurs tarifs.",
   },
   {
     icon: <Package className="h-8 w-8 text-primary" />,
