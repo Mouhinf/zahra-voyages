@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Inter, Playfair_Display } from 'next/font/google';
 import ChatbotLoader from '@/components/chatbot-loader';
+import AnalyticsBeacon from '@/components/analytics-beacon';
 import type {ReactNode} from 'react';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -32,6 +33,7 @@ export default function RootLayout({
         {children}
         <Toaster />
         <ChatbotLoader />
+        <AnalyticsBeacon />
       </body>
     </html>
   );
