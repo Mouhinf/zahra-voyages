@@ -29,6 +29,10 @@ async function openQuoteDialog() {
   await trigger.scrollIntoViewIfNeeded();
   await trigger.click();
   await page.locator('[role="dialog"]').waitFor({ state: 'visible', timeout: 10000 });
+  // Laisser l'arbre du formulaire se stabiliser après l'ouverture (le
+  // dialog est chargé en React.lazy) — un utilisateur réel ne peut pas
+  // taper dans les 100 ms ; sans ce délai le fill tombe sur l'ancien montage.
+  await page.waitForTimeout(600);
   return page.locator('[role="dialog"]');
 }
 
@@ -64,7 +68,7 @@ async function testQuoteDialog(vp) {
   const footer = dialog.locator('button:has-text("Envoyer ma demande")');
   await dialog.locator('div.overflow-y-auto').first().evaluate((el) => el.scrollTo(0, el.scrollHeight));
   await page.waitForTimeout(150);
-  const footerVisible = await footer.isVisible();
+  const footerVisible = await footer.waitFor({ state: 'visible', timeout: 3000 }).then(() => true).catch(() => false);
   const footerBox = footerVisible ? await footer.boundingBox() : null;
   check(
     `[${vp.name}] bouton Envoyer visible après scroll complet`,
@@ -74,7 +78,7 @@ async function testQuoteDialog(vp) {
 
   // Le titre reste visible en haut (non recouvert) après scroll.
   const title = dialog.locator('h2, [role="heading"]').first();
-  const titleVisible = await title.isVisible();
+  const titleVisible = await title.waitFor({ state: 'visible', timeout: 3000 }).then(() => true).catch(() => false);
   check(`[${vp.name}] titre visible après scroll`, titleVisible);
 
   // Le corps défile bien (hauteur interne > hauteur visible OU contenu court).
@@ -91,7 +95,12 @@ async function testQuoteDialog(vp) {
   // Champ conditionnel : changer le service doit afficher des champs dédiés.
   await dialog.locator('button[role="combobox"]').first().click();
   await page.locator('[role="option"]:has-text("Excursions")').first().click();
-  const dateField = await dialog.locator('input[type="date"]').first().isVisible();
+  const dateField = await dialog
+    .locator('input[type="date"]')
+    .first()
+    .waitFor({ state: 'visible', timeout: 3000 })
+    .then(() => true)
+    .catch(() => false);
   check(`[${vp.name}] champs conditionnels (excursion) affichés`, dateField);
 
   // Soumission : API mockée OK → succès + fermeture.
@@ -114,13 +123,20 @@ async function testQuoteDialog(vp) {
   await success.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {});
   check(`[${vp.name}] soumission → succès + référence affichée`, await success.isVisible().catch(() => false));
   await page.waitForTimeout(600);
-  check(`[${vp.name}] modale fermée après succès`, !(await dialog.isVisible().catch(() => false)));
+  const closedAfterSuccess = await dialog
+    .waitFor({ state: 'hidden', timeout: 3000 })
+    .then(() => true)
+    .catch(() => false);
+  check(`[${vp.name}] modale fermée après succès`, closedAfterSuccess);
 
   // Escape ferme la modale et le scroll de la page est restauré.
   const dialog2 = await openQuoteDialog();
   await page.keyboard.press('Escape');
-  await page.waitForTimeout(400);
-  check(`[${vp.name}] Escape ferme la modale`, !(await dialog2.isVisible().catch(() => false)));
+  const closed = await dialog2
+    .waitFor({ state: 'hidden', timeout: 3000 })
+    .then(() => true)
+    .catch(() => false);
+  check(`[${vp.name}] Escape ferme la modale`, closed);
   const scrollRestored = await page.evaluate(() => {
     window.scrollTo({ top: 300, behavior: 'instant' });
     return window.scrollY > 0;

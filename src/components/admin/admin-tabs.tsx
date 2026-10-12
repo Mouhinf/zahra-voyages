@@ -9,6 +9,7 @@ const VoyagesCroisieresManager = React.lazy(() => import('@/components/admin/voy
 const ExcursionsCircuitsManager = React.lazy(() => import('@/components/admin/excursions-circuits-manager'));
 const OffresAffairesManager = React.lazy(() => import('@/components/admin/offres-affaires-manager'));
 const PartenairesManager = React.lazy(() => import('@/components/admin/partenaires-manager'));
+const BannersManager = React.lazy(() => import('@/components/admin/banners-manager'));
 const AdminDashboardPage = React.lazy(() => import('@/components/admin/dashboard-page'));
 const RequestsManager = React.lazy(() => import('@/components/admin/requests-manager'));
 
@@ -24,6 +25,7 @@ export default function AdminTabs() {
         <TabsTrigger value="excursions">Excursions et circuits</TabsTrigger>
         <TabsTrigger value="affaires">Tourisme d&apos;Affaires</TabsTrigger>
         <TabsTrigger value="partenaires">Partenaires</TabsTrigger>
+        <TabsTrigger value="banniere">Bandeau pub</TabsTrigger>
         <TabsTrigger value="demandes">Demandes</TabsTrigger>
         <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
       </TabsList>
@@ -34,6 +36,11 @@ export default function AdminTabs() {
       <TabsContent value="excursions"><ExcursionsCircuitsManager /></TabsContent>
       <TabsContent value="affaires"><OffresAffairesManager /></TabsContent>
       <TabsContent value="partenaires"><PartenairesManager /></TabsContent>
+      <TabsContent value="banniere">
+        <div className="min-h-[400px]">
+          <BannersManager />
+        </div>
+      </TabsContent>
       <TabsContent value="demandes">
         <div className="min-h-[400px]">
           <RequestsManager />

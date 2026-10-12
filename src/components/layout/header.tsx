@@ -4,9 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Send } from 'lucide-react';
+import { Menu, FilePenLine, Send } from 'lucide-react';
 import { QuoteRequestButton } from './quote-request-button';
-import EventBanner from './event-banner';
+import AnnouncementBar from './announcement-bar';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
@@ -16,7 +16,7 @@ const navLinks = [
   { href: '/excursions', label: 'Circuits et Excursions' },
   { href: '/tourisme-affaires', label: "Tourisme d'affaires" },
   { href: '/assistance-voyage', label: 'Assistance voyage' },
-  { href: '/dakar-2026', label: 'Dakar 2026' },
+  { href: '/dakar-2026', label: 'JO Dakar 2026' },
   { href: '/about', label: 'À propos' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -31,7 +31,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function Header() {
   return (
     <>
-      <EventBanner />
+      <AnnouncementBar />
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -43,7 +43,7 @@ export default function Header() {
               priority
               className="h-9 w-9 object-contain"
             />
-            <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
+            <span className="hidden sm:block font-bold text-lg text-primary whitespace-nowrap">SLAAC Voyages</span>
           </Link>
 
         <nav className="hidden xl:flex items-center gap-1 flex-nowrap ml-4" aria-label="Navigation principale">
@@ -58,19 +58,36 @@ export default function Header() {
           ))}
         </nav>
 
+        {/* Actions compactes : icônes seules, cibles tactiles 44 px, libellés
+            pour lecteurs d'écran + info-bulle native sur ordinateur. */}
         <div className="flex items-center gap-2 shrink-0">
-            <a
-              href="https://wa.me/221773129090"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:block"
+            <Button
+              asChild
+              variant="outline"
+              size="icon"
+              className="h-11 w-11 hover:border-green-600/40 hover:bg-green-600/10"
+              title="WhatsApp — réponse rapide"
             >
-                <Button variant="outline" size="sm" className="h-9">
-                    <WhatsAppIcon className="h-4 w-4 fill-current text-green-700" /> WhatsApp
-                </Button>
-            </a>
-            <QuoteRequestButton className="hidden sm:flex" variant="gold" size="sm">
-                  <Send className="h-4 w-4" /> Demander un devis
+              <a
+                href="https://wa.me/221773129090"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Contacter SLAAC Voyages sur WhatsApp"
+              >
+                <WhatsAppIcon className="h-5 w-5 fill-current text-green-700" />
+              </a>
+            </Button>
+            <QuoteRequestButton
+              asChild
+              variant="gold"
+              size="icon"
+              className="h-11 w-11"
+              aria-label="Demander un devis"
+              title="Demander un devis — réponse sous 24 h"
+            >
+              <button type="button" aria-label="Demander un devis">
+                <FilePenLine className="h-5 w-5" />
+              </button>
             </QuoteRequestButton>
           <Sheet>
             <SheetTrigger asChild>
