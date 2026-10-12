@@ -243,7 +243,7 @@ export default function HebergementsManager() {
           <DialogTrigger asChild>
             <Button onClick={openAddDialog}><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un hébergement</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[560px] max-h-[90dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? 'Modifier' : 'Nouvel'} Hébergement</DialogTitle>
               <DialogDescription>Remplissez les informations ci-dessous.</DialogDescription>

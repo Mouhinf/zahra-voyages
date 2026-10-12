@@ -64,7 +64,10 @@ const baseSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
   email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }).optional().or(z.literal('')),
   phone: z.string().min(1, { message: 'Veuillez entrer un numéro de téléphone.' }),
-  destination: z.string().min(2, { message: 'Veuillez préciser une destination.'}).optional(),
+  // Destination optionnelle : `.or(z.literal(''))` autorise la valeur par
+  // défaut `''` (chaîne vide) — sinon min(2) bloquait tout devis générique
+  // (header, hero) sans destination préremplie, alors que l'API l'accepte.
+  destination: z.string().min(2, { message: 'Veuillez préciser une destination.'}).optional().or(z.literal('')),
   departureDate: z.string().optional(),
   travelers: z.coerce.number().min(1, { message: 'Il doit y avoir au moins 1 voyageur.'}).optional(),
   message: z.string().optional(),
@@ -196,15 +199,24 @@ export function QuoteRequestModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[640px]">
-        <DialogHeader>
+      {/*
+        Structure 3 zones (cause du bug : formulaire long sans hauteur max —
+        titre ET boutons sortaient de l'écran sur mobile) :
+        - Header fixe (titre + description, jamais recouverts)
+        - Corps scrollable (flex-1 min-h-0 overflow-y-auto) : champs seuls
+        - Footer fixe (Annuler / Envoyer) : toujours accessible
+        Mobile : plein écran en dvh (tient compte du clavier virtuel).
+      */}
+      <DialogContent className="flex h-[100dvh] max-h-[100dvh] w-[calc(100%-2rem)] max-w-[640px] gap-0 overflow-hidden p-0 sm:h-auto sm:max-h-[92dvh]">
+        <DialogHeader className="shrink-0 space-y-1.5 border-b px-6 py-4 pr-14 text-left">
           <DialogTitle>Demander un devis</DialogTitle>
           <DialogDescription>
             Remplissez le formulaire ci-dessous et notre équipe vous contactera avec une offre personnalisée.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-6 py-4">
             <FormField
               control={form.control}
               name="service"
@@ -496,7 +508,8 @@ export function QuoteRequestModal({
                 </FormItem>
               )}
             />
-            <DialogFooter>
+            </div>
+            <DialogFooter className="shrink-0 gap-2 border-t bg-background px-6 py-4">
                 <DialogClose asChild>
                     <Button type="button" variant="secondary" disabled={isSubmitting}>
                         Annuler

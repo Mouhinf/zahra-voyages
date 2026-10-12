@@ -357,7 +357,7 @@ export default function TransportsManager() {
           <DialogTrigger asChild>
             <Button onClick={openAddDialog}><PlusCircle className="mr-2 h-4 w-4" /> Ajouter un transport</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[560px] max-h-[90dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingItem ? 'Modifier' : 'Nouvel'} Transport</DialogTitle>
               <DialogDescription>Le formulaire s'adapte à la catégorie sélectionnée.</DialogDescription>

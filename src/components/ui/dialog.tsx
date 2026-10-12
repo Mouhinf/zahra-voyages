@@ -38,16 +38,32 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        /*
+          Correctif global scrolling (cause racine : l'ancienne version était
+          centrée par transform sans AUCUNE limite de hauteur — les formulaires
+          longs dépassaient l'écran en haut et en bas, sans défilement possible
+          puisque Radix verrouille la page derrière).
+
+          Architecture :
+          - flex flex-col + max-h en dvh : la modale ne dépasse jamais le
+            viewport (dvh = tient compte des barres d'URL mobile et du clavier).
+          - overflow-y-auto + overscroll-contain : SEULE la modale défile,
+            sans répercuter le scroll sur la page derrière (chaînage bloqué).
+          - w-[calc(100%-2rem)] : marges de sécurité sur mobile (w-full
+            plaquait le contenu contre les bords de l'écran).
+          - Bouton fermer en position sticky : reste accessible même quand
+            le contenu défile (l'ancien absolu sortait de l'écran).
+        */
+        "fixed left-[50%] top-[50%] z-50 flex w-[calc(100%-2rem)] max-w-lg max-h-[100dvh] sm:max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-y-auto overscroll-contain gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       {...props}
     >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+      <DialogPrimitive.Close className="sticky top-0 z-10 ml-auto flex h-8 w-8 shrink-0 -mb-8 items-center justify-center self-end rounded-sm bg-background/90 opacity-70 ring-offset-background backdrop-blur-sm transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
+        <span className="sr-only">Fermer</span>
       </DialogPrimitive.Close>
+      {children}
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
