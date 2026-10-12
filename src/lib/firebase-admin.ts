@@ -79,6 +79,11 @@ export class AuthError extends Error {
  * avec custom claim `admin: true` OU email vérifié présent dans ADMIN_EMAILS.
  */
 export async function verifyAdminToken(request: Request): Promise<{ uid: string; email?: string }> {
+  // Sans clé de compte de service (et sans émulateur), la vérification est
+  // impossible : lever 503 explicite plutôt qu'un 401 trompeur qui fait
+  // croire à un mauvais mot de passe.
+  assertAdminConfigured();
+
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     throw new AuthError('Token manquant', 401);

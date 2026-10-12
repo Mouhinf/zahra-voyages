@@ -60,17 +60,65 @@ export default function AdminLoginPage() {
     try {
       const { signInWithEmailAndPassword } = await import('firebase/auth');
       const { getAuthInstance } = await import('@/lib/firebase');
-      await signInWithEmailAndPassword(getAuthInstance(), values.email, values.password);
-      toast({
-        title: 'Connexion réussie',
-        description: 'Vous allez être redirigé vers le tableau de bord.',
+      const credential = await signInWithEmailAndPassword(getAuthInstance(), values.email, values.password);
+
+      // Vérification immédiate des droits côté serveur : permet d'afficher
+      // la VRAIE raison d'un refus (rôle manquant, configuration serveur…)
+      // au lieu de renvoyer l'utilisateur à l'aveugle vers /admin.
+      const token = await credential.user.getIdToken();
+      const res = await fetch('/api/admin/session', {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
       });
-      router.push('/admin');
+
+      if (res.ok) {
+        toast({
+          title: 'Connexion réussie',
+          description: 'Vous allez être redirigé vers le tableau de bord.',
+        });
+        router.push('/admin');
+        return;
+      }
+
+      const body = await res.json().catch(() => ({}));
+      if (res.status === 503) {
+        toast({
+          title: 'Administration non configurée sur ce serveur',
+          description:
+            body.error ||
+            'Ajoutez FIREBASE_SERVICE_ACCOUNT_KEY dans .env.local (ou les variables Vercel) puis redémarrez le serveur.',
+          variant: 'destructive',
+        });
+      } else if (res.status === 403) {
+        toast({
+          title: 'Ce compte n’a pas les droits administrateur',
+          description:
+            'L’email doit être vérifié et figurer dans ADMIN_EMAILS (ou porter le custom claim admin — voir scripts/set-admin-claim.mjs).',
+          variant: 'destructive',
+        });
+        await getAuthInstance().signOut();
+      } else {
+        toast({
+          title: 'Vérification du compte impossible',
+          description: body.error || `Erreur ${res.status} — réessayez.`,
+          variant: 'destructive',
+        });
+        await getAuthInstance().signOut();
+      }
     } catch (error) {
-      console.error("Erreur de connexion:", error);
+      console.error('Erreur de connexion:', error);
+      const code = (error as { code?: string })?.code ?? '';
+      const messages: Record<string, string> = {
+        'auth/invalid-credential': 'Email ou mot de passe incorrect.',
+        'auth/wrong-password': 'Mot de passe incorrect.',
+        'auth/user-not-found': 'Aucun compte n’existe avec cet email.',
+        'auth/too-many-requests': 'Trop de tentatives — réessayez dans quelques minutes.',
+        'auth/network-request-failed': 'Réseau indisponible — vérifiez votre connexion.',
+        'auth/invalid-email': 'Adresse email invalide.',
+      };
       toast({
         title: 'Erreur de connexion',
-        description: 'Vérifiez votre email et votre mot de passe.',
+        description: messages[code] ?? 'Vérifiez votre email et votre mot de passe.',
         variant: 'destructive',
       });
     } finally {
@@ -95,7 +143,7 @@ export default function AdminLoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="admin@zahravoyages.com" {...field} />
+                      <Input type="email" autoComplete="email" placeholder="admin@zahravoyages.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,7 +156,7 @@ export default function AdminLoginPage() {
                   <FormItem>
                     <FormLabel>Mot de passe</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" autoComplete="current-password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
