@@ -15,6 +15,18 @@ import FaqSection from '@/components/sections/faq-section';
 import { homeFaqItems } from '@/data/home-faq';
 import HomeContactQuick from '@/components/sections/home-contact-quick';
 import Footer from '@/components/layout/footer';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+    languages: {
+      fr: '/',
+      en: '/en',
+      'x-default': '/',
+    },
+  },
+};
 
 export default function Home() {
   return (
@@ -51,6 +63,21 @@ export default function Home() {
         <HomeContactQuick />
       </main>
       <Footer />
+      {/* FAQ en données structurées : réponse directe pour moteurs et assistants IA. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: homeFaqItems.map((item) => ({
+              '@type': 'Question',
+              name: item.question,
+              acceptedAnswer: { '@type': 'Answer', text: item.reponse },
+            })),
+          }),
+        }}
+      />
     </div>
   );
 }

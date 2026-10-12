@@ -4,6 +4,13 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'À propos — Agence de voyage à Dakar',
+  description: "SLAAC Voyages, agence de voyages basée à Dakar Plateau : billetterie, assistance visa, hébergement, circuits et tourisme d'affaires. Notre histoire, notre mission, nos valeurs.",
+  alternates: { canonical: '/about' },
+};
 
 const whyUs = [
   {

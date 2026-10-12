@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
@@ -8,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504518/hero-section-transport.jpg';
 
-export const metadata = {
-  title: 'Assistance Voyage - SLAAC Voyages',
+export const metadata: Metadata = {
+  title: { absolute: 'Assistance Voyage (visas, assurance, préinscriptions) - SLAAC Voyages' },
   description: "Assistance visas, assurance voyage, préinscriptions universitaires et prise de rendez-vous. SLAAC Voyages vous accompagne dans toutes vos démarches à Dakar.",
+  alternates: { canonical: '/assistance-voyage' },
 };
 
 const assistanceServices = [

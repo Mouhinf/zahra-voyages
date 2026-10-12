@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Send } from 'lucide-react';
 import { QuoteRequestButton } from './quote-request-button';
+import EventBanner from './event-banner';
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
@@ -15,6 +16,7 @@ const navLinks = [
   { href: '/excursions', label: 'Circuits et Excursions' },
   { href: '/tourisme-affaires', label: "Tourisme d'affaires" },
   { href: '/assistance-voyage', label: 'Assistance voyage' },
+  { href: '/dakar-2026', label: 'Dakar 2026' },
   { href: '/about', label: 'À propos' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -28,7 +30,9 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <>
+      <EventBanner />
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
@@ -47,7 +51,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs 2xl:text-sm font-medium text-muted-foreground transition-colors hover:text-primary px-1.5 2xl:px-2.5 whitespace-nowrap"
+              className="text-[11px] 2xl:text-sm font-medium text-muted-foreground transition-colors hover:text-primary px-1 2xl:px-2.5 whitespace-nowrap"
             >
               {link.label}
             </Link>
@@ -113,6 +117,7 @@ export default function Header() {
           </Sheet>
         </div>
       </div>
-    </header>
+      </header>
+    </>
   );
 }

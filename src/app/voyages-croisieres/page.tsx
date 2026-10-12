@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import VoyagesCroisieresGrid from '@/components/sections/voyages-croisieres-grid';
@@ -9,9 +10,10 @@ import Image from 'next/image';
 
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504520/hero-section-voyages.jpg';
 
-export const metadata = {
-  title: 'Voyages & Croisières - SLAAC Voyages',
+export const metadata: Metadata = {
+  title: { absolute: 'Voyages & Croisières - SLAAC Voyages' },
   description: 'Voyages sur mesure et croisières vers des destinations de rêve. Préparez votre prochaine aventure avec SLAAC Voyages.',
+  alternates: { canonical: '/voyages-croisieres' },
 };
 
 export const revalidate = 300;

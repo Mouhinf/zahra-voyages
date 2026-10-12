@@ -14,6 +14,8 @@ const navigation = [
   { href: '/about', label: 'À propos' },
   { href: '/contact', label: 'Contact' },
   { href: '/assistance-voyage', label: 'Assistance voyage' },
+  { href: '/dakar-2026', label: 'Séjour Dakar 2026' },
+  { href: '/confidentialite', label: 'Politique de confidentialité' },
 ];
 
 const services = [

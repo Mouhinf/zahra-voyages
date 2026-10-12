@@ -5,6 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Destinations de rêve au départ de Dakar',
+  description: "Paris, Dubaï, New York, Casamance, Bali, Marrakech… Dites-nous où vous rêvez d'aller : SLAAC Voyages construit votre séjour sur mesure, devis gratuit sous 24 h.",
+  alternates: { canonical: '/destinations' },
+};
 
 // Destinations = inspiration. Les tarifs « à partir de » génériques ont été
 // retirés : ils étaient invérifiables et variaient trop selon la saison.

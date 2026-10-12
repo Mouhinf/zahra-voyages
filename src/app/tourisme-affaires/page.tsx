@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: content.metaTitle,
     description: content.metaDescription,
+    alternates: { canonical: '/tourisme-affaires' },
   };
 }
 
