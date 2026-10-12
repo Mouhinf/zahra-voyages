@@ -13,7 +13,7 @@ const navLinks = [
   { href: '/transport', label: 'Transport' },
   { href: '/voyages-croisieres', label: 'Voyages & Croisières' },
   { href: '/excursions', label: 'Circuits et Excursions' },
-  { href: '/tourisme-affaires', label: 'Tourisme' },
+  { href: '/tourisme-affaires', label: "Tourisme d'affaires" },
   { href: '/assistance-voyage', label: 'Assistance voyage' },
   { href: '/about', label: 'À propos' },
   { href: '/contact', label: 'Contact' },
@@ -42,12 +42,12 @@ export default function Header() {
             <span className="font-bold text-lg text-primary">SLAAC Voyages</span>
           </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 flex-nowrap ml-4" aria-label="Navigation principale">
+        <nav className="hidden xl:flex items-center gap-1 flex-nowrap ml-4" aria-label="Navigation principale">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs xl:text-sm font-medium text-muted-foreground transition-colors hover:text-primary px-1.5 xl:px-2.5 whitespace-nowrap"
+              className="text-xs 2xl:text-sm font-medium text-muted-foreground transition-colors hover:text-primary px-1.5 2xl:px-2.5 whitespace-nowrap"
             >
               {link.label}
             </Link>
@@ -70,7 +70,7 @@ export default function Header() {
             </QuoteRequestButton>
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="lg:hidden">
+              <Button variant="outline" size="icon" className="xl:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Ouvrir le menu</span>
               </Button>

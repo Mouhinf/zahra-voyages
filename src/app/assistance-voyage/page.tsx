@@ -133,7 +133,7 @@ export default function AssistanceVoyagePage() {
                 <ul className="mt-6 space-y-3">
                   {[
                     'Suivi personnalisé de votre dossier',
-                    'Constituion et vérification des pièces',
+                    'Constitution et vérification des pièces',
                     'Mise à jour en temps réel de l\'avancement',
                     'Taux de succès élevé pour les demandes de visa',
                     'Accompagnement jusqu\'à l\'obtention du document',

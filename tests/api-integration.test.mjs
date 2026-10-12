@@ -216,6 +216,16 @@ try {
     assert(res.status === 200, `status=${res.status}`);
   });
 
+  // Régression : le formulaire public sérialise `travelers` en chaîne
+  // (contrat API). Un nombre brut doit être rejeté — sinon tout devis
+  // envoyé par le dialogue échoue en 400.
+  await test('devis : travelers en nombre → 400 (contrat string)')(async () => {
+    const res = await post('/api/quotes', {
+      name: 'QA Nombre', phone: '+221770000004', service: 'excursions', travelers: 2,
+    });
+    assert(res.status === 400, `status=${res.status}`);
+  });
+
   await test('devis : service inconnu → 400')(async () => {
     const res = await post('/api/quotes', { name: 'X Y', phone: '+221770000003', service: 'service-fantome' });
     assert(res.status === 400, `status=${res.status}`);

@@ -62,7 +62,7 @@ export default function HomePartenaires() {
     <section className="py-10 bg-white border-y border-border/40 overflow-hidden">
       <div className="container mx-auto max-w-7xl px-4 mb-6">
         <p className="text-center text-sm font-medium uppercase tracking-widest text-primary">
-          Partenaire
+          Ils nous accompagnent
         </p>
       </div>
       <div className="relative">

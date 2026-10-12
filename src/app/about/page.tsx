@@ -1,8 +1,9 @@
 import Image from 'next/image';
-import { Users, Globe, Heart, Building, Award, Target, Download } from 'lucide-react';
+import { Users, Globe, Heart, Building, Award, Target, Download, Send, MessageCircle, Phone } from 'lucide-react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
+import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 
 const whyUs = [
   {
@@ -73,23 +74,23 @@ export default function AboutPage() {
                 <div className="w-12 h-0.5 bg-accent my-5" />
                 <div className="mt-2 text-lg text-muted-foreground space-y-4">
                   <p>
-                    SLAAC Voyages est une agence de voyages et de tourisme, basée au Centre ville de Dakar à l'immeuble TRAMES au premier étage, spécialisée dans la vente des billets d'avion pour toutes les destinations, les préinscriptions, l'assistance visa, les réservations d'hôtel, les prises de rendez-vous et le tourisme.
+                    SLAAC Voyages est une agence de voyages et de tourisme, basée à Dakar Plateau (Immeuble Djolof Chicken, 3<sup>e</sup> étage), spécialisée dans la vente des billets d'avion pour toutes les destinations, les préinscriptions, l'assistance visa, les réservations d'hôtel, les prises de rendez-vous et le tourisme.
                   </p>
                   <p>
                     Nous proposons une gamme complète de services pour répondre à vos besoins professionnels et touristiques. Notre objectif est de vous offrir le meilleur du tourisme à travers des excursions authentiques, des circuits de voyages à thèmes, des séjours linguistiques, des séjours religieux, les Transferts en VTC ou par la plage.
                   </p>
                   <p>
-                    Que vous soyez à la recherche d'aventure, de culture, d'adrénaline, SLAAC Voyages est votre partenaire incontournable pour la réalisation de vos projets. Grace à nos experts, nous mettons au service de nos clients un dispositif d'accompagnement personnalisé, un système de filtrage et des outils de dernière génération afin de leurs garantir les meilleures offres et les billets d'avion les moins chers.
+                    Que vous soyez à la recherche d'aventure, de culture, d'adrénaline, SLAAC Voyages est votre partenaire incontournable pour la réalisation de vos projets. Grâce à nos experts, nous mettons au service de nos clients un dispositif d'accompagnement personnalisé, un système de filtrage et des outils de dernière génération afin de leurs garantir les meilleures offres et les billets d'avion les moins chers.
                   </p>
                 </div>
                  <div className="mt-8">
-                  <a href="/brochure-slaac-voyages.pdf" download>
-                    <Button size="lg" variant="default">
-                      <Download className="mr-2 h-5 w-5" />
-                      Télécharger notre brochure
-                    </Button>
-                  </a>
-                </div>
+                   <a href="/brochure-slaac-voyages.pdf" download>
+                     <Button size="lg" variant="default">
+                       <Download className="mr-2 h-5 w-5" />
+                       Télécharger notre brochure
+                     </Button>
+                   </a>
+                 </div>
               </div>
             </div>
           </div>
@@ -137,6 +138,31 @@ export default function AboutPage() {
                     ))}
                 </div>
             </div>
+        </section>
+
+        {/* Conversion : chaque page guide vers une demande commerciale */}
+        <section className="py-16 sm:py-20 bg-primary text-primary-foreground">
+          <div className="container mx-auto max-w-4xl px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold font-headline">Prêts à Voyager Avec Nous ?</h2>
+            <p className="mt-4 text-lg text-primary-foreground/80 text-balance">
+              Parlons de votre projet : un conseiller SLAAC vous répond sous 24 h avec une proposition adaptée à votre budget.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4">
+              <QuoteRequestButton variant="gold" size="lg" source="a-propos">
+                <Send className="mr-2 h-5 w-5" /> Demander un devis
+              </QuoteRequestButton>
+              <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+                  <MessageCircle className="mr-2 h-5 w-5" /> Contacter sur WhatsApp
+                </Button>
+              </a>
+              <a href="tel:+221773129090">
+                <Button size="lg" variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+                  <Phone className="mr-2 h-5 w-5" /> Parler à un conseiller
+                </Button>
+              </a>
+            </div>
+          </div>
         </section>
       </main>
       <Footer />

@@ -13,7 +13,7 @@ import { SimilarOffers } from '@/components/sections/similar-offers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, Clock, Calendar, Loader2, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Calendar, Loader2, ChevronLeft, ChevronRight, Check, X, MessageCircle } from 'lucide-react';
 
 export default function VoyageDetailPage() {
   const params = useParams();
@@ -102,17 +102,19 @@ export default function VoyageDetailPage() {
             <Image src={gallery[currentImageIdx]} alt={item.titre} fill sizes="100vw" className="object-cover" priority />
             {gallery.length > 1 && (
               <>
-                <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
+                <button onClick={(e) => { e.stopPropagation(); prevImage(); }} aria-label="Photo précédente" className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
                   <ChevronLeft className="h-6 w-6" />
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
+                <button onClick={(e) => { e.stopPropagation(); nextImage(); }} aria-label="Photo suivante" className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
                   <ChevronRight className="h-6 w-6" />
                 </button>
               </>
             )}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
               {gallery.map((_, idx) => (
-                <button key={idx} onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(idx); }} className={`w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/50'}`} />
+                <button key={idx} type="button" onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(idx); }} aria-label={`Voir la photo ${idx + 1}`} aria-current={idx === currentImageIdx} className="p-2 -m-2 flex items-center justify-center">
+                  <span className={`block w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/50'}`} />
+                </button>
               ))}
             </div>
           </div>
@@ -187,9 +189,9 @@ export default function VoyageDetailPage() {
                     <h2 className="text-xl font-semibold text-primary mb-4">Galerie photos</h2>
                     <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:thin]">
                       {gallery.map((img, idx) => (
-                        <div key={idx} className={`relative h-24 min-w-[8.5rem] sm:min-w-0 sm:w-auto sm:flex-1 sm:h-32 rounded-lg overflow-hidden cursor-pointer snap-start border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`} onClick={() => setCurrentImageIdx(idx)}>
-                          <Image src={img} alt={`Photo ${idx + 1}`} fill sizes="(max-width: 640px) 8.5rem, 33vw" className="object-cover" />
-                        </div>
+                        <button key={idx} type="button" className={`relative h-24 min-w-[8.5rem] sm:min-w-0 sm:w-auto sm:flex-1 sm:h-32 rounded-lg overflow-hidden cursor-pointer snap-start border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`} onClick={() => setCurrentImageIdx(idx)} aria-label={`Afficher la photo ${idx + 1}`} aria-pressed={idx === currentImageIdx}>
+                          <Image src={img} alt="" fill sizes="(max-width: 640px) 8.5rem, 33vw" className="object-cover" />
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -227,6 +229,14 @@ export default function VoyageDetailPage() {
                   </div>
 
                   <QuoteRequestButton defaultService="voyages-croisieres" defaultDestination={item.titre} source="offre-voyage" variant={item.disponible ? 'gold' : 'default'} className="w-full" size="lg">{item.disponible ? 'Demander un devis' : 'Sur demande — nous consulter'}</QuoteRequestButton>
+                  <a
+                    href={`https://wa.me/221773129090?text=${encodeURIComponent(`Bonjour, je souhaite des informations sur le voyage ${item.titre}.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-green-600 bg-green-600/10 px-4 text-sm font-medium text-green-700 transition-colors hover:bg-green-600 hover:text-white"
+                  >
+                    <MessageCircle className="h-4 w-4" /> Contacter sur WhatsApp
+                  </a>
                   <p className="text-xs text-center text-muted-foreground mt-3">Réponse sous 24h · Devis gratuit et sans engagement</p>
                 </div>
               </div>
@@ -240,16 +250,22 @@ export default function VoyageDetailPage() {
       <SimilarOffers collectionName="voyagesCroisieres" basePath="/voyages-croisieres" excludeId={params?.id as string} />
 
       {lightboxOpen && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={closeLightbox}>
-          <button className="absolute top-4 right-4 text-white hover:text-white/70 transition-colors z-10" onClick={closeLightbox}>
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photos de ${item.titre}`}
+        >
+          <button className="absolute top-4 right-4 text-white hover:text-white/70 transition-colors z-10" onClick={closeLightbox} aria-label="Fermer la visionneuse">
             <X className="h-8 w-8" />
           </button>
           {gallery.length > 1 && (
             <>
-              <button className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2" onClick={(e) => { e.stopPropagation(); prevImage(); }}>
+              <button className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2" onClick={(e) => { e.stopPropagation(); prevImage(); }} aria-label="Photo précédente">
                 <ChevronLeft className="h-10 w-10" />
               </button>
-              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2" onClick={(e) => { e.stopPropagation(); nextImage(); }}>
+              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2" onClick={(e) => { e.stopPropagation(); nextImage(); }} aria-label="Photo suivante">
                 <ChevronRight className="h-10 w-10" />
               </button>
             </>
@@ -262,7 +278,9 @@ export default function VoyageDetailPage() {
               <span className="text-white text-sm font-medium">{currentImageIdx + 1} / {gallery.length}</span>
               <div className="flex gap-2">
                 {gallery.map((_, idx) => (
-                  <button key={idx} className={`w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/40'}`} onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(idx); }} />
+                  <button key={idx} type="button" className="p-2 -m-2 flex items-center justify-center" onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(idx); }} aria-label={`Voir la photo ${idx + 1}`} aria-current={idx === currentImageIdx}>
+                    <span className={`block w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/40'}`} />
+                  </button>
                 ))}
               </div>
             </div>

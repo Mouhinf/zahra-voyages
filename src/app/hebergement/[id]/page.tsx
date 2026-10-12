@@ -117,10 +117,10 @@ export default function HebergementDetailPage() {
             />
             {gallery.length > 1 && (
               <>
-                <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
+                <button onClick={prevImage} aria-label="Photo précédente" className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
                   <ChevronLeft className="h-6 w-6" />
                 </button>
-                <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
+                <button onClick={nextImage} aria-label="Photo suivante" className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition-colors">
                   <ChevronRight className="h-6 w-6" />
                 </button>
               </>
@@ -129,9 +129,14 @@ export default function HebergementDetailPage() {
               {gallery.map((_, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => setCurrentImageIdx(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/50'}`}
-                />
+                  aria-label={`Voir la photo ${idx + 1}`}
+                  aria-current={idx === currentImageIdx}
+                  className="p-2 -m-2 flex items-center justify-center"
+                >
+                  <span className={`block w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/50'}`} />
+                </button>
               ))}
             </div>
           </div>
@@ -207,13 +212,16 @@ export default function HebergementDetailPage() {
                     <h2 className="text-xl font-semibold text-primary mb-4">Galerie photos</h2>
                     <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:thin]">
                       {gallery.map((img, idx) => (
-                        <div
+                        <button
                           key={idx}
+                          type="button"
                           className={`relative h-24 min-w-[8.5rem] sm:min-w-0 sm:w-auto sm:flex-1 sm:h-32 rounded-lg overflow-hidden cursor-pointer snap-start border-2 transition-colors ${idx === currentImageIdx ? 'border-primary' : 'border-transparent'}`}
                           onClick={() => setCurrentImageIdx(idx)}
+                          aria-label={`Afficher la photo ${idx + 1}`}
+                          aria-pressed={idx === currentImageIdx}
                         >
-                          <Image src={img} alt={`Photo ${idx + 1}`} fill sizes="(max-width: 640px) 8.5rem, 33vw" className="object-cover" />
-                        </div>
+                          <Image src={img} alt="" fill sizes="(max-width: 640px) 8.5rem, 33vw" className="object-cover" />
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -288,10 +296,14 @@ export default function HebergementDetailPage() {
         <div
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
           onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photos de ${item.titre}`}
         >
           <button
             className="absolute top-4 right-4 text-white hover:text-white/70 transition-colors z-10"
             onClick={closeLightbox}
+            aria-label="Fermer la visionneuse"
           >
             <X className="h-8 w-8" />
           </button>
@@ -301,12 +313,14 @@ export default function HebergementDetailPage() {
               <button
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2"
                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                aria-label="Photo précédente"
               >
                 <ChevronLeft className="h-10 w-10" />
               </button>
               <button
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-white/70 transition-colors p-2"
                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                aria-label="Photo suivante"
               >
                 <ChevronRight className="h-10 w-10" />
               </button>
@@ -332,9 +346,14 @@ export default function HebergementDetailPage() {
                 {gallery.map((_, idx) => (
                   <button
                     key={idx}
-                    className={`w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/40'}`}
+                    type="button"
+                    className="p-2 -m-2 flex items-center justify-center"
                     onClick={(e) => { e.stopPropagation(); setCurrentImageIdx(idx); }}
-                  />
+                    aria-label={`Voir la photo ${idx + 1}`}
+                    aria-current={idx === currentImageIdx}
+                  >
+                    <span className={`block w-2.5 h-2.5 rounded-full transition-colors ${idx === currentImageIdx ? 'bg-white' : 'bg-white/40'}`} />
+                  </button>
                 ))}
               </div>
             </div>

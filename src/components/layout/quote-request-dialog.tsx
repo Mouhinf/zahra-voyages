@@ -158,10 +158,17 @@ export function QuoteRequestModal({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
+      // L'API attend `travelers` en chaîne (champ libre borné) : on sérialise.
+      const { travelers, ...rest } = values;
+      const payload = {
+        ...rest,
+        travelers: travelers != null && Number.isFinite(travelers) ? String(travelers) : undefined,
+        source,
+      };
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, source }),
+        body: JSON.stringify(payload),
       });
 
       const body = await res.json().catch(() => ({}));
