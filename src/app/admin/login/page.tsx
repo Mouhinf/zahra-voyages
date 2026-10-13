@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
           const res = await fetch('/api/admin/session', {
             headers: { Authorization: `Bearer ${token}` },
           });
-          if (!cancelled && res.ok) router.replace('/admin');
+          if (!cancelled && res.ok) router.replace('/admin/dashboard');
         } catch {
           // pas admin ou erreur — rester sur la page de connexion
         }
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
           title: 'Connexion réussie',
           description: 'Vous allez être redirigé vers le tableau de bord.',
         });
-        router.push('/admin');
+        router.push('/admin/dashboard');
         return;
       }
 

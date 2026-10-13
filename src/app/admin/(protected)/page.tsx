@@ -1,7 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import AdminTabs from '@/components/admin/admin-tabs';
-
-export default function AdminPage() {
-  return <AdminTabs />;
+export default function AdminIndexPage() {
+  redirect('/admin/dashboard');
 }

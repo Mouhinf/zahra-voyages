@@ -11,6 +11,7 @@
 // ---------------------------------------------------------------------------
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Loader2, RefreshCw, MailWarning, Search, Phone, Mail, MessageCircle,
   Download, StickyNote, UserPlus, History, X, ExternalLink, AlertTriangle,
@@ -541,9 +542,26 @@ function NewsletterList() {
   );
 }
 
-export default function RequestsManager() {
+export type RequestsTab = 'devis' | 'messages' | 'newsletter';
+
+const TAB_PATHS: Record<RequestsTab, string> = {
+  devis: '/admin/demandes/devis',
+  messages: '/admin/demandes/contacts',
+  newsletter: '/admin/demandes/newsletter',
+};
+
+/**
+ * Onglets CRM. `activeTab` vient de la route (chaque onglet est une URL) :
+ * changer d'onglet navigue vers la route correspondante.
+ */
+export default function RequestsManager({ activeTab = 'devis' }: { activeTab?: RequestsTab }) {
+  const router = useRouter();
   return (
-    <Tabs defaultValue="devis" className="w-full">
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) => router.push(TAB_PATHS[value as RequestsTab])}
+      className="w-full"
+    >
       <TabsList className="flex flex-wrap h-auto gap-1 mb-6 bg-background border">
         <TabsTrigger value="devis">Devis</TabsTrigger>
         <TabsTrigger value="messages">Messages de contact</TabsTrigger>

@@ -1,9 +1,9 @@
 'use client';
 
-import { Loader2, LogOut, ShieldAlert } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import AdminShell from '@/components/admin/admin-shell';
 import { useAdminSession } from '@/lib/guard';
 
 interface AdminLayoutProps {
@@ -60,20 +60,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="p-4 sm:p-8 bg-secondary/50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-8 pb-4 border-b">
-          <div>
-            <h1 className="text-3xl font-bold text-primary">Tableau de Bord</h1>
-            <p className="text-muted-foreground">Bienvenue, {email}</p>
-          </div>
-          <Button onClick={handleLogout} variant="outline">
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Button>
-        </header>
-        <main>{children}</main>
-      </div>
-    </div>
+    <AdminShell email={email} onLogout={handleLogout}>
+      {children}
+    </AdminShell>
   );
 }
