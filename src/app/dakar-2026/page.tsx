@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 // Aucune affiliation : SLAAC Voyages n'est ni partenaire ni revendeur officiel de l'événement.
 // Sources factuelles : olympics.com (site officiel CIO) — dates et villes hôtes vérifiées en octobre 2026.
 
-const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png';
+const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1791894558/slaac-voyages/dakar-2026-ceremonie-medailles.png';
 
 const zones = [
   {
@@ -101,7 +101,7 @@ export default function Dakar2026Page() {
       <main className="flex-grow">
         {/* Hero */}
         <section className="relative h-[45vh] min-h-[340px] flex items-center justify-center text-white overflow-hidden">
-          <Image src={HERO_IMG} alt="Dakar, Sénégal" fill className="object-cover" priority sizes="100vw" />
+          <Image src={HERO_IMG} alt="Cérémonie des médailles Dakar 2026 au coucher du soleil" fill className="object-cover" priority sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/85 via-primary/65 to-primary/85 z-10" />
           <div className="relative z-20 text-center px-4 max-w-3xl">
             <span className="inline-block glass-dark px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-4">
