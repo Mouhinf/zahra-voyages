@@ -1,24 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminToken, AuthError } from '@/lib/firebase-admin';
-import { listQuotes } from '@/lib/admin-db';
+import { pageOfLeads } from '@/lib/lead-api';
 
 export const runtime = 'nodejs';
 
 // ---------------------------------------------------------------------------
-// CRM devis (admin) — liste des demandes reçues.
-// Avant correction : fichier vide (route inutilisable). Désormais implémenté
-// et protégé par verifyAdminToken (token admin + rôle vérifiés côté serveur).
+// CRM devis (admin) — une page de demandes, les plus récentes d'abord.
+// Pagination par curseur : ?limit=50&cursor=<id du dernier élément reçu>.
 // ---------------------------------------------------------------------------
 
 export async function GET(request: NextRequest) {
   try {
     await verifyAdminToken(request);
-
-    const limitParam = Number(request.nextUrl.searchParams.get('limit') || '200');
-    const limit = Number.isFinite(limitParam) ? Math.min(Math.max(Math.trunc(limitParam), 1), 500) : 200;
-
-    const items = await listQuotes(limit);
-    return NextResponse.json({ items });
+    return await pageOfLeads(request, 'quotes');
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });

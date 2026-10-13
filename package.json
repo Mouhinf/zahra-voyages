@@ -5,6 +5,7 @@
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "test:rules": "bash scripts/test-rules.sh",
+    "test:crm": "bash scripts/test-crm.sh",
     "test:api": "node tests/api-integration.test.mjs"
   },
   "dependencies": {

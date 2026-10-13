@@ -121,48 +121,77 @@ export async function patchLead(patch: LeadPatch, actor: string): Promise<LeadPa
   });
 }
 
-/** Compteurs CRM pour le tableau de bord (données réelles uniquement). */
+export type LeadCollection = 'quotes' | 'contacts';
+export const LEAD_COLLECTIONS: readonly LeadCollection[] = ['quotes', 'contacts'];
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Compteurs CRM pour le tableau de bord.
+ *
+ * Ne lit PAS l'intégralité des collections : les totaux et répartitions par
+ * statut sont des agrégations `count()`, et les séries temporelles ne portent
+ * que sur les 30 derniers jours. Les demandes non traitées (> 48 h) sont
+ * recherchées dans les 90 derniers jours.
+ */
 export async function crmOverview() {
-  const quotesSnap = await db().collection('quotes').get();
-  const contactsSnap = await db().collection('contacts').get();
+  const now = Date.now();
+  const cutoff48h = new Date(now - UNHANDLED_AFTER_HOURS * 60 * 60 * 1000).toISOString();
+  const since30d = new Date(now - 30 * DAY_MS).toISOString();
+  const since90d = new Date(now - 90 * DAY_MS).toISOString();
 
   const statusCounts: Record<LeadStatus, number> = {
     nouveau: 0, contacte: 0, en_discussion: 0, devis_envoye: 0, confirme: 0, perdu: 0,
   };
-  let total = 0;
-  const unhandledCutoff = Date.now() - UNHANDLED_AFTER_HOURS * 60 * 60 * 1000;
-  let unhandled = 0;
-  const serviceCounts: Record<string, number> = {};
-  const perDay: Record<string, number> = {};
+  const totals: Record<LeadCollection, number> = { quotes: 0, contacts: 0 };
 
-  for (const doc of quotesSnap.docs) {
-    const d = doc.data();
-    total++;
-    const status = (LEAD_STATUSES as readonly string[]).includes(String(d.crmStatus)) ? (d.crmStatus as LeadStatus) : 'nouveau';
-    statusCounts[status]++;
-    const created = typeof d.createdAt === 'string' ? new Date(d.createdAt).getTime() : NaN;
-    if (Number.isFinite(created)) {
-      if (status === 'nouveau' && created < unhandledCutoff) unhandled++;
-      const day = new Date(created).toISOString().slice(0, 10);
-      perDay[day] = (perDay[day] ?? 0) + 1;
+  for (const col of LEAD_COLLECTIONS) {
+    const total = (await db().collection(col).count().get()).data().count;
+    totals[col] = total;
+    let explicit = 0;
+    for (const status of LEAD_STATUSES) {
+      if (status === 'nouveau') continue;
+      const n = (await db().collection(col).where('crmStatus', '==', status).count().get()).data().count;
+      statusCounts[status] += n;
+      explicit += n;
     }
-    const svc = String(d.service || 'inconnu');
-    serviceCounts[svc] = (serviceCounts[svc] ?? 0) + 1;
+    // Les anciennes demandes sans crmStatus comptent comme « nouveau ».
+    statusCounts.nouveau += Math.max(0, total - explicit);
   }
 
-  // Les messages de contact sont des prospects aussi (sans service).
-  let contactsTotal = 0;
-  for (const doc of contactsSnap.docs) {
-    const d = doc.data();
-    contactsTotal++;
-    const status = (LEAD_STATUSES as readonly string[]).includes(String(d.crmStatus)) ? (d.crmStatus as LeadStatus) : 'nouveau';
-    statusCounts[status]++;
-    const created = typeof d.createdAt === 'string' ? new Date(d.createdAt).getTime() : NaN;
-    if (Number.isFinite(created)) {
-      if (status === 'nouveau' && created < unhandledCutoff) unhandled++;
-      const day = new Date(created).toISOString().slice(0, 10);
-      perDay[day] = (perDay[day] ?? 0) + 1;
-    }
+  // Demandes non traitées : statut « nouveau » (ou absent) et plus de 48 h.
+  const staleSnap = await db()
+    .collection('quotes')
+    .where('createdAt', '>=', since90d)
+    .where('createdAt', '<', cutoff48h)
+    .select('crmStatus')
+    .get();
+  const staleContacts = await db()
+    .collection('contacts')
+    .where('createdAt', '>=', since90d)
+    .where('createdAt', '<', cutoff48h)
+    .select('crmStatus')
+    .get();
+  const unhandled = [...staleSnap.docs, ...staleContacts.docs].filter((d) => {
+    const status = String(d.get('crmStatus') ?? 'nouveau');
+    return status === 'nouveau';
+  }).length;
+
+  // 30 derniers jours : évolution quotidienne et services demandés.
+  const quotesRecent = await db().collection('quotes').where('createdAt', '>=', since30d).select('createdAt', 'service').get();
+  const contactsRecent = await db().collection('contacts').where('createdAt', '>=', since30d).select('createdAt').get();
+
+  const perDay: Record<string, number> = {};
+  const serviceCounts: Record<string, number> = {};
+  for (const doc of quotesRecent.docs) {
+    const day = String(doc.get('createdAt')).slice(0, 10);
+    perDay[day] = (perDay[day] ?? 0) + 1;
+    const svc = String(doc.get('service') || 'inconnu');
+    serviceCounts[svc] = (serviceCounts[svc] ?? 0) + 1;
+  }
+  for (const doc of contactsRecent.docs) {
+    const day = String(doc.get('createdAt')).slice(0, 10);
+    perDay[day] = (perDay[day] ?? 0) + 1;
   }
 
   const topServices = Object.entries(serviceCounts)
@@ -170,5 +199,59 @@ export async function crmOverview() {
     .slice(0, 6)
     .map(([service, count]) => ({ service, count }));
 
-  return { total, contactsTotal, statusCounts, unhandled, topServices, perDay };
+  return {
+    total: totals.quotes,
+    contactsTotal: totals.contacts,
+    statusCounts,
+    unhandled,
+    topServices,
+    perDay,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Lecture d'une demande et pagination (liste admin)
+// ---------------------------------------------------------------------------
+
+export type LeadRow = Record<string, unknown> & { id: string };
+
+/** Une page de demandes, les plus récentes d'abord. `cursor` = id du dernier élément reçu. */
+export async function listLeads(
+  collection: LeadCollection,
+  limit: number,
+  cursor?: string,
+): Promise<{ items: LeadRow[]; nextCursor: string | null } | { error: string }> {
+  let query = db().collection(collection).orderBy('createdAt', 'desc');
+  if (cursor) {
+    const cursorSnap = await db().collection(collection).doc(cursor).get();
+    if (!cursorSnap.exists) return { error: 'Curseur de pagination invalide' };
+    query = query.startAfter(cursorSnap);
+  }
+  const snap = await query.limit(limit + 1).get();
+  const docs = snap.docs.slice(0, limit);
+  return {
+    items: docs.map((d) => ({ id: d.id, ...d.data() })),
+    nextCursor: snap.docs.length > limit ? docs[docs.length - 1].id : null,
+  };
+}
+
+/** Une demande complète (avec notes et historique), ou null si absente. */
+export async function getLead(collection: LeadCollection, id: string): Promise<LeadRow | null> {
+  const snap = await db().collection(collection).doc(id).get();
+  return snap.exists ? { id: snap.id, ...snap.data() } : null;
+}
+
+/** Dernières demandes reçues, devis et contacts confondus. */
+export async function recentLeads(limit = 6): Promise<Array<LeadRow & { kind: LeadCollection }>> {
+  const [quotes, contacts] = await Promise.all([
+    db().collection('quotes').orderBy('createdAt', 'desc').limit(limit).get(),
+    db().collection('contacts').orderBy('createdAt', 'desc').limit(limit).get(),
+  ]);
+  const rows = [
+    ...quotes.docs.map((d) => ({ kind: 'quotes' as const, id: d.id, ...d.data() })),
+    ...contacts.docs.map((d) => ({ kind: 'contacts' as const, id: d.id, ...d.data() })),
+  ] as Array<LeadRow & { kind: LeadCollection }>;
+  return rows
+    .sort((a, b) => String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? '')))
+    .slice(0, limit);
 }
