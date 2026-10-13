@@ -43,6 +43,7 @@ service cloud.firestore {
         'hebergements',
         'transports',
         'voyages',
+        'voyagesCroisieres',
         'excursions',
         'offresAffaires',
         'partenaires',
@@ -95,6 +96,15 @@ service cloud.firestore {
       allow read, write: if false;
     }
     match /users/{doc} {
+      allow read, write: if false;
+    }
+    // Bandeau publicitaire : lu par /api/promo-banners, écrit par /api/admin/banners
+    // (SDK Admin). Aucun accès client direct.
+    match /promotionalBanners/{doc} {
+      allow read, write: if false;
+    }
+    // Journal d'audit : écrit uniquement côté serveur.
+    match /auditLogs/{doc} {
       allow read, write: if false;
     }
   }

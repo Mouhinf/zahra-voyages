@@ -14,38 +14,48 @@ const ADMIN_EMAILS: string[] = (process.env.ADMIN_EMAILS || 'mouhopap@gmail.com'
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
+/**
+ * Compte de service lu une seule fois. Une clé absente ou mal formée ne doit
+ * pas faire échouer l'import de tout le module (toutes les routes API) :
+ * elle est signalée et ignorée, et assertAdminConfigured() refuse alors
+ * proprement au lieu de produire un 401 trompeur.
+ */
+function parseServiceAccount(): object | undefined {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (!raw) return undefined;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && 'private_key' in parsed ? parsed : undefined;
+  } catch {
+    console.error("FIREBASE_SERVICE_ACCOUNT_KEY n'est pas un JSON valide : compte de service ignoré.");
+    return undefined;
+  }
+}
+
+const SERVICE_ACCOUNT = parseServiceAccount();
+
 function getAdminApp() {
   if (getApps().length) {
     return getApps()[0];
   }
 
-  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
-    : undefined;
-
-  // Sans clé de service explicite : initialisation minimale.
-  // - En local avec les émulateurs Firebase (FIREBASE_AUTH_EMULATOR_HOST /
-  //   FIRESTORE_EMULATOR_HOST), ce mode fonctionne.
-  // - En production (Vercel), FIREBASE_SERVICE_ACCOUNT_KEY est requis :
-  //   verifyIdToken() échouera sinon avec une erreur explicite.
+  // Sans compte de service : initialisation minimale.
+  // - En local avec les émulateurs Firebase, ce mode fonctionne.
+  // - En production (Vercel), FIREBASE_SERVICE_ACCOUNT_KEY est requis.
   return initializeApp(
-    serviceAccount
-      ? { credential: cert(serviceAccount), projectId }
+    SERVICE_ACCOUNT
+      ? { credential: cert(SERVICE_ACCOUNT as Parameters<typeof cert>[0]), projectId }
       : { projectId },
   );
 }
 
 /**
- * Vrai si le SDK Admin est réellement configuré (compte de service présent
+ * Vrai si le SDK Admin est réellement configuré (compte de service valide
  * OU émulateur Firestore détecté). En production sans clé, les écritures
- * Firestore échouent — les routes publiques doivent renvoyer un 503 clair
- * plutôt qu'un 500 opaque.
+ * Firestore échouent — les routes doivent renvoyer un 503 clair plutôt qu'un 500 opaque.
  */
 export function isAdminConfigured(): boolean {
-  return (
-    !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
-    !!process.env.FIRESTORE_EMULATOR_HOST
-  );
+  return !!SERVICE_ACCOUNT || !!process.env.FIRESTORE_EMULATOR_HOST;
 }
 
 /** Erreur de configuration serveur — distinguée des erreurs d'auth. */

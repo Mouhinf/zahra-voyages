@@ -43,8 +43,14 @@ export async function GET(req: NextRequest) {
       analyticsPerDay(),
       ...CATALOG_COLLECTIONS.map(async (c) => {
         // Offres PUBLIÉES uniquement (disponible !== false).
-        const snap = await db.collection(c.key).where('disponible', '!=', false).count().get();
-        return { key: c.key, label: c.label, published: snap.data().count };
+        // Un `where('disponible', '!=', false)` exclurait les anciens documents
+        // sans ce champ (Firestore ignore les champs absents dans un `!=`) :
+        // on compte donc le total puis on retire les masqués explicites.
+        const [total, hidden] = await Promise.all([
+          db.collection(c.key).count().get(),
+          db.collection(c.key).where('disponible', '==', false).count().get(),
+        ]);
+        return { key: c.key, label: c.label, published: total.data().count - hidden.data().count };
       }),
     ]);
 

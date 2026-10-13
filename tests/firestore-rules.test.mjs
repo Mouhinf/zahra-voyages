@@ -99,10 +99,25 @@ await test('utilisateur lambda : lecture des destinations autorisée', () =>
 await test('visiteur anonyme : lecture des offresAffaires autorisée (allowlist complète)', () =>
   assertSucceeds(anonymous.firestore().collection('offresAffaires').limit(5).get()));
 
+await test('visiteur anonyme : lecture des voyagesCroisieres autorisée (page publique)', () =>
+  assertSucceeds(anonymous.firestore().collection('voyagesCroisieres').limit(5).get()));
+
+await test('visiteur anonyme : lecture des promotionalBanners refusée (passe par /api/promo-banners)', () =>
+  assertFails(anonymous.firestore().collection('promotionalBanners').limit(5).get()));
+
+await test('visiteur anonyme : lecture des auditLogs refusée', () =>
+  assertFails(anonymous.firestore().collection('auditLogs').limit(5).get()));
+
 await test('visiteur anonyme : lecture des pageContents autorisée', () =>
   assertSucceeds(anonymous.firestore().collection('pageContents').limit(5).get()));
 
 console.log('\n— Écritures sur le catalogue —');
+
+await test('admin (email) : écriture voyagesCroisieres autorisée', () =>
+  assertSucceeds(adminByEmail.firestore().collection('voyagesCroisieres').doc('vc1').set(catalogDoc)));
+
+await test('utilisateur lambda : écriture voyagesCroisieres refusée', () =>
+  assertFails(regularUser.firestore().collection('voyagesCroisieres').doc('vc2').set(catalogDoc)));
 
 await test('visiteur anonyme : création refusée', () =>
   assertFails(anonymous.firestore().collection('destinations').doc('x1').set(catalogDoc)));
