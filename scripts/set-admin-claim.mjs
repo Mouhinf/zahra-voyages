@@ -96,10 +96,10 @@ async function main() {
 
   // firebase-admin est une dépendance du projet ; import dynamique pour
   // que ce script reste utilisable sans build préalable.
-  const { initializeApp, getApps } = await import('firebase-admin/app');
+  const { initializeApp, getApps, cert } = await import('firebase-admin/app');
   const { getAuth } = await import('firebase-admin/auth');
 
-  const app = getApps().length ? getApps()[0] : initializeApp({ credential: (await import('firebase-admin/credential')).cert(serviceAccount) });
+  const app = getApps().length ? getApps()[0] : initializeApp({ credential: cert(serviceAccount) });
   const auth = getAuth(app);
 
   const target = emailArg ? { email: emailArg } : { uid: uidArg };
