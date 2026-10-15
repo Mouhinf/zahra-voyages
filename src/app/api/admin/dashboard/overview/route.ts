@@ -3,7 +3,7 @@ import { verifyAdminToken, AuthError } from '@/lib/firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { adminApp } from '@/lib/firebase-admin';
 import { crmOverview } from '@/lib/crm';
-import { totalVisits, topPagesDetailed, topSourcesDetailed, analyticsPerDay } from '@/lib/admin-db';
+import { dashboardAnalyticsOverview } from '@/lib/admin-db';
 
 export const runtime = 'nodejs';
 
@@ -35,12 +35,9 @@ export async function GET(req: NextRequest) {
     await verifyAdminToken(req);
     const db = getFirestore(adminApp);
 
-    const [crm, visits, pages, sources, analyticsPerDayVal, ...catalogCounts] = await Promise.all([
+    const [crm, analytics, ...catalogCounts] = await Promise.all([
       crmOverview(),
-      totalVisits(),
-      topPagesDetailed(),
-      topSourcesDetailed(),
-      analyticsPerDay(),
+      dashboardAnalyticsOverview(),
       ...CATALOG_COLLECTIONS.map(async (c) => {
         // Offres PUBLIÉES uniquement (disponible !== false).
         // Un `where('disponible', '!=', false)` exclurait les anciens documents
@@ -75,10 +72,10 @@ export async function GET(req: NextRequest) {
       },
       offers: catalogCounts,
       analytics: {
-        totalVisits: visits,
-        pages,
-        sources,
-        perDay: analyticsPerDayVal,
+        totalVisits: analytics.totalVisits,
+        pages: analytics.pages,
+        sources: analytics.sources,
+        perDay: analytics.perDay,
       },
       leadsPerDay,
     });

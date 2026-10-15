@@ -47,6 +47,14 @@ export default function Hero() {
 
   const goTo = (idx: number) => setCurrent(idx);
 
+  const [canLoadRest, setCanLoadRest] = useState(false);
+
+  useEffect(() => {
+    // Diffère le chargement des diapositives secondaires pour prioriser le LCP de la diapositive 1
+    const timer = setTimeout(() => setCanLoadRest(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     // Respect de prefers-reduced-motion : pas de défilement automatique.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -65,14 +73,17 @@ export default function Hero() {
           }`}
           aria-hidden={idx !== current}
         >
-          <Image
-            src={slide.url}
-            alt={slide.alt}
-            fill
-            className="object-cover"
-            priority={idx === 0}
-            sizes="100vw"
-          />
+          {(idx === 0 || idx === current || canLoadRest) && (
+            <Image
+              src={slide.url}
+              alt={slide.alt}
+              fill
+              className="object-cover"
+              priority={idx === 0}
+              quality={75}
+              sizes="(max-width: 768px) 100vw, 1920px"
+            />
+          )}
         </div>
       ))}
 

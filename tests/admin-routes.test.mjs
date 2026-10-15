@@ -29,6 +29,7 @@ const PROTECTED_ROUTES = [
   '/admin/demandes/newsletter',
   '/admin/demandes/devis/exemple-id',
   '/admin/demandes/contacts/exemple-id',
+  '/admin/statistiques',
   '/admin/destinations',
   '/admin/hebergements',
   '/admin/transports',

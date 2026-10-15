@@ -3,8 +3,7 @@
 import * as React from 'react';
 import Image from 'next/image';
 import { Calendar, Globe, Users, Handshake } from 'lucide-react';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+
 
 type Stat = {
   valeur: number;
@@ -58,7 +57,7 @@ function StatItem({ stat, started }: { stat: Stat; started: boolean }) {
 
 export default function HomeStats() {
   const [started, setStarted] = React.useState(false);
-  const [bgImage, setBgImage] = React.useState<string>(FALLBACK_BG);
+  const bgImage = FALLBACK_BG;
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -77,25 +76,7 @@ export default function HomeStats() {
     return () => observer.disconnect();
   }, []);
 
-  React.useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const db = getDbInstance();
-        const q = query(collection(db, 'voyagesCroisieres'), orderBy('ordre', 'asc'), limit(1));
-        const snap = await getDocs(q);
-        snap.forEach((docSnap) => {
-          const d = docSnap.data() as { image?: string; disponible?: boolean };
-          if (d.disponible !== false && d.image && mounted) {
-            setBgImage(d.image.includes('unsplash') ? FALLBACK_BG : d.image);
-          }
-        });
-      } catch (e) {
-        console.error('Erreur fetch bg stats:', e);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+
 
   return (
     <section ref={ref} className="relative py-16 sm:py-20 overflow-hidden">

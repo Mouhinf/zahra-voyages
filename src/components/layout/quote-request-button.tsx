@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Button, type ButtonProps } from '@/components/ui/button';
+import { trackAnalyticsEvent } from '@/components/analytics-beacon';
 
 const LazyQuoteRequestModal = React.lazy(() =>
   import('./quote-request-dialog').then((module) => ({
@@ -39,6 +40,7 @@ export function QuoteRequestButton({
   const [open, setOpen] = React.useState(false);
 
   const openDialog = () => {
+    trackAnalyticsEvent('quote_start', { source });
     setShouldLoadDialog(true);
     setOpen(true);
   };

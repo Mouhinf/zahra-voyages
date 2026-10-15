@@ -3,7 +3,9 @@ import { getDbInstance } from '@/lib/firebase';
 import { defaultPageContents } from '@/data/default-page-contents';
 import type { PageContent, PageSlug } from '@/types';
 
-export async function fetchPageContent(pageSlug: PageSlug): Promise<PageContent> {
+import { cache } from 'react';
+
+export const fetchPageContent = cache(async (pageSlug: PageSlug): Promise<PageContent> => {
   const defaults = defaultPageContents[pageSlug];
   try {
     const docSnap = await getDoc(doc(getDbInstance(), 'pageContents', pageSlug));
@@ -15,7 +17,7 @@ export async function fetchPageContent(pageSlug: PageSlug): Promise<PageContent>
     console.error(`Erreur fetch pageContents/${pageSlug}:`, error);
   }
   return defaults;
-}
+});
 
 export async function savePageContent(pageSlug: PageSlug, content: PageContent): Promise<void> {
   const { id: _id, ...data } = content;

@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   BedDouble,
   Briefcase,
   Bus,
@@ -33,6 +34,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: 'Principal',
     items: [
       { href: '/admin/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+      { href: '/admin/statistiques', label: 'Statistiques & Acquisition', icon: BarChart3 },
       { href: '/admin/demandes', label: 'Demandes et CRM', icon: Inbox },
     ],
   },

@@ -130,8 +130,8 @@ const SUGGESTIONS = [
   'Organisez-vous des séminaires ?',
 ];
 
-export default function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Chatbot({ initialOpen = false }: { initialOpen?: boolean } = {}) {
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -270,6 +270,9 @@ export default function Chatbot() {
           href="https://wa.me/221773129090"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            import('@/components/analytics-beacon').then((m) => m.trackAnalyticsEvent('whatsapp_click'));
+          }}
           className="w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center"
           aria-label="Contacter sur WhatsApp"
         >

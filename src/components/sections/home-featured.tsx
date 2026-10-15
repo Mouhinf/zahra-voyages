@@ -23,34 +23,39 @@ const collectionsConfig = [
   { name: 'excursions', basePath: '/excursions', section: 'Excursions', limit: 2 },
 ];
 
-async function fetchFeatured(): Promise<OffrePhare[]> {
-  const offres: OffrePhare[] = [];
+import { cache } from 'react';
+
+const fetchFeatured = cache(async (): Promise<OffrePhare[]> => {
   const db = getDbInstance();
-  for (const cfg of collectionsConfig) {
-    try {
-      const q = query(collection(db, cfg.name), orderBy('ordre', 'asc'), limit(cfg.limit));
-      const snap = await getDocs(q);
-      snap.forEach((docSnap) => {
-        const d = docSnap.data() as { titre: string; prix: string; image: string; tag: string; disponible?: boolean };
-        if (d.disponible !== false && d.image) {
-          const img = d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image;
-          offres.push({
-            id: docSnap.id,
-            titre: d.titre,
-            prix: d.prix,
-            image: img,
-            tag: d.tag,
-            section: cfg.section,
-            basePath: cfg.basePath,
-          });
-        }
-      });
-    } catch (e) {
-      console.error(`Erreur fetch ${cfg.name}:`, e);
-    }
-  }
-  return offres.slice(0, 6);
-}
+  const results = await Promise.all(
+    collectionsConfig.map(async (cfg) => {
+      const items: OffrePhare[] = [];
+      try {
+        const q = query(collection(db, cfg.name), orderBy('ordre', 'asc'), limit(cfg.limit));
+        const snap = await getDocs(q);
+        snap.forEach((docSnap) => {
+          const d = docSnap.data() as { titre: string; prix: string; image: string; tag: string; disponible?: boolean };
+          if (d.disponible !== false && d.image) {
+            const img = d.image.includes('unsplash') ? 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png' : d.image;
+            items.push({
+              id: docSnap.id,
+              titre: d.titre,
+              prix: d.prix,
+              image: img,
+              tag: d.tag,
+              section: cfg.section,
+              basePath: cfg.basePath,
+            });
+          }
+        });
+      } catch (e) {
+        console.error(`Erreur fetch ${cfg.name}:`, e);
+      }
+      return items;
+    })
+  );
+  return results.flat().slice(0, 6);
+});
 
 export default async function HomeFeatured() {
   let offres: OffrePhare[] = [];

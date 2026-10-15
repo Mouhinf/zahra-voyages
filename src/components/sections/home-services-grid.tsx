@@ -1,13 +1,11 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { ArrowRight, Hotel, Car, Ship, MapPinned, Briefcase, Zap } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { cache } from 'react';
 
 const FALLBACK_IMAGES: Record<string, string> = {
   hebergements: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-hebergement.png',
@@ -63,32 +61,34 @@ const services: ServiceDef[] = [
   },
 ];
 
-export default function HomeServicesGrid() {
-  const [images, setImages] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const db = getDbInstance();
-      const result: Record<string, string> = {};
-      for (const service of services) {
+const fetchServiceImages = cache(async (): Promise<Record<string, string>> => {
+  const result: Record<string, string> = { ...FALLBACK_IMAGES };
+  try {
+    const db = getDbInstance();
+    await Promise.all(
+      services.map(async (service) => {
         try {
           const q = query(collection(db, service.collectionName), orderBy('ordre', 'asc'), limit(1));
           const snap = await getDocs(q);
           snap.forEach((docSnap) => {
             const d = docSnap.data() as { image?: string; disponible?: boolean };
-            if (d.disponible !== false && d.image) {
-              result[service.collectionName] = d.image.includes('unsplash') ? FALLBACK_IMAGES[service.collectionName] : d.image;
+            if (d.disponible !== false && d.image && !d.image.includes('unsplash')) {
+              result[service.collectionName] = d.image;
             }
           });
-        } catch (e) {
-          console.error(`Erreur fetch image ${service.collectionName}:`, e);
+        } catch {
+          // Utilise le fallback fiable
         }
-      }
-      if (mounted) setImages(result);
-    })();
-    return () => { mounted = false; };
-  }, []);
+      })
+    );
+  } catch {
+    // Utilise les fallbacks Cloudinary
+  }
+  return result;
+});
+
+export default async function HomeServicesGrid() {
+  const images = await fetchServiceImages();
 
   return (
     <section id="services" className="py-16 sm:py-24 bg-white">
@@ -134,32 +134,32 @@ export default function HomeServicesGrid() {
           })}
 
           {/* 6e carte : Réservation express */}
-          <QuoteRequestButton asChild>
+          <QuoteRequestButton asChild source="accueil-reservation-express">
             <button type="button" className="text-left w-full h-full cursor-pointer">
-            <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-accent/5 border-accent/30 flex flex-col p-0">
-              <div className="relative h-48 overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop"
-                  alt="Réservation express"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-accent/80 to-transparent" />
-                <div className="absolute bottom-3 left-3 w-11 h-11 rounded-full bg-accent flex items-center justify-center shadow-lg">
-                  <Zap className="h-6 w-6 text-accent-foreground" />
+              <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-accent/5 border-accent/30 flex flex-col p-0">
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png"
+                    alt="Réservation express"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-accent/80 to-transparent" />
+                  <div className="absolute bottom-3 left-3 w-11 h-11 rounded-full bg-accent flex items-center justify-center shadow-lg">
+                    <Zap className="h-6 w-6 text-accent-foreground" />
+                  </div>
                 </div>
-              </div>
-              <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-primary">Réservation Express</h3>
-                <p className="mt-2 text-sm text-muted-foreground flex-grow">
-                  Besoin d'un devis rapide ? Décrivez votre projet, notre équipe vous répond sous 24h.
-                </p>
-                <div className="mt-4 flex items-center text-accent-foreground text-sm font-medium">
-                  Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
+                <div className="p-5 flex flex-col flex-grow">
+                  <h3 className="text-xl font-semibold text-primary">Réservation Express</h3>
+                  <p className="mt-2 text-sm text-muted-foreground flex-grow">
+                    Besoin d'un devis rapide ? Décrivez votre projet, notre équipe vous répond sous 24h.
+                  </p>
+                  <div className="mt-4 flex items-center text-accent-foreground text-sm font-medium">
+                    Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
             </button>
           </QuoteRequestButton>
         </div>

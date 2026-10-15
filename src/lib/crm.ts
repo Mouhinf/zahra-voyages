@@ -145,41 +145,57 @@ export async function crmOverview() {
   };
   const totals: Record<LeadCollection, number> = { quotes: 0, contacts: 0 };
 
-  for (const col of LEAD_COLLECTIONS) {
-    const total = (await db().collection(col).count().get()).data().count;
-    totals[col] = total;
-    let explicit = 0;
-    for (const status of LEAD_STATUSES) {
-      if (status === 'nouveau') continue;
-      const n = (await db().collection(col).where('crmStatus', '==', status).count().get()).data().count;
-      statusCounts[status] += n;
-      explicit += n;
-    }
-    // Les anciennes demandes sans crmStatus comptent comme « nouveau ».
-    statusCounts.nouveau += Math.max(0, total - explicit);
-  }
+  // Exécution parallèle de tous les comptages et requêtes temporelles
+  const [
+    quotesTotalSnap,
+    contactsTotalSnap,
+    quotesStatusSnaps,
+    contactsStatusSnaps,
+    staleQuotesSnap,
+    staleContactsSnap,
+    quotesRecent,
+    contactsRecent,
+  ] = await Promise.all([
+    db().collection('quotes').count().get(),
+    db().collection('contacts').count().get(),
+    Promise.all(
+      LEAD_STATUSES.filter((s) => s !== 'nouveau').map((s) =>
+        db().collection('quotes').where('crmStatus', '==', s).count().get()
+      )
+    ),
+    Promise.all(
+      LEAD_STATUSES.filter((s) => s !== 'nouveau').map((s) =>
+        db().collection('contacts').where('crmStatus', '==', s).count().get()
+      )
+    ),
+    db().collection('quotes').where('createdAt', '>=', since90d).where('createdAt', '<', cutoff48h).select('crmStatus').get(),
+    db().collection('contacts').where('createdAt', '>=', since90d).where('createdAt', '<', cutoff48h).select('crmStatus').get(),
+    db().collection('quotes').where('createdAt', '>=', since30d).select('createdAt', 'service').get(),
+    db().collection('contacts').where('createdAt', '>=', since30d).select('createdAt').get(),
+  ]);
+
+  totals.quotes = quotesTotalSnap.data().count;
+  totals.contacts = contactsTotalSnap.data().count;
+
+  const nonNewStatuses = LEAD_STATUSES.filter((s) => s !== 'nouveau');
+  let quotesExplicit = 0;
+  let contactsExplicit = 0;
+
+  nonNewStatuses.forEach((status, idx) => {
+    const qCount = quotesStatusSnaps[idx].data().count;
+    const cCount = contactsStatusSnaps[idx].data().count;
+    statusCounts[status] = qCount + cCount;
+    quotesExplicit += qCount;
+    contactsExplicit += cCount;
+  });
+
+  statusCounts.nouveau = Math.max(0, totals.quotes - quotesExplicit) + Math.max(0, totals.contacts - contactsExplicit);
 
   // Demandes non traitées : statut « nouveau » (ou absent) et plus de 48 h.
-  const staleSnap = await db()
-    .collection('quotes')
-    .where('createdAt', '>=', since90d)
-    .where('createdAt', '<', cutoff48h)
-    .select('crmStatus')
-    .get();
-  const staleContacts = await db()
-    .collection('contacts')
-    .where('createdAt', '>=', since90d)
-    .where('createdAt', '<', cutoff48h)
-    .select('crmStatus')
-    .get();
-  const unhandled = [...staleSnap.docs, ...staleContacts.docs].filter((d) => {
+  const unhandled = [...staleQuotesSnap.docs, ...staleContactsSnap.docs].filter((d) => {
     const status = String(d.get('crmStatus') ?? 'nouveau');
     return status === 'nouveau';
   }).length;
-
-  // 30 derniers jours : évolution quotidienne et services demandés.
-  const quotesRecent = await db().collection('quotes').where('createdAt', '>=', since30d).select('createdAt', 'service').get();
-  const contactsRecent = await db().collection('contacts').where('createdAt', '>=', since30d).select('createdAt').get();
 
   const perDay: Record<string, number> = {};
   const serviceCounts: Record<string, number> = {};

@@ -1,21 +1,98 @@
 'use client';
 
 /**
- * Suivi des pages vues — balise côté client (sendBeacon).
+ * Suivi analytics éco-conçu et respectueux de la vie privée — SLAAC Voyages.
  *
- * Pourquoi ce remplacement : l'ancien middleware déclenchait un appel API
- * à chaque navigation côté serveur (coût + erreurs possibles + la navigation
- * pouvait en dépendre). Ici :
- * - Le visiteur envoie la page vue depuis son navigateur via
- *   navigator.sendBeacon (non bloquant, survit aux fermetures d'onglet).
- * - La navigation ne dépend JAMAIS de l'analytics : tout échec est
- *   silencieux, aucun rechargement ni blocage.
- * - Respect de la vie privée : aucune donnée personnelle (userId null),
- *   pas de cookie ; les pages /admin ne sont pas mesurées.
+ * Caractéristiques :
+ * - Pages vues : `navigator.sendBeacon` (non-bloquant, survit aux fermetures d'onglets).
+ * - Clics CTA & WhatsApp : traçage léger sans impacter la navigation.
+ * - Détection UTM : utm_source, utm_medium, utm_campaign normalisés.
+ * - Détection d'appareil : mobile / tablette / desktop via largeur d'écran / user-agent.
+ * - Zéro donnée personnelle collectée, aucune IP stockée.
+ * - Pages /admin exclues de la mesure.
  */
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+
+export type ClientEventType = 'page_view' | 'cta_click' | 'whatsapp_click' | 'quote_start';
+
+function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
+  if (typeof window === 'undefined') return 'desktop';
+  const width = window.innerWidth;
+  if (width < 768) return 'mobile';
+  if (width < 1024) return 'tablet';
+  return 'desktop';
+}
+
+function parseUtmParams(): { source?: string; medium?: string; campaign?: string } {
+  if (typeof window === 'undefined') return {};
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get('utm_source') || undefined;
+    const medium = params.get('utm_medium') || undefined;
+    const campaign = params.get('utm_campaign') || undefined;
+    return { source, medium, campaign };
+  } catch {
+    return {};
+  }
+}
+
+function detectSource(referrer: string, utmSource?: string): string {
+  if (utmSource) return utmSource.toLowerCase().slice(0, 50);
+  if (!referrer) return 'direct';
+  const ref = referrer.toLowerCase();
+  if (ref.includes('google.')) return 'google';
+  if (ref.includes('facebook.com') || ref.includes('fb.com')) return 'facebook';
+  if (ref.includes('instagram.com')) return 'instagram';
+  if (ref.includes('tiktok.com')) return 'tiktok';
+  if (ref.includes('twitter.com') || ref.includes('x.com') || ref.includes('t.co')) return 'twitter';
+  if (ref.includes('whatsapp.com')) return 'whatsapp';
+  return 'referral';
+}
+
+/** Envoie un événement analytics de façon totalement asynchrone et non-bloquante */
+export function trackAnalyticsEvent(
+  eventType: ClientEventType,
+  details?: { page?: string; campaign?: string; source?: string }
+): void {
+  if (typeof window === 'undefined') return;
+  const pathname = details?.page || window.location.pathname;
+
+  // Pas de suivi sur l'administration
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return;
+
+  const utm = parseUtmParams();
+  const referrer = document.referrer || '';
+  const source = details?.source || detectSource(referrer, utm.source);
+
+  const payload = JSON.stringify({
+    page: pathname.slice(0, 200),
+    eventType,
+    source,
+    medium: utm.medium,
+    campaign: details?.campaign || utm.campaign,
+    referrer: referrer ? referrer.slice(0, 500) : null,
+    device: getDeviceType(),
+    method: 'POST',
+  });
+
+  try {
+    const blob = new Blob([payload], { type: 'application/json' });
+    if (navigator.sendBeacon) {
+      const queued = navigator.sendBeacon('/api/analytics/log', blob);
+      if (queued) return;
+    }
+    void fetch('/api/analytics/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // Silencieux : le suivi ne doit jamais impacter l'expérience
+  }
+}
 
 export default function AnalyticsBeacon() {
   const pathname = usePathname();
@@ -23,46 +100,11 @@ export default function AnalyticsBeacon() {
 
   useEffect(() => {
     if (!pathname) return;
-    // Anti-doublon : StrictMode monte les effets deux fois en dev.
+    // Anti-doublon StrictMode
     if (lastPath.current === pathname) return;
     lastPath.current = pathname;
 
-    // Le back-office n'est pas du trafic public.
-    if (pathname === '/admin' || pathname.startsWith('/admin/')) return;
-
-    const referrer = typeof document !== 'undefined' ? document.referrer || '' : '';
-    let source = 'direct';
-    if (referrer) {
-      if (referrer.includes('facebook.com')) source = 'facebook';
-      else if (referrer.includes('google.com')) source = 'google';
-      else if (referrer.includes('twitter.com') || referrer.includes('x.com')) source = 'twitter';
-      else source = 'referral';
-    }
-
-    const payload = JSON.stringify({
-      page: pathname.slice(0, 200),
-      source,
-      referrer: referrer ? referrer.slice(0, 500) : null,
-      userId: null,
-      method: 'GET',
-    });
-
-    try {
-      const blob = new Blob([payload], { type: 'application/json' });
-      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-        const queued = navigator.sendBeacon('/api/analytics/log', blob);
-        if (queued) return; // envoyé
-      }
-      // Repli non bloquant pour les navigateurs sans sendBeacon.
-      void fetch('/api/analytics/log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true,
-      }).catch(() => {});
-    } catch {
-      // L'analytics ne doit jamais casser l'expérience.
-    }
+    trackAnalyticsEvent('page_view', { page: pathname });
   }, [pathname]);
 
   return null;
