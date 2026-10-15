@@ -1,0 +1,118 @@
+{
+  "code": 200,
+  "info": "Fetched DNS Zone",
+  "data": [
+    {
+      "id": 2541571,
+      "type": "NS",
+      "name": "@",
+      "value": "ns21.lwsdns.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541572,
+      "type": "NS",
+      "name": "@",
+      "value": "ns22.lwsdns.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541573,
+      "type": "NS",
+      "name": "@",
+      "value": "ns23.lwsdns.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541574,
+      "type": "NS",
+      "name": "@",
+      "value": "ns24.lwsdns.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541567,
+      "type": "MX",
+      "name": "@",
+      "value": "10 mail.slaacvoyages.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541560,
+      "type": "A",
+      "name": "@",
+      "value": "194.126.193.52",
+      "ttl": 21600
+    },
+    {
+      "id": 2541561,
+      "type": "A",
+      "name": "mail",
+      "value": "213.255.195.66",
+      "ttl": 21600
+    },
+    {
+      "id": 2991994,
+      "type": "AAAA",
+      "name": "@",
+      "value": "2a00:7ee0:40:0:3:4807:0:295",
+      "ttl": 3600
+    },
+    {
+      "id": 2541566,
+      "type": "CNAME",
+      "name": "ftp",
+      "value": "@",
+      "ttl": 86400
+    },
+    {
+      "id": 2541563,
+      "type": "CNAME",
+      "name": "imap",
+      "value": "mail.slaacvoyages.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541564,
+      "type": "CNAME",
+      "name": "pop",
+      "value": "mail.slaacvoyages.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541562,
+      "type": "CNAME",
+      "name": "smtp",
+      "value": "mail.slaacvoyages.com.",
+      "ttl": 86400
+    },
+    {
+      "id": 2541565,
+      "type": "CNAME",
+      "name": "www",
+      "value": "@",
+      "ttl": 86400
+    },
+    {
+      "id": 2541568,
+      "type": "TXT",
+      "name": "@",
+      "value": "v=spf1 mx:slaacvoyages.com a:mail.slaacvoyages.com a:mailphp.lws-hosting.com -all",
+      "ttl": 86400
+    },
+    {
+      "id": 2541570,
+      "type": "TXT",
+      "name": "dkim._domainkey",
+      "value": "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8C8Xh049AFp+LuKVCUlwahtRFxO85rrJ0dE0idCfNAsI5Nlobf02gik8jesZ04clvZ0lxaM+L8IU50AKVHeFva83Y7LVJdeaXk14fO3gwQ1r/asNhzvg++88bfhSaLKD5M4Eid13mBrpsV3gP/MeGIzsty0AMUUNpDwe0otnv3wIDAQAB",
+      "ttl": 3600
+    },
+    {
+      "id": 2541569,
+      "type": "TXT",
+      "name": "_dmarc",
+      "value": "v=DMARC1; p=quarantine;",
+      "ttl": 86400
+    }
+  ]
+}

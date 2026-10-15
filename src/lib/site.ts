@@ -1,7 +1,7 @@
 // Configuration centrale du site : URL canonique, identité et contacts.
 // Sert au SEO (sitemap, robots, canonical, hreflang) et aux schémas JSON-LD.
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://slaac-voyages.vercel.app').replace(/\/$/, '');
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://slaacvoyages.com').replace(/\/$/, '');
 
 export const SITE_NAME = 'SLAAC Voyages';
 export const SITE_TAGLINE = 'Votre Passeport pour le Monde';

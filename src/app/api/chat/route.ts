@@ -96,10 +96,14 @@ export async function POST(req: NextRequest) {
     // origin/referer allow list — comparaison EXACTE de l'origine
     // (startsWith autoriserait https://slaac-voyages.vercel.app.evil.com)
     const allowedOrigins = [
-      process.env.NEXT_PUBLIC_BASE_URL || 'https://slaac-voyages.vercel.app',
+      'https://slaacvoyages.com',
+      'https://www.slaacvoyages.com',
+      'https://slaac-voyages.vercel.app',
+      process.env.NEXT_PUBLIC_BASE_URL,
+      process.env.NEXT_PUBLIC_SITE_URL,
       'http://localhost:3000',
       'http://127.0.0.1:3000',
-    ];
+    ].filter(Boolean) as string[];
     const refererHeader = req.headers.get('referer') || req.headers.get('origin') || '';
     if (refererHeader) {
       try {
@@ -158,7 +162,7 @@ export async function POST(req: NextRequest) {
           headers: {
             'Authorization': 'Bearer ' + OPENROUTER_KEY,
             'Content-Type': 'application/json',
-            'Referer': process.env.NEXT_PUBLIC_BASE_URL || 'https://slaac-voyages.vercel.app',
+            'Referer': process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://slaacvoyages.com',
             'X-Title': 'SLAAC Voyages Assistant',
           },
           body: JSON.stringify({
