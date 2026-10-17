@@ -107,5 +107,9 @@ service cloud.firestore {
     match /auditLogs/{doc} {
       allow read, write: if false;
     }
+    // Outbox transactionnelle emails : manipulée exclusivement côté serveur (SDK Admin).
+    match /emailOutbox/{doc} {
+      allow read, write: if false;
+    }
   }
 }

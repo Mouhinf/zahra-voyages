@@ -126,7 +126,7 @@ function LeadTable({
                   {kind === 'quotes' && <Badge variant="outline">{serviceLabel(str(it.service))}</Badge>}
                   {kind === 'quotes' && <span className="text-xs text-muted-foreground">{str(it.reference)}</span>}
                   {isUnhandled(it) && <Badge variant="destructive" className="gap-1"><AlertTriangle className="h-3 w-3" /> &gt; 48 h</Badge>}
-                  <NotifyBadge value={it.notifyStatus} />
+                  <NotifyBadge value={it.notifyStatus} emailStatus={it.emailStatus} />
                   <span className="ml-auto text-sm text-muted-foreground">{formatCreatedAt(it.createdAt)}</span>
                   <ExternalLink className="h-4 w-4 text-muted-foreground" />
                 </div>

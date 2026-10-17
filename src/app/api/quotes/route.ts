@@ -3,7 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as z from 'zod';
 import { adminApp, assertAdminConfigured, ConfigError } from '@/lib/firebase-admin';
 import { clientIpFromHeaders, rateLimit } from '@/lib/rate-limit';
-import { sendAgencyEmail } from '@/lib/notify';
+import { sendQuoteNotifications, type QuoteEmailData } from '@/lib/email';
 
 export const runtime = 'nodejs';
 
@@ -159,23 +159,38 @@ export async function POST(req: NextRequest) {
       notifyStatus: 'pending',
     });
 
-    // Notification best-effort — un échec n'invalide pas la demande,
-    // mais le statut est consigné pour l'administration.
-    const emailPayload: Array<[string, unknown]> = Object.entries({ reference, ...record }).map(
-      ([k, v]) => [k, typeof v === 'boolean' ? (v ? 'oui' : 'non') : (v ?? '—')],
-    );
-    const notify = await sendAgencyEmail(
-      `Nouveau devis ${reference} — ${SERVICE_LABELS[quote.service] ?? quote.service}`,
-      emailPayload,
-    );
-    const notifyStatus = notify.sent ? 'sent' : `failed:${notify.reason ?? 'unknown'}`;
-    await docRef.update({ notifyStatus }).catch(() => {});
+    // Notification transactionnelle résiliente (Client + Agence + Responsable)
+    // avec persistance dans l'Outbox Firestore et clé d'idempotence.
+    // L'échec éventuel de l'envoi n'annule jamais la demande enregistrée.
+    const quoteData: QuoteEmailData = {
+      reference,
+      name: quote.name,
+      email: quote.email ?? null,
+      phone: quote.phone,
+      service: quote.service,
+      destination: quote.destination ?? null,
+      departureDate: quote.departureDate ?? null,
+      returnDate: quote.returnDate ?? null,
+      travelers: quote.travelers ?? (quote.attendees ? String(quote.attendees) : null),
+      notes: quote.message ?? null,
+      message: quote.message ?? null,
+      budget: quote.preferredCurrency ? `Devise : ${quote.preferredCurrency}` : null,
+      accommodation: quote.roomType ? `${quote.roomType}${quote.nights ? ` (${quote.nights} nuits)` : ''}` : null,
+      transport: quote.transportClass ?? null,
+    };
+
+    const notifyResults = await sendQuoteNotifications(docRef.id, quoteData).catch((err) => {
+      console.error('Quote notification dispatch error:', err);
+      return null;
+    });
+
+    const agencyFailed = notifyResults?.agency && !notifyResults.agency.success;
 
     return NextResponse.json({
       ok: true,
       id: docRef.id,
       reference,
-      emailWarning: !notify.sent && notify.reason !== 'not-configured',
+      emailWarning: Boolean(agencyFailed),
     });
   } catch (err: unknown) {
     if (err instanceof ConfigError) {

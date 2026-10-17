@@ -74,7 +74,32 @@ export function StatusBadge({ value }: { value: string }) {
   return <Badge variant="outline" className={s.badgeClass}>{s.label}</Badge>;
 }
 
-export function NotifyBadge({ value }: { value: unknown }) {
+export function NotifyBadge({ value, emailStatus }: { value?: unknown; emailStatus?: unknown }) {
+  if (emailStatus && typeof emailStatus === 'object') {
+    const statuses = Object.values(emailStatus as Record<string, { status?: string }>).map((s) => s?.status);
+    if (statuses.some((s) => s === 'failed' || s === 'permanently_failed')) {
+      return (
+        <Badge variant="destructive" className="gap-1">
+          <MailWarning className="h-3 w-3" /> email en échec
+        </Badge>
+      );
+    }
+    if (statuses.length > 0 && statuses.every((s) => s === 'sent')) {
+      return (
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+          emails livrés
+        </Badge>
+      );
+    }
+    if (statuses.some((s) => s === 'processing' || s === 'pending')) {
+      return (
+        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+          envoi en cours
+        </Badge>
+      );
+    }
+  }
+
   const v = str(value);
   if (!v || v === 'pending') return null;
   if (v === 'sent') return <Badge variant="secondary">email envoyé</Badge>;

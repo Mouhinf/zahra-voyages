@@ -3,7 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as z from 'zod';
 import { adminApp, assertAdminConfigured, ConfigError } from '@/lib/firebase-admin';
 import { clientIpFromHeaders, rateLimit } from '@/lib/rate-limit';
-import { sendAgencyEmail } from '@/lib/notify';
+import { sendContactNotifications } from '@/lib/email';
 import { createHash } from 'node:crypto';
 
 export const runtime = 'nodejs';
@@ -98,26 +98,29 @@ export async function POST(req: NextRequest) {
       notifyStatus: 'pending',
     });
 
-    // Notification best-effort — n'affecte pas le succès de la demande.
-    const notify = await sendAgencyEmail(
-      `Nouveau message de contact — ${data.name}`,
-      [
-        ['Nom', data.name],
-        ['Email', data.email],
-        ['Téléphone', data.phone ?? '—'],
-        ['Message', data.message],
-        ['Reçu le', new Date().toLocaleString('fr-FR')],
-        ['Réf. document', docRef.id],
-      ],
-    );
-    const notifyStatus = notify.sent ? 'sent' : `failed:${notify.reason ?? 'unknown'}`;
-    await docRef.update({ notifyStatus }).catch(() => {});
+    // Notification transactionnelle résiliente (Client + Agence + Responsable)
+    // avec persistance dans l'Outbox Firestore et clé d'idempotence.
+    // L'échec éventuel de l'envoi n'annule jamais la demande enregistrée.
+    const contactData = {
+      id: docRef.id,
+      name: data.name,
+      email: data.email,
+      phone: data.phone ?? null,
+      message: data.message,
+    };
+
+    const notifyResults = await sendContactNotifications(docRef.id, contactData).catch((err) => {
+      console.error('Contact notification dispatch error:', err);
+      return null;
+    });
+
+    const agencyFailed = notifyResults?.agency && !notifyResults.agency.success;
 
     return NextResponse.json({
       ok: true,
       id: docRef.id,
       // Signal explicite pour l'administration (non montré au visiteur).
-      emailWarning: !notify.sent && notify.reason !== 'not-configured',
+      emailWarning: Boolean(agencyFailed),
     });
   } catch (err: unknown) {
     if (err instanceof ConfigError) {
