@@ -66,14 +66,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <h3 className="text-lg font-semibold text-accent">SLAAC Voyages</h3>
-            <p className="mt-2 text-sm text-primary-foreground/80">
-              Votre passeport pour des aventures inoubliables. Agence de voyage à Dakar : hébergement, transport, circuits et assistance.
+            <p className="mt-2 text-sm text-primary-foreground/80 leading-relaxed">
+              Votre conciergerie de voyage au Sénégal et dans le monde. Transferts VIP AIBD, résidences vérifiées avec groupe électrogène & fibre, circuits d'exception et assistance visas au cœur de Dakar Plateau.
             </p>
-            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
-              <Button variant="gold" size="sm">
-                <MessageCircle className="h-4 w-4" /> WhatsApp
-              </Button>
-            </a>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
+                <Button variant="whatsapp" size="sm" className="font-medium">
+                  <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp 7j/7
+                </Button>
+              </a>
+            </div>
           </div>
 
           <div>
@@ -88,7 +90,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-accent">Nos services</h3>
+            <h3 className="text-lg font-semibold text-accent">Nos Prestations</h3>
             <ul className="mt-2 space-y-1 text-sm">
               {services.map((l) => (
                 <li key={l.href}>
@@ -99,7 +101,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-accent">Contact & Newsletter</h3>
+            <h3 className="text-lg font-semibold text-accent">Agence Plateau & Contact</h3>
             <ul className="mt-2 space-y-2 text-sm text-primary-foreground/80">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
@@ -111,8 +113,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="mailto:mdslaacvoyages@gmail.com" className="flex items-center gap-2 hover:text-accent transition-colors">
-                  <Mail className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" /> mdslaacvoyages@gmail.com
+                <a href="mailto:contact@slaacvoyages.com" className="flex items-center gap-2 hover:text-accent transition-colors">
+                  <Mail className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" /> contact@slaacvoyages.com
                 </a>
               </li>
             </ul>
@@ -122,17 +124,21 @@ export default function Footer() {
                 name="email"
                 aria-label="Votre adresse email pour la newsletter"
                 placeholder="Votre email"
-                className="bg-background/10 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/50"
+                className="bg-background/10 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/50 h-10"
                 required
               />
-              <Button type="submit" variant="gold" disabled={isSubmitting}>
+              <Button type="submit" variant="gold" disabled={isSubmitting} className="h-10 px-4 font-semibold">
                 {isSubmitting ? '…' : 'S\'inscrire'}
               </Button>
             </form>
           </div>
         </div>
-        <div className="mt-10 border-t border-primary-foreground/20 pt-6 text-center text-sm text-primary-foreground/60">
-          <p>&copy; {new Date().getFullYear()} SLAAC Voyages. Tous droits réservés.</p>
+        <div className="mt-10 border-t border-primary-foreground/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-primary-foreground/60">
+          <p>&copy; {new Date().getFullYear()} SLAAC Voyages. Tous droits réservés. Agence immatriculée à Dakar (Sénégal).</p>
+          <div className="flex gap-4">
+            <Link href="/confidentialite" className="hover:underline">Confidentialité</Link>
+            <Link href="/about" className="hover:underline">Mentions Légales</Link>
+          </div>
         </div>
       </div>
     </footer>

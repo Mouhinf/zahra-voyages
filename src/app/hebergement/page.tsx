@@ -46,7 +46,35 @@ export default async function HebergementPage() {
           </div>
         </section>
 
-        <section className="py-20 sm:py-28 bg-background">
+        {/* Garanties critiques pour hébergements à Dakar */}
+        <section className="py-8 bg-slate-50 border-b border-slate-200/80">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">⚡</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Groupe Électrogène 24/7</div>
+                <div className="text-[11px] text-slate-500">Zéro coupure Senelec</div>
+              </div>
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">📶</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Fibre Optique Vérifiée</div>
+                <div className="text-[11px] text-slate-500">Idéal télétravail & business</div>
+              </div>
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">💧</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Réserve d'Eau & Surpresseur</div>
+                <div className="text-[11px] text-slate-500">Approvisionnement continu</div>
+              </div>
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">🛡️</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Gardiennage & Concierge</div>
+                <div className="text-[11px] text-slate-500">Sécurité et assistance 7j/7</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-24 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
             <div className="text-center mb-14">
               <span className="text-sm font-semibold uppercase tracking-widest text-primary">{content.gridSection.badge}</span>

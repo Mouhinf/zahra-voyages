@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Inter, Playfair_Display } from 'next/font/google';
 import ChatbotLoader from '@/components/chatbot-loader';
 import AnalyticsBeacon from '@/components/analytics-beacon';
+import { FloatingConciergeBar } from '@/components/layout/floating-concierge-bar';
 import type {ReactNode} from 'react';
 import { SITE_URL, SITE_NAME, CONTACT } from '@/lib/site';
 
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     template: '%s | SLAAC Voyages',
   },
   description: "Découvrez le monde avec SLAAC Voyages, votre agence de confiance à Dakar. Billets d'avion, séjours sur mesure, et assistance visa. L'aventure vous attend.",
-  keywords: "agence de voyage Dakar, billets d’avion Sénégal, SLAAC Voyages Dakar, packages touristiques Sénégal, Merveille Voyage Dakar, voyage sur mesure",
+  keywords: "agence de voyage Dakar, conciergerie voyage Sénégal, billets d’avion Sénégal, SLAAC Voyages Dakar, transfert aéroport AIBD, séjour Dakar 2026, voyage sur mesure, visas d'affaires Dakar",
   openGraph: {
     type: 'website',
     locale: 'fr_SN',
@@ -64,6 +65,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(travelAgencyJsonLd) }}
         />
+        <FloatingConciergeBar />
         <Toaster />
         <ChatbotLoader />
         <AnalyticsBeacon />

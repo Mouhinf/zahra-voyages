@@ -25,6 +25,7 @@ const VIEWPORTS = [
 async function openQuoteDialog() {
   // Le CTA du hero est le plus haut de la page d'accueil.
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(600);
   const trigger = page.locator('button:has-text("Demander un devis"):visible').first();
   await trigger.scrollIntoViewIfNeeded();
   await trigger.click();
@@ -123,6 +124,10 @@ async function testQuoteDialog(vp) {
   await success.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {});
   check(`[${vp.name}] soumission → succès + référence affichée`, await success.isVisible().catch(() => false));
   await page.waitForTimeout(600);
+  const closeBtn = dialog.locator('button:has-text("Fermer"), button:has(svg.lucide-x)').first();
+  if (await closeBtn.isVisible().catch(() => false)) {
+    await closeBtn.click();
+  }
   const closedAfterSuccess = await dialog
     .waitFor({ state: 'hidden', timeout: 3000 })
     .then(() => true)

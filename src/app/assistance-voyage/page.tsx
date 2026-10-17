@@ -147,14 +147,16 @@ export default function AssistanceVoyagePage() {
                     </li>
                   ))}
                 </ul>
+                <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+                  <strong>Mention légale consulaire :</strong> SLAAC Voyages est un intermédiaire professionnel d'accompagnement logistique et administratif. L'acceptation d'un dossier de visa relève exclusivement de la décision souveraine de l'ambassade ou du consulat compétent.
+                </div>
               </div>
               <div className="relative h-80 lg:h-full min-h-[300px] w-full rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=600&h=700&fit=crop"
-                  alt="Documents de voyage et passeport"
+                  src="https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png"
+                  alt="Assistance démarches de voyage et visas SLAAC Voyages Dakar"
                   fill
                   className="object-cover"
-                  data-ai-hint="travel documents passport visa"
                 />
               </div>
             </div>

@@ -9,22 +9,27 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        // CTA de conversion : fond or, texte marine.
-        gold: "bg-accent text-accent-foreground shadow-sm hover:bg-accent/90",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+        // CTA de conversion prioritaire : fond or prestigieux, texte blanc très lisible.
+        gold: "bg-slaac-gold-500 text-white font-semibold shadow-sm hover:bg-slaac-gold-600 focus-visible:ring-slaac-gold-400",
+        // CTA WhatsApp : vert officiel WhatsApp avec icône
+        whatsapp: "bg-[#25D366] text-white font-medium shadow-sm hover:bg-[#20ba5a] focus-visible:ring-[#25D366]",
+        // Bleu marine d'autorité
+        navy: "bg-slaac-navy-900 text-white font-medium shadow-sm hover:bg-slaac-navy-800 focus-visible:ring-slaac-navy-700",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-accent/10 hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "hover:bg-accent/10 hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        sm: "h-9 rounded-md px-3 text-xs",
+        lg: "h-11 rounded-md px-6 text-sm font-medium",
+        xl: "h-12 rounded-lg px-8 text-base font-semibold",
         icon: "h-10 w-10",
       },
     },

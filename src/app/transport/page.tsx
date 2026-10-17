@@ -45,7 +45,121 @@ export default async function TransportPage() {
           </div>
         </section>
 
-        <section className="py-20 sm:py-28 bg-background">
+        {/* Grille des tarifs officiels et garanties de ponctualité AIBD */}
+        <section className="py-12 bg-white border-b border-slate-200/80">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="max-w-3xl mb-8">
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-slaac-gold-600">
+                Tarification Transparente
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 font-headline mt-1">
+                Forfaits Navettes Aéroport Blaise Diagne (AIBD)
+              </h2>
+              <div className="w-16 h-0.5 bg-slaac-gold-500 my-3" />
+              <p className="text-sm sm:text-base text-slate-600">
+                Tarifs fixes et tout compris : péage autoroutier inclus, accueil nominatif avec pancarte en sortie de terminal et suivi de vol en direct.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {/* Forfait 1 */}
+              <div className="card-premium p-5 flex flex-col justify-between border-slaac-gold-300 bg-amber-50/20">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">AIBD ⇄ Dakar Centre</span>
+                    <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-slaac-gold-100 text-slaac-gold-800">Populaire</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">Plateau · Médina · Fann</h3>
+                  <div className="text-2xl font-extrabold text-slaac-navy-900 mb-2">30 000 FCFA <span className="text-xs font-normal text-slate-500">(~46 €)</span></div>
+                  <ul className="text-xs text-slate-600 space-y-1.5 mb-4">
+                    <li>✓ Péage autoroute inclus</li>
+                    <li>✓ Berline climatisée 3 places</li>
+                    <li>✓ Accueil pancarte nominative</li>
+                  </ul>
+                </div>
+                <QuoteRequestButton variant="gold" size="sm" defaultService="transport" defaultDestination="AIBD - Dakar Plateau" className="w-full">
+                  Réserver ce trajet
+                </QuoteRequestButton>
+              </div>
+
+              {/* Forfait 2 */}
+              <div className="card-premium p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">AIBD ⇄ Almadies</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">Almadies · Ngor · Ouakam</h3>
+                  <div className="text-2xl font-extrabold text-slaac-navy-900 mb-2">35 000 FCFA <span className="text-xs font-normal text-slate-500">(~53 €)</span></div>
+                  <ul className="text-xs text-slate-600 space-y-1.5 mb-4">
+                    <li>✓ Péage autoroute inclus</li>
+                    <li>✓ Berline grand confort</li>
+                    <li>✓ Bouteille d'eau fraîche & Wi-Fi</li>
+                  </ul>
+                </div>
+                <QuoteRequestButton variant="gold" size="sm" defaultService="transport" defaultDestination="AIBD - Almadies" className="w-full">
+                  Réserver ce trajet
+                </QuoteRequestButton>
+              </div>
+
+              {/* Forfait 3 */}
+              <div className="card-premium p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">AIBD ⇄ Petite Côte</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">Saly · Somone · Mbour</h3>
+                  <div className="text-2xl font-extrabold text-slaac-navy-900 mb-2">35 000 FCFA <span className="text-xs font-normal text-slate-500">(~53 €)</span></div>
+                  <ul className="text-xs text-slate-600 space-y-1.5 mb-4">
+                    <li>✓ Péage autoroute inclus</li>
+                    <li>✓ Transfert balnéaire direct</li>
+                    <li>✓ Siège enfant sur demande</li>
+                  </ul>
+                </div>
+                <QuoteRequestButton variant="gold" size="sm" defaultService="transport" defaultDestination="AIBD - Saly" className="w-full">
+                  Réserver ce trajet
+                </QuoteRequestButton>
+              </div>
+
+              {/* Forfait 4 */}
+              <div className="card-premium p-5 flex flex-col justify-between bg-slate-50">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Mise à Disposition</span>
+                    <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-200 text-slate-700">Journée</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">Berline avec Chauffeur</h3>
+                  <div className="text-2xl font-extrabold text-slaac-navy-900 mb-2">60 000 FCFA <span className="text-xs font-normal text-slate-500">(~90 €)</span></div>
+                  <ul className="text-xs text-slate-600 space-y-1.5 mb-4">
+                    <li>✓ 8h consécutives intra-Dakar</li>
+                    <li>✓ Carburant inclus</li>
+                    <li>✓ Chauffeur professionnel dédié</li>
+                  </ul>
+                </div>
+                <QuoteRequestButton variant="gold" size="sm" defaultService="transport" defaultDestination="Mise à disposition journée Dakar" className="w-full">
+                  Réserver la journée
+                </QuoteRequestButton>
+              </div>
+            </div>
+
+            {/* Bandeau de réassurance vol retardé */}
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-emerald-800">
+              <div className="flex items-center gap-2.5">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                <span><strong>Garantie Vol Retardé :</strong> Nous suivons l'état de votre vol en temps réel. Zéro supplément de tarif en cas de retard de votre avion.</span>
+              </div>
+              <a
+                href="https://wa.me/221773129090?text=Bonjour%20SLAAC%20Voyages%2C%20je%20souhaite%20r%C3%A9server%20un%20transfert%20a%C3%A9roport%20AIBD."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 font-semibold underline text-emerald-900 hover:text-emerald-700"
+              >
+                Réserver immédiatement sur WhatsApp →
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-24 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
             <div className="text-center mb-14">
               <span className="text-sm font-semibold uppercase tracking-widest text-primary">{content.gridSection.badge}</span>
