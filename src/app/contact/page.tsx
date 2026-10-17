@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -8,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Mail, Send } from 'lucide-react';
+import { MapPin, Mail, Send, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
@@ -19,33 +20,74 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
-  email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }),
-  phone: z.string().optional(),
-  message: z.string().min(10, { message: 'Le message doit contenir au moins 10 caractères.' }),
-});
+import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
 
 export default function ContactPage() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [utmParams, setUtmParams] = useState<Record<string, string>>({});
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const search = new URLSearchParams(window.location.search);
+      const params: Record<string, string> = {};
+      const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign'];
+      for (const k of utmKeys) {
+        const val = search.get(k);
+        if (val) params[k] = val;
+      }
+      if (document.referrer) params.referrer = document.referrer;
+      params.landingPage = window.location.pathname;
+      setUtmParams(params);
+    }
+  }, []);
+
+  const form = useForm<ContactInput>({
+    resolver: zodResolver(contactSchema),
     defaultValues: {
       name: '',
       email: '',
       phone: '',
       message: '',
+      website: '',
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-  
-    toast({
-      title: 'Message envoyé !',
-      description: 'Merci de nous avoir contactés. Nous reviendrons vers vous rapidement.',
-    });
-    form.reset();
+  async function onSubmit(values: ContactInput) {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...values,
+          utmSource: utmParams.utm_source,
+          utmMedium: utmParams.utm_medium,
+          utmCampaign: utmParams.utm_campaign,
+          referrer: utmParams.referrer,
+          landingPage: utmParams.landingPage,
+          website: '', // pot de miel anti-robots
+        }),
+      });
+
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
+
+      toast({
+        title: 'Message envoyé !',
+        description: 'Votre message a bien été transmis à nos conseillers. Nous vous contacterons dans les meilleurs délais.',
+      });
+      form.reset();
+    } catch (err: unknown) {
+      console.error('Contact submit error:', err);
+      toast({
+        title: 'Envoi impossible',
+        description: (err instanceof Error && err.message) || 'Votre message n\'a pas pu être enregistré. Réessayez ou écrivez-nous sur WhatsApp.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -162,8 +204,16 @@ export default function ContactPage() {
                                     </FormItem>
                                 )}
                                 />
-                                <Button type="submit" className="w-full" size="lg">
-                                    Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi en cours...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                                        </>
+                                    )}
                                 </Button>
                             </form>
                             </Form>

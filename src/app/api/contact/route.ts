@@ -1,43 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
-import * as z from 'zod';
 import { adminApp, assertAdminConfigured, ConfigError } from '@/lib/firebase-admin';
 import { clientIpFromHeaders, rateLimit } from '@/lib/rate-limit';
 import { sendContactNotifications } from '@/lib/email';
 import { createHash } from 'node:crypto';
+import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
+import { cleanFirestoreData } from '@/lib/schemas/quote-schema';
 
 export const runtime = 'nodejs';
 
 // ---------------------------------------------------------------------------
 // Formulaire de contact public.
 //
-// Fiabilité (le formulaire ne doit JAMAIS afficher "Message envoyé" si
-// l'enregistrement a échoué) :
+// Fiabilité :
 // - 200 uniquement si le document est bien écrit dans Firestore.
 // - L'email à l'agence est best-effort : un échec est consigné dans le
 //   document (notifyStatus) — la demande reste consultable côté admin.
 //
-// Anti-spam :
+// Anti-spam & Idempotence :
 // - Rate limiting : 5 messages / 5 min / IP.
 // - Champ pot de miel (website) : invisible pour les humains, rempli par
-//   les robots → requête ignorée silencieusement (réponse 200 factice).
+//   les robots → requête ignorée silencieusement (réponse 200 neutre).
 // - Déduplication : même email + même empreinte de message moins de 10
 //   minutes avant → pas de second document (réponse ok, flag deduped).
+// - Nettoyage strict Firestore (cleanFirestoreData) contre tout 'undefined'.
 // ---------------------------------------------------------------------------
 
-const contactSchema = z.object({
-  name: z.string().trim().min(2, 'Nom requis').max(100),
-  email: z.string().trim().email('Email invalide').max(150),
-  phone: z.string().trim().max(30).optional().or(z.literal('').transform(() => undefined)),
-  message: z.string().trim().min(10, 'Message trop court').max(3000),
-  // Pot de miel anti-robots — doit rester vide. Accepté dans le schéma pour
-  // qu'un robot reçoive une réponse neutre (200 factice) et ne sache pas
-  // qu'il a été détecté ; la requête est ensuite ignorée.
-  website: z.string().max(200).optional().or(z.literal('').transform(() => undefined)),
-});
-
 function fingerprint(email: string, message: string): string {
-  return createHash('sha256').update(`${email.toLowerCase()}|${message.trim().toLowerCase()}`).digest('hex').slice(0, 32);
+  return createHash('sha256')
+    .update(`${email.toLowerCase()}|${message.trim().toLowerCase()}`)
+    .digest('hex')
+    .slice(0, 32);
 }
 
 export async function POST(req: NextRequest) {
@@ -61,13 +54,16 @@ export async function POST(req: NextRequest) {
 
     const parsed = contactSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Champs invalides', details: parsed.error.flatten().fieldErrors }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Champs invalides', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
-    const data = parsed.data;
+    const data: ContactInput = parsed.data;
 
     // Pot de miel rempli → robot. Réponse neutre pour ne rien révéler.
-    if (data.website !== undefined) {
-      return NextResponse.json({ ok: true });
+    if (data.website) {
+      return NextResponse.json({ ok: true, deduped: true });
     }
 
     assertAdminConfigured();
@@ -86,7 +82,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, deduped: true });
     }
 
-    const docRef = await db.collection('contacts').add({
+    const rawRecord: Record<string, unknown> = {
       name: data.name,
       email: data.email,
       phone: data.phone ?? null,
@@ -95,8 +91,18 @@ export async function POST(req: NextRequest) {
       ip: ip === 'unknown' ? null : ip,
       createdAt: new Date().toISOString(),
       status: 'new',
+      crmStatus: 'nouveau',
+      priorite: 'normale',
       notifyStatus: 'pending',
-    });
+      utmSource: data.utmSource,
+      utmMedium: data.utmMedium,
+      utmCampaign: data.utmCampaign,
+      referrer: data.referrer,
+      landingPage: data.landingPage,
+    };
+
+    const cleanRecord = cleanFirestoreData(rawRecord);
+    const docRef = await db.collection('contacts').add(cleanRecord);
 
     // Notification transactionnelle résiliente (Client + Agence + Responsable)
     // avec persistance dans l'Outbox Firestore et clé d'idempotence.
@@ -128,6 +134,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
     console.error('Contact API error:', err);
-    return NextResponse.json({ error: 'Impossible d\'enregistrer le message pour le moment. Réessayez ou contactez-nous sur WhatsApp.' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Impossible d'enregistrer le message pour le moment. Réessayez ou contactez-nous sur WhatsApp." },
+      { status: 500 }
+    );
   }
 }

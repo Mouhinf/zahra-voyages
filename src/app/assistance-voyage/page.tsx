@@ -5,6 +5,7 @@ import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import FaqSection from '@/components/sections/faq-section';
 import { Send, FileText, ShieldCheck, GraduationCap, CalendarCheck, Globe, HelpCircle } from 'lucide-react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504518/hero-section-transport.jpg';
@@ -169,9 +170,11 @@ export default function AssistanceVoyagePage() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <QuoteRequestButton size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</QuoteRequestButton>
-              <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
-                <QuoteRequestButton size="lg" variant="outline">Nous écrire sur WhatsApp</QuoteRequestButton>
-              </a>
+              <Button asChild size="lg" variant="outline">
+                <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
+                  Nous écrire sur WhatsApp
+                </a>
+              </Button>
             </div>
           </div>
         </section>

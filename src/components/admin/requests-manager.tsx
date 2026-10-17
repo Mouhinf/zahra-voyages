@@ -25,6 +25,7 @@ import { getAuthInstance } from '@/lib/firebase';
 import { serviceLabel } from '@/lib/lead-labels';
 import {
   adminFetch, formatCreatedAt, isUnhandled, NotifyBadge, Row, STATUS, StatusBadge, str,
+  PRIORITIES, PRIORITY_CONFIG, PriorityBadge, FollowUpBadge,
 } from '@/components/admin/lead-ui';
 
 // ---------------------------------------------------------------------------
@@ -65,19 +66,21 @@ function LeadTable({
 }) {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [onlyUnhandled, setOnlyUnhandled] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return items.filter((it) => {
       if (statusFilter !== 'all' && (str(it.crmStatus) || 'nouveau') !== statusFilter) return false;
+      if (priorityFilter !== 'all' && (str(it.priorite) || 'normale') !== priorityFilter) return false;
       if (onlyUnhandled && !isUnhandled(it)) return false;
       if (!q) return true;
       const haystack = [str(it.reference), str(it.name), str(it.phone), str(it.email), str(it.destination), str(it.message), str(it.service)]
         .join(' ').toLowerCase();
       return haystack.includes(q);
     });
-  }, [items, query, statusFilter, onlyUnhandled]);
+  }, [items, query, statusFilter, priorityFilter, onlyUnhandled]);
 
   const unhandledCount = items.filter(isUnhandled).length;
 
@@ -89,10 +92,19 @@ function LeadTable({
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher (nom, téléphone, référence…)" className="pl-9" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous les statuts</SelectItem>
+            <SelectItem value="all">Tous statuts</SelectItem>
             {STATUS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toutes priorités</SelectItem>
+            {PRIORITIES.map((p) => (
+              <SelectItem key={p} value={p}>{PRIORITY_CONFIG[p].label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Button
@@ -122,9 +134,11 @@ function LeadTable({
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge value={status} />
+                  <PriorityBadge value={it.priorite} />
                   <span className="font-semibold">{str(it.name)}</span>
                   {kind === 'quotes' && <Badge variant="outline">{serviceLabel(str(it.service))}</Badge>}
                   {kind === 'quotes' && <span className="text-xs text-muted-foreground">{str(it.reference)}</span>}
+                  <FollowUpBadge value={it.nextFollowUpAt} />
                   {isUnhandled(it) && <Badge variant="destructive" className="gap-1"><AlertTriangle className="h-3 w-3" /> &gt; 48 h</Badge>}
                   <NotifyBadge value={it.notifyStatus} emailStatus={it.emailStatus} />
                   <span className="ml-auto text-sm text-muted-foreground">{formatCreatedAt(it.createdAt)}</span>

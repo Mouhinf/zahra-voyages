@@ -32,7 +32,13 @@ export async function PATCH(req: NextRequest) {
     }
 
     const patch = parsed.data;
-    if (patch.crmStatus === undefined && patch.assignee === undefined && !patch.note) {
+    if (
+      patch.crmStatus === undefined &&
+      patch.priorite === undefined &&
+      patch.nextFollowUpAt === undefined &&
+      patch.assignee === undefined &&
+      !patch.note
+    ) {
       return NextResponse.json({ error: 'Aucune modification demandée' }, { status: 400 });
     }
 
@@ -40,7 +46,12 @@ export async function PATCH(req: NextRequest) {
     if (!result.updated) {
       return NextResponse.json({ error: result.error ?? 'Modification impossible' }, { status: 404 });
     }
-    return NextResponse.json({ ok: true, crmStatus: result.crmStatus });
+    return NextResponse.json({
+      ok: true,
+      crmStatus: result.crmStatus,
+      priorite: result.priorite,
+      nextFollowUpAt: result.nextFollowUpAt,
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });

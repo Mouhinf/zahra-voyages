@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
-import * as z from 'zod';
+import { createHash } from 'node:crypto';
 import { adminApp, assertAdminConfigured, ConfigError } from '@/lib/firebase-admin';
 import { clientIpFromHeaders, rateLimit } from '@/lib/rate-limit';
 import { sendQuoteNotifications, type QuoteEmailData } from '@/lib/email';
+import {
+  quoteSchema,
+  cleanFirestoreData,
+  type QuoteInput,
+} from '@/lib/schemas/quote-schema';
 
 export const runtime = 'nodejs';
 
@@ -11,80 +16,23 @@ export const runtime = 'nodejs';
 // Réception des demandes de devis (formulaire public).
 //
 // Sécurité :
-// - Validation stricte Zod : seuls les champs listés sont acceptés, avec
-//   longueurs bornées (les champs inconnus sont écartés — plus d'écriture
-//   de données arbitraires en base).
+// - Validation stricte Zod partagée (schéma universel client/serveur).
+// - Pot de miel anti-robots (champ `website` caché).
 // - Rate limiting : 5 demandes / 5 min / IP.
-// - reCAPTCHA (optionnel, activé si RECAPTCHA_SECRET est défini).
-// - Écriture via SDK Admin (les règles Firestore interdisent l'écriture
-//   client sur `quotes`).
+// - reCAPTCHA (optionnel, actif si RECAPTCHA_SECRET est défini).
+// - Écriture via SDK Admin (règles Firestore protégeant la collection).
 //
-// Fiabilité :
-// - 200 uniquement si le document est écrit ; référence lisible unique
-//   (ex. DV-20261011-4821) renvoyée au client et stockée.
-// - Notification email best-effort, statut consigné dans le document.
+// Fiabilité commerciale :
+// - Idempotence double-clic : vérification par `clientSubmissionId` et
+//   empreinte cryptographique (fingerprint) sur 2 minutes.
+// - Référence lisible et unique (ex. DV-20261017-4821) renvoyée au client.
+// - Nettoyage strict des valeurs `undefined` pour Firestore (aucun crash).
+// - Notification email outbox best-effort, statut consigné en base.
 // ---------------------------------------------------------------------------
-
-// Services réellement commercialisés (catalogue + page /assistance-voyage).
-const SERVICE_VALUES = [
-  'hebergement',
-  'transport',
-  'voyages-croisieres',
-  'excursions',
-  'tourisme-affaires',
-  'reservation-express',
-  'assistance-visa',
-  'assurance-voyage',
-  'preinscription-universitaire',
-  'prise-de-rendez-vous',
-] as const;
-
-const quoteSchema = z.object({
-  name: z.string().trim().min(2, 'Nom requis').max(100),
-  phone: z.string().trim().min(6, 'Téléphone requis').max(30),
-  email: z.string().trim().email().max(150).optional().or(z.literal('').transform(() => undefined)),
-  service: z.enum(SERVICE_VALUES).default('reservation-express'),
-  destination: z.string().trim().max(120).optional(),
-  departureCountry: z.string().trim().max(80).optional(),
-  preferredCurrency: z.enum(['XOF', 'EUR', 'USD']).optional(),
-  travelers: z.string().trim().max(30).optional(),
-  message: z.string().trim().max(2000).optional(),
-  // Champs conditionnels par service (bornés, tous optionnels).
-  nights: z.coerce.number().int().min(1).max(365).optional(),
-  roomType: z.enum(['standard', 'deluxe', 'suite']).optional(),
-  transportClass: z.enum(['economy', 'business', 'first']).optional(),
-  roundTrip: z.boolean().optional(),
-  departureDate: z.string().trim().max(30).optional(),
-  returnDate: z.string().trim().max(30).optional(),
-  durationDays: z.coerce.number().int().min(1).max(365).optional(),
-  cabinType: z.enum(['inside', 'oceanview', 'balcony', 'suite']).optional(),
-  excursionDate: z.string().trim().max(30).optional(),
-  pickupLocation: z.string().trim().max(120).optional(),
-  attendees: z.coerce.number().int().min(1).max(10000).optional(),
-  eventType: z.string().trim().max(120).optional(),
-  // Traçabilité commerciale : page / bouton à l'origine de la demande.
-  source: z.string().trim().max(60).optional(),
-  captchaToken: z.string().max(2000).optional(),
-});
-
-type QuoteInput = z.infer<typeof quoteSchema>;
-
-const SERVICE_LABELS: Record<string, string> = {
-  'hebergement': 'Hébergement',
-  'transport': 'Transport',
-  'voyages-croisieres': 'Voyages & Croisières',
-  'excursions': 'Excursions',
-  'tourisme-affaires': 'Tourisme d\'affaires',
-  'reservation-express': 'Réservation Express',
-  'assistance-visa': 'Assistance visa',
-  'assurance-voyage': 'Assurance voyage',
-  'preinscription-universitaire': 'Préinscription universitaire',
-  'prise-de-rendez-vous': 'Prise de rendez-vous',
-};
 
 async function verifyRecaptcha(token?: string) {
   const secret = process.env.RECAPTCHA_SECRET;
-  if (!secret) return true; // not configured => skip
+  if (!secret) return true; // non configuré => pas de blocage
   if (!token) return false;
   try {
     const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
@@ -101,7 +49,7 @@ async function verifyRecaptcha(token?: string) {
   }
 }
 
-/** Référence lisible et unique : DV-AAAAMMJJ-XXXX (identifiant aléatoire). */
+/** Référence lisible et unique : DV-AAAAMMJJ-XXXX */
 function buildReference(): string {
   const now = new Date();
   const y = now.getUTCFullYear();
@@ -111,15 +59,30 @@ function buildReference(): string {
   return `DV-${y}${m}${d}-${rand}`;
 }
 
+/** Empreinte de requête pour déduplication rapide */
+function buildFingerprint(ip: string, quote: QuoteInput): string {
+  const parts = [
+    ip,
+    quote.phone.replace(/\s+/g, ''),
+    quote.service,
+    (quote.destination || '').trim().toLowerCase(),
+    (quote.departureDate || '').trim(),
+  ];
+  return createHash('sha256').update(parts.join('|')).digest('hex').slice(0, 32);
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // Rate limiting avant tout traitement lourd.
+    // Rate limiting avant tout traitement
     const ip = clientIpFromHeaders(req.headers);
     if (!rateLimit('quotes', ip, 5, 5 * 60 * 1000)) {
-      return NextResponse.json({ error: 'Trop de demandes, essayez plus tard' }, { status: 429 });
+      return NextResponse.json(
+        { error: 'Trop de demandes reçues depuis cette adresse. Veuillez patienter 5 minutes ou nous contacter sur WhatsApp.' },
+        { status: 429 }
+      );
     }
 
-    // Garde-fou sur la taille brute de la requête.
+    // Garde-fou sur la taille brute de la requête
     const contentLength = Number(req.headers.get('content-length') || 0);
     if (contentLength > 64 * 1024) {
       return NextResponse.json({ error: 'Requête trop volumineuse' }, { status: 413 });
@@ -134,11 +97,19 @@ export async function POST(req: NextRequest) {
 
     const parsed = quoteSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Champs invalides', details: parsed.error.flatten().fieldErrors }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Champs invalides', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
     const quote: QuoteInput = parsed.data;
 
-    // verify recaptcha when configured
+    // Pot de miel anti-robots : si le champ caché 'website' est rempli, répondre 200 neutre sans écrire
+    if (quote.website) {
+      return NextResponse.json({ ok: true, reference: 'DV-PROCESSED', deduped: true });
+    }
+
+    // Vérification reCAPTCHA si configuré
     const captchaOk = await verifyRecaptcha(quote.captchaToken);
     if (!captchaOk) {
       return NextResponse.json({ error: 'Vérification captcha échouée' }, { status: 400 });
@@ -146,23 +117,84 @@ export async function POST(req: NextRequest) {
 
     assertAdminConfigured();
     const db = getFirestore(adminApp);
-    const record = { ...quote };
-    delete record.captchaToken;
 
+    // -------------------------------------------------------------------------
+    // VÉRIFICATION D'IDEMPOTENCE ET DÉDUPLICATION (DOUBLE CLIC VISITEUR)
+    // -------------------------------------------------------------------------
+    const nowIso = new Date().toISOString();
+    const twoMinAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
+    // 1. Idempotence par clientSubmissionId
+    if (quote.clientSubmissionId) {
+      const existingSubSnap = await db
+        .collection('quotes')
+        .where('clientSubmissionId', '==', quote.clientSubmissionId)
+        .where('createdAt', '>=', tenMinAgo)
+        .limit(1)
+        .get();
+
+      if (!existingSubSnap.empty) {
+        const doc = existingSubSnap.docs[0];
+        const docData = doc.data();
+        return NextResponse.json({
+          ok: true,
+          id: doc.id,
+          reference: docData.reference,
+          deduped: true,
+        });
+      }
+    }
+
+    // 2. Déduplication par empreinte payload courte durée (2 min)
+    const fp = buildFingerprint(ip, quote);
+    const existingFpSnap = await db
+      .collection('quotes')
+      .where('fingerprint', '==', fp)
+      .where('createdAt', '>=', twoMinAgo)
+      .limit(1)
+      .get();
+
+    if (!existingFpSnap.empty) {
+      const doc = existingFpSnap.docs[0];
+      const docData = doc.data();
+      return NextResponse.json({
+        ok: true,
+        id: doc.id,
+        reference: docData.reference,
+        deduped: true,
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // ENREGISTREMENT SÉCURISÉ DANS FIRESTORE
+    // -------------------------------------------------------------------------
     const reference = buildReference();
-    const docRef = await db.collection('quotes').add({
-      ...record,
-      reference,
-      ip: ip === 'unknown' ? null : ip,
-      createdAt: new Date().toISOString(),
-      status: 'new',
-      notifyStatus: 'pending',
-    });
 
-    // Notification transactionnelle résiliente (Client + Agence + Responsable)
-    // avec persistance dans l'Outbox Firestore et clé d'idempotence.
-    // L'échec éventuel de l'envoi n'annule jamais la demande enregistrée.
-    const quoteData: QuoteEmailData = {
+    // Nettoyage de l'objet pour exclure tokens et champs superflus
+    const rawRecord: Record<string, unknown> = {
+      ...quote,
+      reference,
+      fingerprint: fp,
+      ip: ip === 'unknown' ? null : ip,
+      createdAt: nowIso,
+      status: 'new',
+      crmStatus: 'nouveau',
+      priorite: 'normale',
+      notifyStatus: 'pending',
+    };
+    delete rawRecord.captchaToken;
+    delete rawRecord.website;
+
+    // Suppression récursive de toute clé 'undefined' pour prévenir tout rejet Firestore
+    const cleanRecord = cleanFirestoreData(rawRecord);
+
+    const docRef = await db.collection('quotes').add(cleanRecord);
+
+    // -------------------------------------------------------------------------
+    // DISPATCH DES NOTIFICATIONS EMAIL TRANSACTIONNELLES (PROMPT 01)
+    // -------------------------------------------------------------------------
+    const quoteEmailData: QuoteEmailData = {
       reference,
       name: quote.name,
       email: quote.email ?? null,
@@ -175,11 +207,13 @@ export async function POST(req: NextRequest) {
       notes: quote.message ?? null,
       message: quote.message ?? null,
       budget: quote.preferredCurrency ? `Devise : ${quote.preferredCurrency}` : null,
-      accommodation: quote.roomType ? `${quote.roomType}${quote.nights ? ` (${quote.nights} nuits)` : ''}` : null,
+      accommodation: quote.roomType
+        ? `${quote.roomType}${quote.nights ? ` (${quote.nights} nuits)` : ''}`
+        : null,
       transport: quote.transportClass ?? null,
     };
 
-    const notifyResults = await sendQuoteNotifications(docRef.id, quoteData).catch((err) => {
+    const notifyResults = await sendQuoteNotifications(docRef.id, quoteEmailData).catch((err) => {
       console.error('Quote notification dispatch error:', err);
       return null;
     });
@@ -194,11 +228,15 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: unknown) {
     if (err instanceof ConfigError) {
-      console.error('Quote API config:', err.message);
+      console.error('Quote API config error:', err.message);
       return NextResponse.json({ error: err.message }, { status: err.statusCode });
     }
     console.error('Quote API error:', err);
-    return NextResponse.json({ error: 'Impossible d\'enregistrer la demande pour le moment. Réessayez ou contactez-nous sur WhatsApp.' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Impossible d'enregistrer la demande pour le moment. Réessayez ou contactez directement nos conseillers sur WhatsApp.",
+      },
+      { status: 500 }
+    );
   }
 }
-

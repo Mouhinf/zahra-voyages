@@ -24,12 +24,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
-  email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }),
-  phone: z.string().optional(),
-  message: z.string().min(10, { message: 'Le message doit contenir au moins 10 caractères.' }),
-});
+import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
 
 export default function HomeContactQuick() {
   const { toast } = useToast();
@@ -54,12 +49,12 @@ export default function HomeContactQuick() {
     return () => { mounted = false; };
   }, []);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: '', email: '', phone: '', message: '' },
+  const form = useForm<ContactInput>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: { name: '', email: '', phone: '', message: '', website: '' },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: ContactInput) {
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/contact', {
@@ -75,7 +70,7 @@ export default function HomeContactQuick() {
 
       toast({
         title: 'Message envoyé !',
-        description: 'Merci de nous avoir contactés. Nous reviendrons vers vous sous 24h.',
+        description: 'Merci de nous avoir contactés. Notre équipe commerciale traite votre message dans les meilleurs délais.',
       });
       form.reset();
     } catch (err: unknown) {
