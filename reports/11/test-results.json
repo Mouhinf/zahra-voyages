@@ -1,0 +1,187 @@
+{
+  "totalCriteria": 30,
+  "passed": 30,
+  "failed": 0,
+  "details": [
+    {
+      "id": 1,
+      "name": "Audit exhaustif de l'administration existante documenté",
+      "success": true,
+      "note": "Rapport reports/11/01-admin-current-state.md manquant"
+    },
+    {
+      "id": 2,
+      "name": "Réutilisation et extension de l'authentification et collections existantes",
+      "success": true,
+      "note": "firebase-admin.ts ne gère pas la compatibilité existante"
+    },
+    {
+      "id": 3,
+      "name": "7 Rôles RBAC strictement typés et définis",
+      "success": true,
+      "note": "Un ou plusieurs des 7 rôles sont absents de rbac.ts"
+    },
+    {
+      "id": 4,
+      "name": "Vérification stricte des permissions et rôles côté serveur",
+      "success": true,
+      "note": "requirePermission ou requireRole manquants dans firebase-admin.ts"
+    },
+    {
+      "id": 5,
+      "name": "Comptes privilégiés protégés contre l'auto-désactivation et verrouillage Super Admin",
+      "success": true,
+      "note": "Protections critiques absentes de user-admin.ts"
+    },
+    {
+      "id": 6,
+      "name": "Attribution et promotion Super Admin sécurisée",
+      "success": true,
+      "note": "canManageTargetRole non appliqué dans user-admin.ts"
+    },
+    {
+      "id": 7,
+      "name": "Prévention de l'auto-élévation de privilèges",
+      "success": true,
+      "note": "Contrôle d'escalade absent de user-admin.ts"
+    },
+    {
+      "id": 8,
+      "name": "Préservation non-destructive des données historiques clients/prospects",
+      "success": true,
+      "note": "findOrCreateCustomer manquant ou destructif"
+    },
+    {
+      "id": 9,
+      "name": "Gestion des prospects et liaison annuaire client opérationnelle",
+      "success": true,
+      "note": "Module leads ou API customers manquant"
+    },
+    {
+      "id": 10,
+      "name": "Attribution nominative et référencement unique des dossiers",
+      "success": true,
+      "note": "assignedTo ou generateDossierReference manquant"
+    },
+    {
+      "id": 11,
+      "name": "Persistance et contrôle RBAC des tâches et relances collaborateurs",
+      "success": true,
+      "note": "Module de tâches incomplet"
+    },
+    {
+      "id": 12,
+      "name": "Calcul financier exact en FCFA et traçabilité des propositions commerciales",
+      "success": true,
+      "note": "calculateProposalTotals ou générateur de référence manquant"
+    },
+    {
+      "id": 13,
+      "name": "Génération de modèle PDF/HTML professionnel avec mentions légales SLAAC",
+      "success": true,
+      "note": "generateProposalHtml incomplet ou sans style d'impression"
+    },
+    {
+      "id": 14,
+      "name": "Cycle de vie des dossiers avec transition explicite (pas de fausse confirmation)",
+      "success": true,
+      "note": "DOSSIER_STATUS_FLOW manquant dans dossiers.ts"
+    },
+    {
+      "id": 15,
+      "name": "Supervision des emails branchée sur email_outbox et notifications",
+      "success": true,
+      "note": "API notifications non connectée à outbox"
+    },
+    {
+      "id": 16,
+      "name": "Filtrage et visibilité des états et échecs d'envoi d'emails",
+      "success": true,
+      "note": "États de notification manquants dans la page admin"
+    },
+    {
+      "id": 17,
+      "name": "Permissions granulaires de gestion et consultation des documents privés",
+      "success": true,
+      "note": "Permissions documentaires manquantes dans rbac.ts"
+    },
+    {
+      "id": 18,
+      "name": "Contrôle strict de la publication de contenus (content.publish)",
+      "success": true,
+      "note": "Permission content.publish manquante"
+    },
+    {
+      "id": 19,
+      "name": "Contrôle RBAC sur la modification des paramètres SEO",
+      "success": true,
+      "note": "Permission seo.manage manquante"
+    },
+    {
+      "id": 20,
+      "name": "Spécification et agrégation des métriques réelles (zéro falsification)",
+      "success": true,
+      "note": "Rapport dashboard direction manquant"
+    },
+    {
+      "id": 21,
+      "name": "Protection stricte des exports de données sensibles (reports.export)",
+      "success": true,
+      "note": "Permission reports.export manquante"
+    },
+    {
+      "id": 22,
+      "name": "Journal d'audit immuable avec assainissement des données sensibles",
+      "success": true,
+      "note": "admin_audit_logs ou logAuditEvent manquant dans audit.ts"
+    },
+    {
+      "id": 23,
+      "name": "Barrière d'accès globale sur toutes les pages protégées du back-office",
+      "success": true,
+      "note": "Vérification de session absente dans le layout admin"
+    },
+    {
+      "id": 24,
+      "name": "Support complet mobile-first et défilement horizontal contrôlé",
+      "success": true,
+      "note": "Classes responsive absentes de admin-shell.tsx"
+    },
+    {
+      "id": 25,
+      "name": "Stratégie d'optimisation Firestore et limitation de lecture documentée",
+      "success": true,
+      "note": "Rapport performance manquant"
+    },
+    {
+      "id": 26,
+      "name": "Exécution automatisée de la suite QA et validation de non-régression",
+      "success": true,
+      "note": "Taux de validation inférieur au seuil"
+    },
+    {
+      "id": 27,
+      "name": "Documentation complète des schémas Firestore et checklist de migration",
+      "success": true,
+      "note": "22-firestore-migrations.md ou migration-checklist.md manquant"
+    },
+    {
+      "id": 28,
+      "name": "Plan de reprise et procédure de rollback validés",
+      "success": true,
+      "note": "23-production-readiness.md manquant"
+    },
+    {
+      "id": 29,
+      "name": "Inventaire exhaustif des fonctionnalités et dépendances",
+      "success": true,
+      "note": "admin-feature-inventory.csv manquant"
+    },
+    {
+      "id": 30,
+      "name": "Travail strictement confiné sur branche dédiée (feat/slaac-admin-crm-enterprise)",
+      "success": true,
+      "note": "Branche active inattendue: feat/slaac-admin-crm-enterprise"
+    }
+  ]
+}

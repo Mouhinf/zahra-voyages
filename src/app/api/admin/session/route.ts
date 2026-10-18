@@ -13,8 +13,15 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
-    const { uid, email } = await verifyAdminToken(request);
-    return NextResponse.json({ ok: true, uid, email: email ?? null });
+    const session = await verifyAdminToken(request);
+    return NextResponse.json({
+      ok: true,
+      uid: session.uid,
+      email: session.email ?? null,
+      role: session.role,
+      permissions: session.permissions,
+      customPermissions: session.customPermissions || [],
+    });
   } catch (error) {
     if (error instanceof ConfigError) {
       return NextResponse.json(

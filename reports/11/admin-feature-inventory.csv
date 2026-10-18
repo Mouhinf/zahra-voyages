@@ -1,0 +1,26 @@
+Module,Sous-Fonction,Route Frontend,Endpoint API,Collection Firestore,Permission Requise,Statut Implémentation
+Direction,Tableau de bord exécutif,/admin,/api/admin/metrics,analytics / leads / travel_files,reports.view,Opérationnel
+Gestion Utilisateurs,Liste des collaborateurs,/admin/users,/api/admin/users,admin_users,users.view,Opérationnel
+Gestion Utilisateurs,Création d'un collaborateur,/admin/users,/api/admin/users,admin_users,users.manage,Opérationnel
+Gestion Utilisateurs,Édition de rôle et statut,/admin/users,/api/admin/users/[id],admin_users,roles.assign,Opérationnel
+Gestion Utilisateurs,Session courante RBAC,/admin/users,/api/admin/session,admin_users,public_authenticated,Opérationnel
+CRM Commercial,Liste des prospects et leads,/admin/leads,/api/admin/leads,leads / contacts / quotes,crm.view,Opérationnel
+CRM Commercial,Attribution d'un prospect,/admin/leads,/api/admin/leads/[id],leads,crm.assign,Opérationnel
+CRM Commercial,Annuaire des clients,/admin/customers,/api/admin/customers,clients,crm.view,Opérationnel
+Dossiers de Voyage,Suivi des dossiers opérationnels,/admin/dossiers,/api/admin/dossiers,travel_files,dossiers.view,Opérationnel
+Dossiers de Voyage,Création d'un dossier voyage,/admin/dossiers,/api/admin/dossiers,travel_files,dossiers.manage,Opérationnel
+Dossiers de Voyage,Transition d'états de dossier,/admin/dossiers,/api/admin/dossiers/[id],travel_files,dossiers.manage,Opérationnel
+Propositions & Devis,Création de devis chiffré,/admin/proposals,/api/admin/proposals,proposals,quotes.manage,Opérationnel
+Propositions & Devis,Calcul financier automatique FCFA,/admin/proposals,/api/admin/proposals,proposals,quotes.manage,Opérationnel
+Propositions & Devis,Export HTML / Impression PDF,/admin/proposals,/api/admin/proposals/[id]?format=html,proposals,quotes.view,Opérationnel
+Tâches & Relances,Gestion des tâches collaborateur,/admin/tasks,/api/admin/tasks,team_tasks,tasks.view,Opérationnel
+Tâches & Relances,Création et assignation de tâche,/admin/tasks,/api/admin/tasks,team_tasks,tasks.manage,Opérationnel
+Tâches & Relances,Mise à jour du statut tâche,/admin/tasks,/api/admin/tasks/[id],team_tasks,tasks.manage,Opérationnel
+Communications,Supervision boîte d'envoi emails,/admin/notifications,/api/admin/notifications,email_outbox / notifications,notifications.view,Opérationnel
+Gestion Documentaire,Coffre-fort documents voyages,/admin/documents,/api/admin/documents,travel_documents,documents.view,Opérationnel
+Gestion de Contenus,Administration du catalogue offres,/admin/packages,/api/admin/packages,packages,content.view,Opérationnel
+Gestion de Contenus,Administration des destinations,/admin/destinations,/api/admin/destinations,destinations,content.view,Opérationnel
+Gestion de Contenus,Administration des guides & blog,/admin/posts,/api/admin/posts,posts,content.view,Opérationnel
+Outils SEO,Gestion des métadonnées et slugs,/admin/seo,/api/admin/seo,seo_metadata,seo.view,Opérationnel
+Marketing & Campagnes,Supervision attribution et UTMs,/admin/campaigns,/api/admin/campaigns,campaign_stats,marketing.view,Opérationnel
+Journal d'Audit,Traçabilité des actions critiques,/admin/audit-logs,/api/admin/audit-logs,admin_audit_logs,audit.view,Opérationnel

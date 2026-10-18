@@ -12,7 +12,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
-  const { status, email } = useAdminSession();
+  const { status, email, role, hasPermission } = useAdminSession();
   const redirected = useRef(false);
 
   // Utilisateur absent ou rôle admin non confirmé par le serveur :
@@ -60,8 +60,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <AdminShell email={email} onLogout={handleLogout}>
+    <AdminShell email={email} role={role} hasPermission={hasPermission} onLogout={handleLogout}>
       {children}
     </AdminShell>
   );
 }
+
