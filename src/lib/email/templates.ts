@@ -301,6 +301,7 @@ export function generateQuoteAgencyEmail(data: QuoteEmailData): { subject: strin
   const rows: Array<[string, string]> = [
     ['Référence', data.reference],
     ['Nom complet', data.name],
+    ['Langue du client', data.lang === 'en' ? 'Anglais (English)' : 'Français (French)'],
     ['Email client', data.email || 'Non renseigné'],
     ['Téléphone', data.phone || 'Non renseigné'],
     ['Service', serviceName],
@@ -386,6 +387,7 @@ export function generateQuoteAgencyEmail(data: QuoteEmailData): { subject: strin
     `==================================`,
     `Référence: ${data.reference}`,
     `Client: ${data.name}`,
+    `Langue du client: ${data.lang === 'en' ? 'Anglais (English)' : 'Français (French)'}`,
     `Email: ${data.email}`,
     `Téléphone: ${data.phone || 'Non renseigné'}`,
     `Service: ${serviceName}`,
@@ -427,6 +429,7 @@ export function generateQuoteManagerEmail(data: QuoteEmailData): { subject: stri
 
     <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px; border-radius: 6px; font-size: 13px; line-height: 20px; color: #334155; margin-bottom: 20px;">
       <div><strong>Client :</strong> ${escapeHtml(data.name)}</div>
+      <div><strong>Langue du client :</strong> ${data.lang === 'en' ? 'Anglais (English)' : 'Français (French)'}</div>
       <div><strong>Téléphone :</strong> <a href="tel:${(data.phone || '').replace(/[^0-9+]/g, '')}" style="color: #0A192F;">${escapeHtml(data.phone || 'Non renseigné')}</a></div>
       <div><strong>Email :</strong> ${data.email ? `<a href="mailto:${data.email}" style="color: #0A192F;">${escapeHtml(data.email)}</a>` : 'Non renseigné'}</div>
       <div><strong>Période :</strong> du ${escapeHtml(data.departureDate || '—')} au ${escapeHtml(data.returnDate || '—')}</div>
@@ -562,6 +565,7 @@ export function generateContactAgencyEmail(data: ContactEmailData): { subject: s
     <!-- Coordonnées -->
     <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px; border-radius: 6px; font-size: 13px; line-height: 20px; color: #334155; margin-bottom: 20px;">
       <div><strong>Nom :</strong> ${escapeHtml(data.name)}</div>
+      <div><strong>Langue du client :</strong> ${data.lang === 'en' ? 'Anglais (English)' : 'Français (French)'}</div>
       <div><strong>Email :</strong> <a href="mailto:${data.email}" style="color: #0A192F;">${escapeHtml(data.email)}</a></div>
       <div><strong>Téléphone :</strong> <a href="tel:${(data.phone || '').replace(/[^0-9+]/g, '')}" style="color: #0A192F;">${escapeHtml(data.phone || 'Non renseigné')}</a></div>
       ${data.subject ? `<div><strong>Objet :</strong> ${escapeHtml(data.subject)}</div>` : ''}
@@ -601,6 +605,7 @@ export function generateContactAgencyEmail(data: ContactEmailData): { subject: s
     `NOUVEAU MESSAGE DE CONTACT — SLAAC VOYAGES`,
     `==========================================`,
     `De: ${data.name}`,
+    `Langue du client: ${data.lang === 'en' ? 'Anglais (English)' : 'Français (French)'}`,
     `Email: ${data.email}`,
     `Téléphone: ${data.phone || '—'}`,
     `Objet: ${data.subject || '—'}`,

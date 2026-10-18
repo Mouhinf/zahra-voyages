@@ -13,7 +13,14 @@ import FaqSection from '@/components/sections/faq-section';
 export const metadata: Metadata = {
   title: 'Séjour Dakar fin 2026 : transferts AIBD & hébergements | SLAAC Voyages',
   description: "Logistique des séjours et délégations à Dakar, Diamniadio et Saly fin 2026 : flottes privées AIBD, résidences sécurisées et excursions avec SLAAC Voyages.",
-  alternates: { canonical: '/dakar-2026' },
+  alternates: {
+    canonical: '/dakar-2026',
+    languages: {
+      fr: '/dakar-2026',
+      en: '/en/dakar-2026',
+      'x-default': '/dakar-2026',
+    },
+  },
   openGraph: {
     title: 'Séjour Dakar fin 2026 : transferts AIBD & hébergements | SLAAC Voyages',
     description: "Organisation de séjours et logistique d'accueil au Sénégal fin 2026 avec l'agence locale SLAAC Voyages.",

@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { QuoteRequestButton } from './quote-request-button';
 import AnnouncementBar from './announcement-bar';
+import { LanguageSwitcher } from './language-switcher';
 import { cn } from '@/lib/utils';
 
 const servicesList = [
@@ -51,19 +52,24 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function Header() {
-  const pathname = usePathname();
-  const isEn = pathname?.startsWith('/en');
+  const pathname = usePathname() || '/';
+  const isEn = pathname === '/en' || pathname.startsWith('/en/');
 
   const services = isEn ? [
-    { href: '/transport', label: 'AIBD Airport Transfers & Shuttles', icon: Car, desc: 'Private drivers, AIBD meet & greet, VIP sedans' },
-    { href: '/hebergement', label: 'Accommodations & Serviced Stays', icon: Hotel, desc: 'Furnished apartments, guaranteed fiber & generator' },
-    { href: '/excursions', label: 'Private Tours & Discoveries', icon: MapPinned, desc: 'Gorée Island, Pink Lake, Bandia Safari' },
+    { href: '/en/transport', label: 'AIBD Airport Transfers & Shuttles', icon: Car, desc: 'Private drivers, AIBD meet & greet, VIP sedans' },
+    { href: '/en/hebergement', label: 'Accommodations & Serviced Stays', icon: Hotel, desc: 'Furnished apartments, guaranteed fiber & generator' },
+    { href: '/en/excursions', label: 'Private Tours & Discoveries', icon: MapPinned, desc: 'Gorée Island, Pink Lake, Bandia Safari' },
     { href: '/omra', label: 'Umrah Pilgrimage Support', icon: Compass, desc: 'Tailored stays, flights & hotels near holy mosques' },
-    { href: '/tourisme-affaires', label: 'Corporate Travel & MICE', icon: Briefcase, desc: 'Conferences, delegations, B2B invoicing' },
-    { href: '/assistance-voyage', label: 'Visa Support & Insurance', icon: FileCheck2, desc: 'China, Dubai, Schengen visas and assistance' },
+    { href: '/en/tourisme-affaires', label: 'Corporate Travel & MICE', icon: Briefcase, desc: 'Conferences, delegations, B2B invoicing' },
+    { href: '/en/assistance-voyage', label: 'Visa Support & Insurance', icon: FileCheck2, desc: 'China, Dubai, Schengen visas and assistance' },
     { href: '/voyages-croisieres', label: 'Voyages & Cruises', icon: Ship, desc: 'Tailor-made itineraries and global cruises' },
-    { href: '/destinations', label: 'All Destinations', icon: MapPinned, desc: 'Explore all catalogs in Senegal & abroad' },
+    { href: '/en/destinations', label: 'All Destinations', icon: MapPinned, desc: 'Explore all catalogs in Senegal & abroad' },
   ] : servicesList;
+
+  const whatsappMessage = isEn
+    ? 'Hello SLAAC Voyages, I would like information regarding travel services in Senegal.'
+    : 'Bonjour SLAAC Voyages, je souhaite obtenir des informations sur vos prestations.';
+  const whatsappUrl = `https://wa.me/221773129090?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <>
@@ -140,10 +146,10 @@ export default function Header() {
 
             {/* Lien direct JO Dakar 2026 avec badge */}
             <Link
-              href="/dakar-2026"
+              href={isEn ? '/en/dakar-2026' : '/dakar-2026'}
               className={cn(
                 "inline-flex items-center gap-1.5 text-sm font-medium transition-colors px-3 py-2 rounded-md hover:text-slaac-navy-900 hover:bg-slate-100/80",
-                pathname.startsWith('/dakar-2026') ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
+                pathname.includes('/dakar-2026') ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
               )}
             >
               <span>{isEn ? 'Dakar 2026 Games' : 'JO Dakar 2026'}</span>
@@ -153,10 +159,10 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/about"
+              href={isEn ? '/en/about' : '/about'}
               className={cn(
                 "text-sm font-medium transition-colors px-3 py-2 rounded-md hover:text-slaac-navy-900 hover:bg-slate-100/80",
-                pathname === '/about' ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
+                (pathname === '/about' || pathname === '/en/about') ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
               )}
             >
               {isEn ? 'About Us' : 'À propos'}
@@ -173,10 +179,10 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/contact"
+              href={isEn ? '/en/contact' : '/contact'}
               className={cn(
                 "text-sm font-medium transition-colors px-3 py-2 rounded-md hover:text-slaac-navy-900 hover:bg-slate-100/80",
-                pathname === '/contact' ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
+                (pathname === '/contact' || pathname === '/en/contact') ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
               )}
             >
               {isEn ? 'Contact' : 'Contact'}
@@ -185,36 +191,8 @@ export default function Header() {
 
           {/* Actions : WhatsApp direct + CTA Devis + Hamburger mobile */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            {/* Sélecteur de langue crawlable FR / EN */}
-            <nav aria-label="Langues" className="hidden sm:inline-flex items-center text-xs font-semibold rounded-lg border border-slate-200 p-0.5 bg-slate-50/80">
-              <Link
-                href="/"
-                hrefLang="fr"
-                lang="fr"
-                className={cn(
-                  "px-2 py-1 rounded transition-colors",
-                  !isEn ? "bg-white text-slaac-navy-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
-                )}
-                title="Version française"
-                aria-label="Passer en version française"
-              >
-                FR
-              </Link>
-              <span className="text-slate-300" aria-hidden="true">|</span>
-              <Link
-                href="/en"
-                hrefLang="en"
-                lang="en"
-                className={cn(
-                  "px-2 py-1 rounded transition-colors",
-                  isEn ? "bg-white text-slaac-navy-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
-                )}
-                title="English version"
-                aria-label="Switch to English version"
-              >
-                EN
-              </Link>
-            </nav>
+            {/* Sélecteur de langue contextuel FR / EN */}
+            <LanguageSwitcher className="hidden sm:inline-flex" />
 
             {/* Bouton WhatsApp avec icône verte et cible tactile 40px/44px */}
             <Button
@@ -222,13 +200,13 @@ export default function Header() {
               variant="outline"
               size="icon"
               className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg border-emerald-200/80 hover:border-emerald-500 hover:bg-emerald-50 text-emerald-600 transition-colors"
-              title="WhatsApp — réponse rapide conciergerie"
+              title={isEn ? "WhatsApp — instant travel concierge" : "WhatsApp — réponse rapide conciergerie"}
             >
               <a
-                href="https://wa.me/221773129090"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Contacter SLAAC Voyages sur WhatsApp"
+                aria-label={isEn ? "Chat with SLAAC Voyages on WhatsApp" : "Contacter SLAAC Voyages sur WhatsApp"}
               >
                 <WhatsAppIcon className="h-5 w-5 fill-current text-[#25D366]" />
               </a>
@@ -239,11 +217,12 @@ export default function Header() {
               asChild
               variant="gold"
               size="icon"
+              locale={isEn ? 'en' : 'fr'}
               className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg gold-glow"
-              aria-label="Demander un devis"
-              title="Demander un devis — réponse sous 24 h"
+              aria-label={isEn ? "Request a quote" : "Demander un devis"}
+              title={isEn ? "Request a quote — reply within 24 h" : "Demander un devis — réponse sous 24 h"}
             >
-              <button type="button" aria-label="Demander un devis">
+              <button type="button" aria-label={isEn ? "Request a quote" : "Demander un devis"}>
                 <FilePenLine className="h-5 w-5" />
               </button>
             </QuoteRequestButton>
@@ -276,24 +255,7 @@ export default function Header() {
                         <span className="text-[10px] uppercase tracking-wider text-slaac-gold-600 font-semibold">Conciergerie Dakar</span>
                       </div>
                     </div>
-                    <div className="flex items-center text-xs font-semibold rounded-md border border-slate-200 p-0.5 bg-slate-50 mr-6">
-                      <Link
-                        href="/"
-                        hrefLang="fr"
-                        lang="fr"
-                        className={cn("px-2 py-1 rounded transition-colors", !isEn ? "bg-white text-slaac-navy-900 font-bold shadow-xs" : "text-slate-500")}
-                      >
-                        FR
-                      </Link>
-                      <Link
-                        href="/en"
-                        hrefLang="en"
-                        lang="en"
-                        className={cn("px-2 py-1 rounded transition-colors", isEn ? "bg-white text-slaac-navy-900 font-bold shadow-xs" : "text-slate-500")}
-                      >
-                        EN
-                      </Link>
-                    </div>
+                    <LanguageSwitcher size="sm" className="mr-6" />
                   </SheetTitle>
                 </SheetHeader>
 
@@ -341,10 +303,10 @@ export default function Header() {
                     <div className="border-t border-slate-100 pt-2 flex flex-col gap-0.5">
                       <SheetClose asChild>
                         <Link
-                          href="/dakar-2026"
+                          href={isEn ? '/en/dakar-2026' : '/dakar-2026'}
                           className={cn(
                             "flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-medium transition-colors",
-                            pathname.startsWith('/dakar-2026') ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                            pathname.includes('/dakar-2026') ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
                           )}
                         >
                           <span className="flex items-center gap-2">
@@ -357,10 +319,10 @@ export default function Header() {
 
                       <SheetClose asChild>
                         <Link
-                          href="/about"
+                          href={isEn ? '/en/about' : '/about'}
                           className={cn(
                             "flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-medium transition-colors",
-                            pathname === '/about' ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                            (pathname === '/about' || pathname === '/en/about') ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
                           )}
                         >
                           {isEn ? 'About Us' : 'À propos de nous'}
@@ -384,10 +346,10 @@ export default function Header() {
 
                       <SheetClose asChild>
                         <Link
-                          href="/contact"
+                          href={isEn ? '/en/contact' : '/contact'}
                           className={cn(
                             "flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-medium transition-colors",
-                            pathname === '/contact' ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                            (pathname === '/contact' || pathname === '/en/contact') ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
                           )}
                         >
                           {isEn ? 'Contact Us & Office' : 'Contact & Agence Plateau'}
@@ -398,12 +360,12 @@ export default function Header() {
 
                   {/* Boutons d'action mobile */}
                   <div className="flex flex-col gap-2.5 pt-4 border-t border-slate-100">
-                    <QuoteRequestButton variant="gold" size="lg" className="w-full justify-center">
+                    <QuoteRequestButton variant="gold" size="lg" locale={isEn ? 'en' : 'fr'} className="w-full justify-center">
                       <Send className="mr-2 h-4 w-4" /> {isEn ? 'Request a quote' : 'Demander un devis'}
                     </QuoteRequestButton>
 
                     <a
-                      href="https://wa.me/221773129090"
+                      href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full"
@@ -420,6 +382,20 @@ export default function Header() {
                       <Phone className="h-3.5 w-3.5 text-slaac-gold-600" />
                       Appel direct : +221 77 312 90 90
                     </a>
+
+                    {/* Sélecteur de langue mobile crawlable */}
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-600">
+                      <span>{isEn ? 'Language:' : 'Langue :'}</span>
+                      <div className="flex items-center gap-2">
+                        <Link href="/" hrefLang="fr" lang="fr" className={!isEn ? 'font-bold text-slaac-navy-900 underline' : 'text-slate-500 hover:text-slate-800'}>
+                          Français
+                        </Link>
+                        <span className="text-slate-300">|</span>
+                        <Link href="/en" hrefLang="en" lang="en" className={isEn ? 'font-bold text-slaac-navy-900 underline' : 'text-slate-500 hover:text-slate-800'}>
+                          English
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </SheetContent>

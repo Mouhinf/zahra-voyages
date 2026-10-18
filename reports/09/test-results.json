@@ -1,0 +1,158 @@
+{
+  "totalCriteria": 25,
+  "passed": 25,
+  "failed": 0,
+  "timestamp": "2026-10-18T17:12:08.428Z",
+  "details": [
+    {
+      "id": 1,
+      "name": "Parité stricte des dictionnaires fr.json et en.json (100% clés identiques)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 2,
+      "name": "Existence des 10 pages candidates anglaises et de leurs layouts Next.js",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 3,
+      "name": "Rendu dynamique SSR de <html lang={locale}> piloté par x-slaac-locale",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 4,
+      "name": "Middleware d'interception /en et injection de l'en-tête x-slaac-locale",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 5,
+      "name": "Sélecteur de langue contextuel et accessible avec attributs ARIA",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 6,
+      "name": "Table de correspondance bi-directionnelle (10 paires d'URLs préservant le contexte)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 7,
+      "name": "Schéma devis bilingue avec support locale en/fr et libellés anglais",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 8,
+      "name": "Schéma contact avec validation locale en/fr et repli par défaut fr",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 9,
+      "name": "API /api/quotes : persistance de la locale dans Firestore et passage à l'email",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 10,
+      "name": "API /api/contact : persistance de la locale dans Firestore et notification bilingue",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 11,
+      "name": "Template email transactionnel devis : génération anglaise certifiée (lang === en)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 12,
+      "name": "Template email accusé de réception contact : version anglaise professionnelle",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 13,
+      "name": "Notification agence et responsable : affichage clair de la langue du client",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 14,
+      "name": "Hub international Dakar 2026 : dates, 3 pôles et avertissement légal d'indépendance",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 15,
+      "name": "Navigation Header et Footer : intégration du switcher et textes traduits",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 16,
+      "name": "Modal de devis et bouton déclencheur : localisation complète et transmission locale",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 17,
+      "name": "Page contact en anglais : formulaire interactif, adresse Plateau et toast en anglais",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 18,
+      "name": "Page À propos en anglais : histoire agence, licences NINEA/RCCM et Teranga",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 19,
+      "name": "Page transport en anglais : navettes AIBD, grille tarifaire FCFA et chauffeurs privés",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 20,
+      "name": "Page hébergement en anglais : garanties groupe électrogène, fibre optique et quartiers",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 21,
+      "name": "Page excursions en anglais : circuits guidés Gorée, Lac Rose, Bandia et Sine-Saloum",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 22,
+      "name": "Page tourisme d'affaires en anglais : MICE, délégations et facturation TVA déductible",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 23,
+      "name": "Page assistance voyage en anglais : formalités visas, études et avertissement consulaire",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 24,
+      "name": "Sitemap dynamique : indexation des 10 URLs anglaises avec alternates.languages réciproques",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 25,
+      "name": "Non-régression technique : robots.txt accessible et explorabilité garantie",
+      "success": true,
+      "note": ""
+    }
+  ]
+}

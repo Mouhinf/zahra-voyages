@@ -10,7 +10,14 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'À propos de SLAAC Voyages | Agence agréée à Dakar Plateau',
   description: "SLAAC Voyages, agence de voyage et conciergerie locale à Dakar Plateau (NINEA, RCCM) : billetterie, assistance visas, hébergements vérifiés et accueil VIP au Sénégal.",
-  alternates: { canonical: '/about' },
+  alternates: {
+    canonical: '/about',
+    languages: {
+      fr: '/about',
+      en: '/en/about',
+      'x-default': '/about',
+    },
+  },
   openGraph: {
     title: 'À propos de SLAAC Voyages | Agence agréée à Dakar Plateau',
     description: "Présentation de SLAAC Voyages, agence de voyages et conciergerie locale immatriculée à Dakar Plateau.",

@@ -50,18 +50,22 @@ import {
   type ServiceType,
   quoteSchema,
   type QuoteInput,
+  getServiceOptions,
 } from '@/lib/schemas/quote-schema';
+import { usePathname } from 'next/navigation';
 
 export function QuoteRequestDialog({
   children,
   defaultService,
   defaultDestination,
   source,
+  locale,
 }: {
   children: React.ReactNode;
   defaultService?: ServiceType;
   defaultDestination?: string;
   source?: string;
+  locale?: 'fr' | 'en';
 }) {
   const [open, setOpen] = useState(false);
 
@@ -76,6 +80,7 @@ export function QuoteRequestDialog({
         defaultService={defaultService}
         defaultDestination={defaultDestination}
         source={source}
+        locale={locale}
       />
     </>
   );
@@ -87,13 +92,19 @@ export function QuoteRequestModal({
   defaultService,
   defaultDestination,
   source,
+  locale,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultService?: ServiceType;
   defaultDestination?: string;
   source?: string;
+  locale?: 'fr' | 'en';
 }) {
+  const pathname = usePathname();
+  const activeLocale = locale || (pathname?.startsWith('/en') ? 'en' : 'fr');
+  const isEn = activeLocale === 'en';
+  const serviceOptions = getServiceOptions(activeLocale);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -184,7 +195,8 @@ export function QuoteRequestModal({
     try {
       const payload = {
         ...values,
-        source: source || 'modal-quote',
+        locale: activeLocale,
+        source: source || (isEn ? 'en-modal-quote' : 'modal-quote'),
         clientSubmissionId: submissionId || `${instanceId}-${Date.now()}`,
         utmSource: utmParams.utm_source,
         utmMedium: utmParams.utm_medium,
@@ -203,7 +215,9 @@ export function QuoteRequestModal({
 
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(body?.error || 'Erreur lors de l’enregistrement de votre demande.');
+        throw new Error(
+          body?.error || (isEn ? 'Failed to submit quote request.' : 'Erreur lors de l’enregistrement de votre demande.')
+        );
       }
 
       const ref = body?.reference || 'DV-EN-COURS';
@@ -214,18 +228,22 @@ export function QuoteRequestModal({
       });
 
       toast({
-        title: 'Demande enregistrée !',
-        description: `Référence : ${ref}. Nos conseillers préparent votre devis.`,
+        title: isEn ? 'Request received!' : 'Demande enregistrée !',
+        description: isEn
+          ? `Reference: ${ref}. Our travel team is reviewing your file.`
+          : `Référence : ${ref}. Nos conseillers préparent votre devis.`,
       });
 
       form.reset();
     } catch (err: unknown) {
       console.error('Quote submit error:', err);
       toast({
-        title: 'Envoi impossible',
+        title: isEn ? 'Submission failed' : 'Envoi impossible',
         description:
           (err instanceof Error && err.message) ||
-          'Une erreur est survenue. Veuillez vérifier vos informations ou nous contacter sur WhatsApp.',
+          (isEn
+            ? 'An error occurred. Please verify your details or contact us directly on WhatsApp.'
+            : 'Une erreur est survenue. Veuillez vérifier vos informations ou nous contacter sur WhatsApp.'),
         variant: 'destructive',
       });
     } finally {
@@ -239,16 +257,22 @@ export function QuoteRequestModal({
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
       toast({
-        title: 'Copié !',
-        description: 'La référence a été copiée dans votre presse-papier.',
+        title: isEn ? 'Copied!' : 'Copié !',
+        description: isEn
+          ? 'The reference number has been copied to your clipboard.'
+          : 'La référence a été copiée dans votre presse-papier.',
       });
     }
   };
 
   const whatsappMessage = encodeURIComponent(
-    `Bonjour SLAAC Voyages, je viens d'enregistrer ma demande de devis sous la référence ${
-      successInfo?.reference || ''
-    }. Pouvez-vous m'apporter des précisions ?`
+    isEn
+      ? `Hello SLAAC Voyages, I have just submitted a quote request under reference ${
+          successInfo?.reference || ''
+        }. Could you please provide further details?`
+      : `Bonjour SLAAC Voyages, je viens d'enregistrer ma demande de devis sous la référence ${
+          successInfo?.reference || ''
+        }. Pouvez-vous m'apporter des précisions ?`
   );
   const whatsappUrl = `https://wa.me/221773129090?text=${whatsappMessage}`;
 
@@ -263,10 +287,12 @@ export function QuoteRequestModal({
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <DialogTitle className="text-xl sm:text-2xl font-bold text-emerald-950 dark:text-emerald-100 font-headline">
-                Demande Enregistrée avec Succès !
+                {isEn ? 'Request Received Successfully!' : 'Demande Enregistrée avec Succès !'}
               </DialogTitle>
               <DialogDescription className="text-emerald-800 dark:text-emerald-200 text-sm">
-                Votre projet est entre les mains de nos conseillers spécialistes.
+                {isEn
+                  ? 'Your travel file has been assigned to our local Dakar team.'
+                  : 'Votre projet est entre les mains de nos conseillers spécialistes.'}
               </DialogDescription>
             </DialogHeader>
 
@@ -274,7 +300,7 @@ export function QuoteRequestModal({
               {/* Carte Référence */}
               <div className="rounded-xl border border-primary/20 bg-secondary/30 p-4 text-center space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Votre référence de dossier
+                  {isEn ? 'Your File Reference' : 'Votre référence de dossier'}
                 </span>
                 <div className="flex items-center justify-center gap-3">
                   <span className="font-mono text-xl sm:text-2xl font-bold text-primary tracking-wide">
@@ -286,30 +312,32 @@ export function QuoteRequestModal({
                     size="sm"
                     onClick={copyReference}
                     className="h-8 px-2.5 text-xs gap-1.5"
-                    title="Copier la référence"
+                    title={isEn ? 'Copy reference' : 'Copier la référence'}
                   >
                     {copied ? (
                       <>
                         <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        <span className="text-emerald-600">Copié</span>
+                        <span className="text-emerald-600">{isEn ? 'Copied' : 'Copié'}</span>
                       </>
                     ) : (
                       <>
                         <Copy className="h-3.5 w-3.5" />
-                        <span>Copier</span>
+                        <span>{isEn ? 'Copy' : 'Copier'}</span>
                       </>
                     )}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Conservez cette référence pour tout échange avec votre conseiller dédié.
+                  {isEn
+                    ? 'Keep this reference for any correspondence with your designated travel advisor.'
+                    : 'Conservez cette référence pour tout échange avec votre conseiller dédié.'}
                 </p>
               </div>
 
               {/* Étapes suivantes (Transparence & CRO) */}
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-primary flex items-center gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-primary" /> Prochaines étapes de votre prise en charge
+                  <ShieldCheck className="h-4 w-4 text-primary" /> {isEn ? 'Next Steps' : 'Prochaines étapes de votre prise en charge'}
                 </h4>
                 <ol className="space-y-2.5 text-xs sm:text-sm text-muted-foreground">
                   <li className="flex items-start gap-2.5">
@@ -317,7 +345,7 @@ export function QuoteRequestModal({
                       1
                     </span>
                     <span>
-                      <strong>Analyse de vos besoins</strong> : Un conseiller examine vos critères et vos dates.
+                      <strong>{isEn ? 'Requirement Review' : 'Analyse de vos besoins'}</strong> : {isEn ? 'A dedicated travel specialist checks your dates and preferences.' : 'Un conseiller examine vos critères et vos dates.'}
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
@@ -325,7 +353,7 @@ export function QuoteRequestModal({
                       2
                     </span>
                     <span>
-                      <strong>Élaboration du devis sur mesure</strong> : Nous sélectionnons les options aux meilleurs tarifs.
+                      <strong>{isEn ? 'Tailored Offer' : 'Élaboration du devis sur mesure'}</strong> : {isEn ? 'We select verified options at the best available rates.' : 'Nous sélectionnons les options aux meilleurs tarifs.'}
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
@@ -333,7 +361,7 @@ export function QuoteRequestModal({
                       3
                     </span>
                     <span>
-                      <strong>Contact personnalisé</strong> : Vous recevez votre devis détaillé par email ou directement sur WhatsApp.
+                      <strong>{isEn ? 'Direct Contact' : 'Contact personnalisé'}</strong> : {isEn ? 'You receive your quote by email or directly on WhatsApp.' : 'Vous recevez votre devis détaillé par email ou directement sur WhatsApp.'}
                     </span>
                   </li>
                 </ol>
@@ -343,10 +371,12 @@ export function QuoteRequestModal({
               <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-4 space-y-2.5">
                 <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200 font-medium text-sm">
                   <MessageCircle className="h-4 w-4 text-emerald-600" />
-                  <span>Besoin d'une réponse urgente ?</span>
+                  <span>{isEn ? 'Need an urgent response?' : "Besoin d'une réponse urgente ?"}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Accélérez le traitement de votre demande en échangeant directement avec un conseiller sur WhatsApp :
+                  {isEn
+                    ? 'Speed up your request by chatting directly with an advisor on WhatsApp:'
+                    : 'Accélérez le traitement de votre demande en échangeant directement avec un conseiller sur WhatsApp :'}
                 </p>
                 <Button
                   asChild
@@ -354,7 +384,7 @@ export function QuoteRequestModal({
                 >
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="mr-2 h-4 w-4 fill-current" />
-                    Échanger sur WhatsApp avec ma référence
+                    {isEn ? 'Chat on WhatsApp with my reference' : 'Échanger sur WhatsApp avec ma référence'}
                   </a>
                 </Button>
               </div>
@@ -368,11 +398,11 @@ export function QuoteRequestModal({
                 onClick={() => setSuccessInfo(null)}
                 className="text-xs text-muted-foreground gap-1"
               >
-                <RotateCcw className="h-3.5 w-3.5" /> Nouvelle demande
+                <RotateCcw className="h-3.5 w-3.5" /> {isEn ? 'New Request' : 'Nouvelle demande'}
               </Button>
               <DialogClose asChild>
                 <Button type="button" variant="default" size="sm">
-                  Fermer
+                  {isEn ? 'Close' : 'Fermer'}
                 </Button>
               </DialogClose>
             </DialogFooter>
@@ -382,10 +412,12 @@ export function QuoteRequestModal({
           <>
             <DialogHeader className="shrink-0 space-y-1.5 border-b px-6 py-4 pr-14 text-left bg-muted/20">
               <DialogTitle className="text-lg sm:text-xl font-bold font-headline text-primary">
-                Demander un devis sur mesure
+                {isEn ? 'Request a Tailored Travel Quote' : 'Demander un devis sur mesure'}
               </DialogTitle>
               <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
-                Précisez votre projet en quelques instants. Demande gratuite et sans engagement.
+                {isEn
+                  ? 'Specify your requirements in a few moments. Free request, no commitment.'
+                  : 'Précisez votre projet en quelques instants. Demande gratuite et sans engagement.'}
               </DialogDescription>
             </DialogHeader>
 
@@ -408,15 +440,17 @@ export function QuoteRequestModal({
                     name="service"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-semibold text-primary">Prestation souhaitée</FormLabel>
+                        <FormLabel className="font-semibold text-primary">
+                          {isEn ? 'Requested service' : 'Prestation souhaitée'}
+                        </FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="font-medium">
-                              <SelectValue placeholder="Choisir un service" />
+                              <SelectValue placeholder={isEn ? 'Select a service' : 'Choisir un service'} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {SERVICE_OPTIONS.map((opt) => (
+                            {serviceOptions.map((opt) => (
                               <SelectItem key={opt.value} value={opt.value}>
                                 {opt.label}
                               </SelectItem>
@@ -435,9 +469,9 @@ export function QuoteRequestModal({
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Nom complet *</FormLabel>
+                          <FormLabel>{isEn ? 'Full name *' : 'Nom complet *'}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Votre prénom et nom" {...field} />
+                            <Input placeholder={isEn ? 'e.g. Sarah Jenkins' : 'Votre prénom et nom'} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -449,9 +483,9 @@ export function QuoteRequestModal({
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Téléphone / WhatsApp *</FormLabel>
+                          <FormLabel>{isEn ? 'Phone / WhatsApp *' : 'Téléphone / WhatsApp *'}</FormLabel>
                           <FormControl>
-                            <Input placeholder="+221 77 000 00 00" type="tel" {...field} />
+                            <Input placeholder={isEn ? '+1 555 123 4567 or +221 ...' : '+221 77 000 00 00'} type="tel" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -464,9 +498,13 @@ export function QuoteRequestModal({
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Adresse email (Recommandé pour recevoir le devis)</FormLabel>
+                        <FormLabel>
+                          {isEn
+                            ? 'Email address (Recommended to receive the quote)'
+                            : 'Adresse email (Recommandé pour recevoir le devis)'}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="nom@exemple.com" type="email" {...field} />
+                          <Input placeholder={isEn ? 'name@example.com' : 'nom@exemple.com'} type="email" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -962,15 +1000,16 @@ export function QuoteRequestModal({
                   )}
 
                   {/* Nombre de voyageurs / personnes (pour les services concernés) */}
+                  {/* Nombre de voyageurs / personnes (pour les services concernés) */}
                   {!['prise-de-rendez-vous', 'tourisme-affaires'].includes(service) && (
                     <FormField
                       control={form.control}
                       name="travelers"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Nombre de voyageurs / personnes</FormLabel>
+                          <FormLabel>{isEn ? 'Number of travelers / attendees' : 'Nombre de voyageurs / personnes'}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ex: 2 adultes, 1 enfant" {...field} />
+                            <Input placeholder={isEn ? 'e.g. 2 adults, 1 child' : 'Ex: 2 adultes, 1 enfant'} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -984,10 +1023,14 @@ export function QuoteRequestModal({
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Précisions / attentes particulières (Optionnel)</FormLabel>
+                        <FormLabel>{isEn ? 'Specific requirements or flight details (Optional)' : 'Précisions / attentes particulières (Optionnel)'}</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Préférences de dates, budget indicatif, compagnie aérienne préférée, hôtel souhaité..."
+                            placeholder={
+                              isEn
+                                ? 'Flight numbers, preferred airline or hotel styles, approximate budget, specific dates...'
+                                : 'Préférences de dates, budget indicatif, compagnie aérienne préférée, hôtel souhaité...'
+                            }
                             rows={3}
                             {...field}
                           />
@@ -1001,17 +1044,17 @@ export function QuoteRequestModal({
                 <DialogFooter className="shrink-0 gap-2 border-t bg-background px-6 py-4 flex flex-row items-center justify-between sm:justify-end">
                   <DialogClose asChild>
                     <Button type="button" variant="outline" disabled={isSubmitting}>
-                      Annuler
+                      {isEn ? 'Cancel' : 'Annuler'}
                     </Button>
                   </DialogClose>
                   <Button type="submit" disabled={isSubmitting} className="min-w-[150px]">
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enregistrement...
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {isEn ? 'Submitting...' : 'Enregistrement...'}
                       </>
                     ) : (
                       <>
-                        Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                        {isEn ? 'Submit Quote Request' : 'Envoyer ma demande'} <Send className="ml-2 h-4 w-4" />
                       </>
                     )}
                   </Button>

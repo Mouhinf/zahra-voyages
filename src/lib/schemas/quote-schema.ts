@@ -19,7 +19,7 @@ export const SERVICE_VALUES = [
 
 export type ServiceType = (typeof SERVICE_VALUES)[number];
 
-export const SERVICE_LABELS: Record<ServiceType, string> = {
+export const SERVICE_LABELS_FR: Record<ServiceType, string> = {
   'hebergement': 'Hébergement',
   'transport': 'Transport & Transferts',
   'voyages-croisieres': 'Voyages & Croisières',
@@ -32,10 +32,34 @@ export const SERVICE_LABELS: Record<ServiceType, string> = {
   'prise-de-rendez-vous': 'Prise de rendez-vous',
 };
 
+export const SERVICE_LABELS: Record<ServiceType, string> = SERVICE_LABELS_FR;
+
+export const SERVICE_LABELS_EN: Record<ServiceType, string> = {
+  'hebergement': 'Accommodation & Stays',
+  'transport': 'Airport Transfers & Transport',
+  'voyages-croisieres': 'Travel & Cruises',
+  'excursions': 'Private Tours & Day Trips',
+  'tourisme-affaires': 'Corporate Travel & MICE',
+  'reservation-express': 'Flight Ticketing & Booking',
+  'assistance-visa': 'Visa & Travel Assistance',
+  'assurance-voyage': 'Travel Insurance',
+  'preinscription-universitaire': 'University Pre-enrollment',
+  'prise-de-rendez-vous': 'Embassy Appointment Booking',
+};
+
 export const SERVICE_OPTIONS = SERVICE_VALUES.map((val) => ({
   value: val,
   label: SERVICE_LABELS[val],
 }));
+
+export function getServiceOptions(locale: 'fr' | 'en' = 'fr') {
+  const labels = locale === 'en' ? SERVICE_LABELS_EN : SERVICE_LABELS_FR;
+  return SERVICE_VALUES.map((val) => ({
+    value: val,
+    label: labels[val] || val,
+  }));
+}
+
 
 /**
  * Validation robuste du numéro de téléphone international :
@@ -95,6 +119,7 @@ export const baseQuoteSchema = z.object({
   preferredCurrency: z.enum(['XOF', 'EUR', 'USD']).optional().or(z.literal('').transform(() => undefined)),
   travelers: z.string().trim().max(30).optional().or(z.literal('').transform(() => undefined)),
   message: z.string().trim().max(2500, 'Message trop long (max 2500 caractères).').optional().or(z.literal('').transform(() => undefined)),
+  locale: z.enum(['fr', 'en']).optional().default('fr'),
 
   // Champs conditionnels par service
   // Hébergement

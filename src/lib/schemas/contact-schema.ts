@@ -37,6 +37,8 @@ export const contactSchema = z.object({
   utmCampaign: z.string().trim().max(100).optional(),
   referrer: z.string().trim().max(250).optional(),
   landingPage: z.string().trim().max(250).optional(),
+  // Langue du client pour email et CRM
+  locale: z.enum(['fr', 'en']).optional().default('fr'),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

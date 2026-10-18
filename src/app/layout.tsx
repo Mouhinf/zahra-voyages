@@ -45,16 +45,19 @@ export const metadata: Metadata = {
 };
 
 import { getTravelAgencySchema } from '@/lib/seo-schema';
+import { headers } from 'next/headers';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const headersList = await headers();
+  const locale = headersList.get('x-slaac-locale') === 'en' ? 'en' : 'fr';
   const travelAgencyJsonLd = getTravelAgencySchema();
 
   return (
-    <html lang="fr" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html lang={locale} className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${playfair.variable} font-body antialiased`}>
         {children}
         <script

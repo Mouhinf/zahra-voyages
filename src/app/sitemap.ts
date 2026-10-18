@@ -135,38 +135,252 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       },
     },
-    {
-      url: `${SITE_URL}/hebergement`,
-      lastModified: STATIC_CONTENT_LASTMOD,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
+    // Transport & Airport Transfers
     {
       url: `${SITE_URL}/transport`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
       priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/transport`,
+          en: `${SITE_URL}/en/transport`,
+          'x-default': `${SITE_URL}/transport`,
+        },
+      },
     },
+    {
+      url: `${SITE_URL}/en/transport`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/transport`,
+          en: `${SITE_URL}/en/transport`,
+          'x-default': `${SITE_URL}/transport`,
+        },
+      },
+    },
+    // Accommodation
+    {
+      url: `${SITE_URL}/hebergement`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/hebergement`,
+          en: `${SITE_URL}/en/hebergement`,
+          'x-default': `${SITE_URL}/hebergement`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/hebergement`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/hebergement`,
+          en: `${SITE_URL}/en/hebergement`,
+          'x-default': `${SITE_URL}/hebergement`,
+        },
+      },
+    },
+    // Excursions & Guided Tours
     {
       url: `${SITE_URL}/excursions`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
       priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/excursions`,
+          en: `${SITE_URL}/en/excursions`,
+          'x-default': `${SITE_URL}/excursions`,
+        },
+      },
     },
+    {
+      url: `${SITE_URL}/en/excursions`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/excursions`,
+          en: `${SITE_URL}/en/excursions`,
+          'x-default': `${SITE_URL}/excursions`,
+        },
+      },
+    },
+    // Corporate Travel & MICE
     {
       url: `${SITE_URL}/tourisme-affaires`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
       priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/tourisme-affaires`,
+          en: `${SITE_URL}/en/tourisme-affaires`,
+          'x-default': `${SITE_URL}/tourisme-affaires`,
+        },
+      },
     },
     {
-      url: `${SITE_URL}/voyages-croisieres`,
+      url: `${SITE_URL}/en/tourisme-affaires`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
       priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/tourisme-affaires`,
+          en: `${SITE_URL}/en/tourisme-affaires`,
+          'x-default': `${SITE_URL}/tourisme-affaires`,
+        },
+      },
     },
+    // Travel Assistance & Visas
     {
       url: `${SITE_URL}/assistance-voyage`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/assistance-voyage`,
+          en: `${SITE_URL}/en/assistance-voyage`,
+          'x-default': `${SITE_URL}/assistance-voyage`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/assistance-voyage`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.75,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/assistance-voyage`,
+          en: `${SITE_URL}/en/assistance-voyage`,
+          'x-default': `${SITE_URL}/assistance-voyage`,
+        },
+      },
+    },
+    // Dakar 2026 Event Hub
+    {
+      url: `${SITE_URL}/dakar-2026`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/dakar-2026`,
+          en: `${SITE_URL}/en/dakar-2026`,
+          'x-default': `${SITE_URL}/dakar-2026`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/dakar-2026`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/dakar-2026`,
+          en: `${SITE_URL}/en/dakar-2026`,
+          'x-default': `${SITE_URL}/dakar-2026`,
+        },
+      },
+    },
+    // Destinations
+    {
+      url: `${SITE_URL}/destinations`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/destinations`,
+          en: `${SITE_URL}/en/destinations`,
+          'x-default': `${SITE_URL}/destinations`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/destinations`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/destinations`,
+          en: `${SITE_URL}/en/destinations`,
+          'x-default': `${SITE_URL}/destinations`,
+        },
+      },
+    },
+    // Contact
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/contact`,
+          en: `${SITE_URL}/en/contact`,
+          'x-default': `${SITE_URL}/contact`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/contact`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/contact`,
+          en: `${SITE_URL}/en/contact`,
+          'x-default': `${SITE_URL}/contact`,
+        },
+      },
+    },
+    // About
+    {
+      url: `${SITE_URL}/about`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/about`,
+          en: `${SITE_URL}/en/about`,
+          'x-default': `${SITE_URL}/about`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/about`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/about`,
+          en: `${SITE_URL}/en/about`,
+          'x-default': `${SITE_URL}/about`,
+        },
+      },
+    },
+    // French-only Services and Religious Tourism
+    {
+      url: `${SITE_URL}/voyages-croisieres`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -184,31 +398,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
-      url: `${SITE_URL}/dakar-2026`,
-      lastModified: STATIC_CONTENT_LASTMOD,
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    {
-      url: `${SITE_URL}/destinations`,
-      lastModified: STATIC_CONTENT_LASTMOD,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
       url: `${SITE_URL}/services`,
-      lastModified: STATIC_CONTENT_LASTMOD,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/about`,
-      lastModified: STATIC_CONTENT_LASTMOD,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/contact`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'monthly',
       priority: 0.7,

@@ -99,6 +99,7 @@ export async function POST(req: NextRequest) {
       utmCampaign: data.utmCampaign,
       referrer: data.referrer,
       landingPage: data.landingPage,
+      locale: data.locale || 'fr',
     };
 
     const cleanRecord = cleanFirestoreData(rawRecord);
@@ -113,6 +114,7 @@ export async function POST(req: NextRequest) {
       email: data.email,
       phone: data.phone ?? null,
       message: data.message,
+      lang: data.locale === 'en' ? ('en' as const) : ('fr' as const),
     };
 
     const notifyResults = await sendContactNotifications(docRef.id, contactData).catch((err) => {

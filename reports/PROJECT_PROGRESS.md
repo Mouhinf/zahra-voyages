@@ -1,7 +1,7 @@
 # Journal de Progression Global — SLAAC Voyages
 
 > **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
-> **Branche de travail actuelle :** `feat/slaac-local-seo`  
+> **Branche de travail actuelle :** `feat/slaac-full-internationalization`  
 > **Dernière mise à jour :** 18 octobre 2026  
 > **Responsable Technique :** Architecte Logiciel Senior & Lead DevOps  
 
@@ -10,7 +10,7 @@
 ## 1. Feuille de Route Globale (Programme 12 Phases)
 
 | Phase | Intitulé & Périmètre | Statut | Branche Git | Date d'Achèvement |
-| :--- :--- | :---: | :---: | :---: |
+| :--- | :--- | :---: | :---: | :---: |
 | **01/12** | **Système Email Transactionnel Premium, LWS, Firebase & Vercel** | **TERMINÉ** | `feat/slaac-transactional-emails` | 17 oct. 2026 |
 | **02/12** | **Refonte Professionnelle des Formulaires, du CRM et des Parcours de Conversion** | **TERMINÉ** | `feat/slaac-forms-crm` | 17 oct. 2026 |
 | **03/12** | **Benchmark Concurrentiel, Intelligence de Marché & Positionnement Premium** | **TERMINÉ** | `feat/slaac-market-benchmark` | 17 oct. 2026 |
@@ -19,14 +19,50 @@
 | **06/12** | **SEO Technique Avancé, Indexation Google & Architecture de Référencement** | **TERMINÉ** | `feat/slaac-technical-seo` | 18 oct. 2026 |
 | **07/12** | **Domination Éditoriale SEO, Pages de Services, Destinations & Stratégie de Contenus** | **TERMINÉ** | `feat/slaac-editorial-seo` | 18 oct. 2026 |
 | **08/12** | **SEO Local Avancé, Google Business Profile, Google Maps & E-Réputation** | **TERMINÉ** | `feat/slaac-local-seo` | 18 oct. 2026 |
-| **09/12** | SEO Technique International & Données Structurées Schema.org | *Planifié* | - | - |
+| **09/12** | **Internationalisation Complète FR/EN, Expérience Touristique Internationale & Dakar 2026** | **TERMINÉ** | `feat/slaac-full-internationalization` | 18 oct. 2026 |
 | **10/12** | Automatisation WhatsApp Business API & Chatbot Hybride | *Planifié* | - | - |
 | **11/12** | Espace Partenaires B2B & Tourisme d'Affaires (MICE) | *Planifié* | - | - |
 | **12/12** | Système de Facturation, Acomptes & Passerelles de Paiement | *Planifié* | - | - |
 
 ---
 
-## 2. Bilan de la Phase 08/12 (SEO Local Avancé, Google Business Profile, Google Maps & E-Réputation)
+## 2. Bilan de la Phase 09/12 (Internationalisation Complète FR/EN, Expérience Touristique Internationale & Dakar 2026)
+
+### 2.1. Réalisations Majeures & Métriques Clés
+1. **Infrastructure Bilingue Hybride & Rendu SSR `<html lang>` Dynamique :**
+   - Conservation stricte de l'arborescence francophone à la racine (`/`) sans impact sur l'indexation historique.
+   - Création de 10 URLs candidates anglaises sous préfixe `/en/*` (`/en`, `/en/transport`, `/en/hebergement`, `/en/excursions`, `/en/tourisme-affaires`, `/en/assistance-voyage`, `/en/destinations`, `/en/about`, `/en/contact`, `/en/dakar-2026`).
+   - Détection de la locale par le middleware Next.js (`src/middleware.ts`) avec en-tête `x-slaac-locale` et injection serveur de `<html lang={locale}>` dans le `RootLayout` sans délai de redirection.
+2. **Sélecteur de Langue Accessible & Préservation du Contexte :**
+   - Composant `LanguageSwitcher` (`FR | EN`) intégré au header desktop, au volet mobile (`Sheet`) et au footer universel.
+   - Algorithme de correspondance `getAlternatePath` garantissant la conservation de la page active (ex: `/transport` $\leftrightarrow$ `/en/transport`, `/dakar-2026` $\leftrightarrow$ `/en/dakar-2026`).
+   - Attributs ARIA complets (`aria-current="page"`, `hrefLang="fr"`, `hrefLang="en"`).
+3. **Formulaires, Schémas Zod & Persistance CRM Firestore :**
+   - Schémas `quoteSchema` et `contactSchema` enrichis avec l'attribut `locale: z.enum(['fr', 'en']).optional().default('fr')`.
+   - Modal de devis (`QuoteRequestModal`) 100% bilingue avec libellés des services en anglais (`SERVICE_LABELS_EN`), placeholders et écran de confirmation traduits.
+   - Formulaire de la page `/en/contact` soumettant `locale: 'en'` avec toasts natifs en anglais.
+   - Persistance de `locale` dans les documents Firestore des collections `quotes` et `contacts` pour affichage et segmentation dans le CRM admin.
+4. **Emails Transactionnels Bilingues & Alertes Commerciales :**
+   - Accusés de réception devis et contact traduits en anglais certifié avec clauses légales et disclaimer obligatoire traduit lorsque `lang === 'en'`.
+   - Alertes agence et direction enrichies d'un indicateur explicite : `Langue du client : Anglais (English)`.
+5. **Hub International Dakar 2026 (`/en/dakar-2026`) :**
+   - Présentation factuelle des Jeux Olympiques de la Jeunesse (31 octobre – 13 novembre 2026) sur les 3 zones hôtes (Dakar, Diamniadio, Saly).
+   - Offres logistiques indépendantes : navettes aéroport AIBD, flottes avec chauffeurs, hébergements vérifiés avec groupe électrogène et excursions.
+   - Avertissement légal strict de non-affiliation et renvoi vers la billetterie officielle (`tickets.dakar2026.org`).
+   - Données structurées Schema.org `FAQPage` en anglais.
+6. **SEO International & Hreflang Réciproque :**
+   - Annotations `metadata.alternates.languages` réciproques complètes sur les 10 couples d'URLs (`fr`, `en`, `x-default`).
+   - Mise à jour du `sitemap.xml` dynamique avec les 10 routes anglaises et leurs équivalences `xhtml:link`.
+7. **Livrables Documentaires & Validation Qualité 100% :**
+   - 3 fichiers CSV livrés dans `reports/09/` : `route-language-inventory.csv`, `translation-glossary.csv`, `translation-coverage.csv`.
+   - 21 rapports markdown exhaustifs dans `reports/09/01-i18n-audit.md` à `21-production-readiness.md`.
+   - Validation 25/25 par la suite automatisée `tests/i18n-system.test.mjs` (`reports/09/test-results.json`).
+   - Non-régression totale sur les suites antérieures (Local SEO 20/20, Editorial SEO 20/20, Technical SEO 20/20, Email 11/11, Forms & CRM 16/16).
+   - Compilation Next.js 15 sans erreur avec 73/73 routes générées au `npm run build`.
+
+---
+
+## 3. Bilan de la Phase 08/12 (SEO Local Avancé, Google Business Profile, Google Maps & E-Réputation)
 
 ### 2.1. Réalisations Majeures & Métriques Clés
 1. **Audit Approfondi de la Fiche Google Business & Détection du Déménagement :**

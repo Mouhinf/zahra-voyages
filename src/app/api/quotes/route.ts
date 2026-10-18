@@ -174,6 +174,7 @@ export async function POST(req: NextRequest) {
     // Nettoyage de l'objet pour exclure tokens et champs superflus
     const rawRecord: Record<string, unknown> = {
       ...quote,
+      locale: quote.locale || 'fr',
       reference,
       fingerprint: fp,
       ip: ip === 'unknown' ? null : ip,
@@ -211,6 +212,7 @@ export async function POST(req: NextRequest) {
         ? `${quote.roomType}${quote.nights ? ` (${quote.nights} nuits)` : ''}`
         : null,
       transport: quote.transportClass ?? null,
+      lang: quote.locale === 'en' ? 'en' : 'fr',
     };
 
     const notifyResults = await sendQuoteNotifications(docRef.id, quoteEmailData).catch((err) => {
