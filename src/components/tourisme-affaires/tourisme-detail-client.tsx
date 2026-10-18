@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { ArrowLeft, MapPin, Users, Clock, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
+import { getServiceSchema } from '@/lib/seo-schema';
 
 interface TourismeDetailClientProps {
   item: OffreAffaires | null;
@@ -127,8 +129,29 @@ export default function TourismeDetailClient({ item, id }: TourismeDetailClientP
           <Badge variant="default" className="absolute top-4 right-4 bg-accent text-accent-foreground z-10">{item.tag}</Badge>
         </section>
 
-        <section className="py-12">
+        <section className="py-8">
           <div className="container mx-auto max-w-5xl px-4">
+            <Breadcrumbs
+              items={[
+                { label: "Tourisme d'Affaires & MICE", href: '/tourisme-affaires' },
+                { label: item.titre },
+              ]}
+              className="mb-4"
+            />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(
+                  getServiceSchema({
+                    name: item.titre,
+                    description: item.description,
+                    url: `/tourisme-affaires/${id}`,
+                    image: item.image,
+                    serviceType: 'CorporateTravelService',
+                  })
+                ),
+              }}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <div className="mb-4">

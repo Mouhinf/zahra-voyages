@@ -4,13 +4,19 @@ import { ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Destinations de rêve au départ de Dakar',
-  description: "Paris, Dubaï, New York, Casamance, Bali, Marrakech… Dites-nous où vous rêvez d'aller : SLAAC Voyages construit votre séjour sur mesure, devis gratuit sous 24 h.",
+  title: 'Destinations de rêve au départ de Dakar | SLAAC Voyages',
+  description: "Paris, Dubaï, New York, Casamance, Bali, Marrakech… Dites-nous où vous rêvez d’aller : SLAAC Voyages conçoit votre séjour sur mesure avec devis gratuit sous 24 h.",
   alternates: { canonical: '/destinations' },
+  openGraph: {
+    title: 'Destinations de rêve au départ de Dakar | SLAAC Voyages',
+    description: "Inspiration voyages et séjours sur mesure au départ de Dakar vers le monde entier avec SLAAC Voyages.",
+    url: '/destinations',
+  },
 };
 
 // Destinations = inspiration. Les tarifs « à partir de » génériques ont été
@@ -105,6 +111,9 @@ export default function DestinationsPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Destinations' }]} />
+        </div>
         <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-primary">Inspiration</span>

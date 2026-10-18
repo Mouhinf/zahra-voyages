@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { ArrowLeft, Users, ChevronLeft, ChevronRight, X, Fuel, User, MessageCircle, Plane } from 'lucide-react';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
+import { getServiceSchema } from '@/lib/seo-schema';
 
 interface TransportDetailClientProps {
   item: Transport | null;
@@ -139,8 +141,29 @@ export default function TransportDetailClient({ item, id }: TransportDetailClien
           </Badge>
         </section>
 
-        <section className="py-12">
+        <section className="py-8">
           <div className="container mx-auto max-w-5xl px-4">
+            <Breadcrumbs
+              items={[
+                { label: 'Transport & Navette AIBD', href: '/transport' },
+                { label: item.titre },
+              ]}
+              className="mb-4"
+            />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(
+                  getServiceSchema({
+                    name: item.titre,
+                    description: item.description,
+                    url: `/transport/${id}`,
+                    image: item.image,
+                    serviceType: 'AirportTransferService',
+                  })
+                ),
+              }}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <div className="mb-4">

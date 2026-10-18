@@ -19,6 +19,16 @@ export const metadata: Metadata = {
   },
   description: "Découvrez le monde avec SLAAC Voyages, votre agence de confiance à Dakar. Billets d'avion, séjours sur mesure, et assistance visa. L'aventure vous attend.",
   keywords: "agence de voyage Dakar, conciergerie voyage Sénégal, billets d’avion Sénégal, SLAAC Voyages Dakar, transfert aéroport AIBD, séjour Dakar 2026, voyage sur mesure, visas d'affaires Dakar",
+  alternates: {
+    canonical: '/',
+    languages: {
+      'fr-SN': '/',
+      'fr': '/',
+      'en-US': '/en',
+      'en': '/en',
+      'x-default': '/',
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'fr_SN',
@@ -34,29 +44,15 @@ export const metadata: Metadata = {
   },
 };
 
-// Données structurées : agence de voyages (adresse, contacts vérifiés).
-const travelAgencyJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'TravelAgency',
-  name: SITE_NAME,
-  url: SITE_URL,
-  telephone: CONTACT.phoneIntl,
-  email: CONTACT.email,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: CONTACT.address.street,
-    addressLocality: CONTACT.address.city,
-    addressCountry: CONTACT.address.country,
-  },
-  areaServed: ['SN', 'FR', 'IT', 'ES', 'BE', 'GB', 'CA', 'US'],
-  availableLanguage: ['fr'],
-};
+import { getTravelAgencySchema } from '@/lib/seo-schema';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const travelAgencyJsonLd = getTravelAgencySchema();
+
   return (
     <html lang="fr" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${playfair.variable} font-body antialiased`}>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import FaqSection from '@/components/sections/faq-section';
 import { Send, FileText, ShieldCheck, GraduationCap, CalendarCheck, Globe, HelpCircle } from 'lucide-react';
@@ -11,9 +12,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504518/hero-section-transport.jpg';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Assistance Voyage (visas, assurance, préinscriptions) - SLAAC Voyages' },
-  description: "Assistance visas, assurance voyage, préinscriptions universitaires et prise de rendez-vous. SLAAC Voyages vous accompagne dans toutes vos démarches à Dakar.",
+  title: 'Assistance voyage et formalités à Dakar | SLAAC Voyages',
+  description: "Assistance visas Chine, Dubaï, Schengen, assurance voyage et préinscriptions universitaires à Dakar Plateau. Démarches accompagnées par SLAAC Voyages.",
   alternates: { canonical: '/assistance-voyage' },
+  openGraph: {
+    title: 'Assistance voyage et formalités à Dakar | SLAAC Voyages',
+    description: "Assistance visas, assurance voyage et préinscriptions à Dakar Plateau avec SLAAC Voyages.",
+    url: '/assistance-voyage',
+  },
 };
 
 const assistanceServices = [
@@ -91,6 +97,10 @@ export default function AssistanceVoyagePage() {
             </p>
           </div>
         </section>
+
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Assistance & Visas' }]} />
+        </div>
 
         <section className="py-20 sm:py-28 bg-background">
           <div className="container mx-auto max-w-7xl px-4">

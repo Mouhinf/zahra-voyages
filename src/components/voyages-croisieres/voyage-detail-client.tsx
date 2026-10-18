@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { ArrowLeft, MapPin, Clock, Calendar, ChevronLeft, ChevronRight, Check, X, MessageCircle } from 'lucide-react';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
+import { getServiceSchema } from '@/lib/seo-schema';
 
 interface VoyageDetailClientProps {
   item: VoyageCroisiere | null;
@@ -122,6 +124,27 @@ export default function VoyageDetailClient({ item, id }: VoyageDetailClientProps
 
         <section className="py-12">
           <div className="container mx-auto max-w-5xl px-4">
+            <Breadcrumbs
+              items={[
+                { label: 'Voyages & Croisières', href: '/voyages-croisieres' },
+                { label: item.titre, href: `/voyages-croisieres/${id}` },
+              ]}
+              className="mb-6"
+            />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(
+                  getServiceSchema({
+                    name: item.titre,
+                    description: item.description,
+                    url: `https://slaacvoyages.com/voyages-croisieres/${id}`,
+                    image: gallery[0],
+                    serviceType: item.type === 'croisiere' ? 'CruiseTrip' : 'TourPackage',
+                  })
+                ),
+              }}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
                 <div className="mb-4">

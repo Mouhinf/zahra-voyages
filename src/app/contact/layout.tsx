@@ -3,9 +3,14 @@ import type { ReactNode } from 'react';
 
 // La page contact est un composant client : les métadonnées vivent ici.
 export const metadata: Metadata = {
-  title: 'Contact — SLAAC Voyages, Dakar',
-  description: "Contactez SLAAC Voyages à Dakar : formulaire, WhatsApp +221 77 312 90 90, email et agence à Dakar Plateau. Réponse sous 24 h, devis gratuit.",
+  title: 'Contact & Agence Dakar Plateau | SLAAC Voyages',
+  description: "Contactez SLAAC Voyages à Dakar Plateau : devis gratuit sous 24 h, WhatsApp +221 77 312 90 90, email contact@slaacvoyages.com et accueil à l’agence.",
   alternates: { canonical: '/contact' },
+  openGraph: {
+    title: 'Contact & Agence Dakar Plateau | SLAAC Voyages',
+    description: "Formulaire de contact, devis en 24 h et coordonnées officielles de l'agence SLAAC Voyages à Dakar Plateau.",
+    url: '/contact',
+  },
 };
 
 export default function ContactLayout({ children }: { children: ReactNode }) {

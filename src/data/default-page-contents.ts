@@ -12,9 +12,9 @@ const HERO_AFFAIRES =
 export const defaultPageContents: Record<PageSlug, PageContent> = {
   hebergement: {
     id: 'hebergement',
-    metaTitle: 'Hébergement - SLAAC Voyages',
+    metaTitle: 'Hébergements et séjours au Sénégal | SLAAC Voyages',
     metaDescription:
-      "Hôtels, résidences et appartements à Dakar, Saly, Casamance et à l'international. Trouvez l'hébergement idéal pour votre séjour avec SLAAC Voyages.",
+      "Hôtels de standing, résidences meublées et lodges à Dakar, Saly et en Casamance. Réservation sécurisée et service conciergerie par SLAAC Voyages.",
     hero: {
       badge: 'Hôtels · Lodges · Campements',
       title: 'Hébergement',
@@ -62,9 +62,9 @@ export const defaultPageContents: Record<PageSlug, PageContent> = {
   },
   transport: {
     id: 'transport',
-    metaTitle: 'Transport - SLAAC Voyages',
+    metaTitle: 'Transferts AIBD et transport à Dakar | SLAAC Voyages',
     metaDescription:
-      'Location de voiture, VTC, transferts aéroport et bus privé à Dakar et au Sénégal. Voyagez en toute liberté avec SLAAC Voyages.',
+      "Chauffeurs privés, transferts aéroport Blaise-Diagne (AIBD), berlines VIP et navettes interurbaines à Dakar et au Sénégal avec SLAAC Voyages.",
     hero: {
       badge: 'Billets · Transferts · Location',
       title: 'Transport',
@@ -85,9 +85,9 @@ export const defaultPageContents: Record<PageSlug, PageContent> = {
   },
   excursions: {
     id: 'excursions',
-    metaTitle: 'Circuits et Excursions - SLAAC Voyages',
+    metaTitle: 'Circuits et excursions au Sénégal | SLAAC Voyages',
     metaDescription:
-      'Circuits et excursions au Sénégal : Île de Gorée, Lac Rose, Casamance. Découvrez les trésors du Sénégal avec SLAAC Voyages.',
+      "Excursions guidées à l'île de Gorée, au Lac Rose, à la réserve de Bandia et dans le Sine Saloum. Découvrez le Sénégal authentique avec SLAAC Voyages.",
     hero: {
       badge: 'Circuits · Excursions',
       title: 'Circuits et Excursions',
@@ -108,9 +108,9 @@ export const defaultPageContents: Record<PageSlug, PageContent> = {
   },
   'tourisme-affaires': {
     id: 'tourisme-affaires',
-    metaTitle: 'Tourisme - SLAAC Voyages',
+    metaTitle: "Voyages d'affaires et déplacements professionnels | SLAAC Voyages",
     metaDescription:
-      'Tourisme religieux, local, linguistique et d’affaires au Sénégal et à l’international avec SLAAC Voyages.',
+      "Organisation logistique pour délégations, séminaires d'entreprises, transports VIP et conciergerie corporate à Dakar Plateau avec SLAAC Voyages.",
     hero: {
       badge: 'Découvertes & expériences',
       title: 'Tourisme',

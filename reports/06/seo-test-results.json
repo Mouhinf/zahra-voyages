@@ -1,0 +1,129 @@
+{
+  "timestamp": "2026-10-18T01:13:54.313Z",
+  "targetDomain": "https://slaacvoyages.com",
+  "totalCriteria": 20,
+  "passed": 20,
+  "failed": 0,
+  "details": [
+    {
+      "id": 1,
+      "name": "Robots.txt règles et pointeur sitemap",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 2,
+      "name": "Protection de l'espace /admin via noindex, nofollow",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 3,
+      "name": "Page 404 personnalisée avec noindex",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 4,
+      "name": "Élimination des soft 404 via notFound() sur les 5 routes dynamiques",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 5,
+      "name": "Sitemap dynamique sans churn de faux new Date()",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 6,
+      "name": "Filtrage strict des brouillons et offres supprimées du Sitemap",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 7,
+      "name": "Balises alternates hreflang dans les entrées du Sitemap",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 8,
+      "name": "MetadataBase et URL canonique https://slaacvoyages.com",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 9,
+      "name": "Déclaration hreflang bilingue fr-SN et en-US dans le Layout racine",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 10,
+      "name": "Bibliothèque de constructeurs Schema.org JSON-LD",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 11,
+      "name": "Complétude des données LocalBusiness / TravelAgency (GPS, NAP, devises)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 12,
+      "name": "Injection du Schema.org TravelAgency dans le DOM HTML racine",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 13,
+      "name": "Composant Fil d'Ariane avec JSON-LD BreadcrumbList",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 14,
+      "name": "Intégration Fil d'Ariane et Schema.org sur toutes les fiches détaillées",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 15,
+      "name": "Métadonnées descriptives et optimisées pour les hubs de services",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 16,
+      "name": "Optimisation SEO ciblée pour la page événement Dakar 2026",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 17,
+      "name": "Sélecteur de langue crawlable avec balises hrefLang dans le Header et Footer",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 18,
+      "name": "Génération des inventaires d'URLs et registre des anomalies",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 19,
+      "name": "Cartes OpenGraph et Twitter Cards complètes sur la page d'accueil",
+      "success": true,
+      "details": ""
+    },
+    {
+      "id": 20,
+      "name": "Non-régression des acquis fonctionnels (Outbox Email, CRM, Design System)",
+      "success": true,
+      "details": ""
+    }
+  ]
+}

@@ -135,8 +135,13 @@ export default function Footer() {
         </div>
         <div className="mt-10 border-t border-primary-foreground/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-primary-foreground/60">
           <p>&copy; {new Date().getFullYear()} SLAAC Voyages. Tous droits réservés. Agence immatriculée à Dakar (Sénégal).</p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/" hrefLang="fr" lang="fr" className="hover:text-accent transition-colors">Français</Link>
+            <span className="text-primary-foreground/30">•</span>
+            <Link href="/en" hrefLang="en" lang="en" className="hover:text-accent transition-colors">English</Link>
+            <span className="text-primary-foreground/30">•</span>
             <Link href="/confidentialite" className="hover:underline">Confidentialité</Link>
+            <span className="text-primary-foreground/30">•</span>
             <Link href="/about" className="hover:underline">Mentions Légales</Link>
           </div>
         </div>

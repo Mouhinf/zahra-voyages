@@ -171,6 +171,37 @@ export default function Header() {
 
           {/* Actions : WhatsApp direct + CTA Devis + Hamburger mobile */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            {/* Sélecteur de langue crawlable FR / EN */}
+            <nav aria-label="Langues" className="hidden sm:inline-flex items-center text-xs font-semibold rounded-lg border border-slate-200 p-0.5 bg-slate-50/80">
+              <Link
+                href="/"
+                hrefLang="fr"
+                lang="fr"
+                className={cn(
+                  "px-2 py-1 rounded transition-colors",
+                  !isEn ? "bg-white text-slaac-navy-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+                )}
+                title="Version française"
+                aria-label="Passer en version française"
+              >
+                FR
+              </Link>
+              <span className="text-slate-300" aria-hidden="true">|</span>
+              <Link
+                href="/en"
+                hrefLang="en"
+                lang="en"
+                className={cn(
+                  "px-2 py-1 rounded transition-colors",
+                  isEn ? "bg-white text-slaac-navy-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+                )}
+                title="English version"
+                aria-label="Switch to English version"
+              >
+                EN
+              </Link>
+            </nav>
+
             {/* Bouton WhatsApp avec icône verte et cible tactile 40px/44px */}
             <Button
               asChild
@@ -217,17 +248,37 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[min(24rem,calc(100vw-1rem))] overflow-y-auto p-0 border-l border-slate-200 bg-white">
                 <SheetHeader className="p-5 border-b border-slate-100 text-left">
-                  <SheetTitle className="flex items-center gap-2.5">
-                    <Image
-                      src="/logo-slaac.png"
-                      alt="SLAAC Voyages"
-                      width={36}
-                      height={36}
-                      className="h-8 w-8 object-contain"
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-bold text-base text-slaac-navy-900 leading-tight">SLAAC Voyages</span>
-                      <span className="text-[10px] uppercase tracking-wider text-slaac-gold-600 font-semibold">Conciergerie Dakar</span>
+                  <SheetTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Image
+                        src="/logo-slaac.png"
+                        alt="SLAAC Voyages"
+                        width={36}
+                        height={36}
+                        className="h-8 w-8 object-contain"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-bold text-base text-slaac-navy-900 leading-tight">SLAAC Voyages</span>
+                        <span className="text-[10px] uppercase tracking-wider text-slaac-gold-600 font-semibold">Conciergerie Dakar</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-xs font-semibold rounded-md border border-slate-200 p-0.5 bg-slate-50 mr-6">
+                      <Link
+                        href="/"
+                        hrefLang="fr"
+                        lang="fr"
+                        className={cn("px-2 py-1 rounded transition-colors", !isEn ? "bg-white text-slaac-navy-900 font-bold shadow-xs" : "text-slate-500")}
+                      >
+                        FR
+                      </Link>
+                      <Link
+                        href="/en"
+                        hrefLang="en"
+                        lang="en"
+                        className={cn("px-2 py-1 rounded transition-colors", isEn ? "bg-white text-slaac-navy-900 font-bold shadow-xs" : "text-slate-500")}
+                      >
+                        EN
+                      </Link>
                     </div>
                   </SheetTitle>
                 </SheetHeader>

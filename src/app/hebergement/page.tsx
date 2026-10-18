@@ -1,5 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import HebergementGrid from '@/components/sections/hebergement-grid';
 import FaqSection from '@/components/sections/faq-section';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
@@ -18,6 +19,17 @@ export async function generateMetadata(): Promise<Metadata> {
     title: content.metaTitle,
     description: content.metaDescription,
     alternates: { canonical: '/hebergement' },
+    openGraph: {
+      title: content.metaTitle,
+      description: content.metaDescription,
+      url: '/hebergement',
+      images: content.hero.image ? [{ url: content.hero.image, width: 1200, height: 630, alt: content.hero.title }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.metaTitle,
+      description: content.metaDescription,
+    },
   };
 }
 
@@ -45,6 +57,10 @@ export default async function HebergementPage() {
             </p>
           </div>
         </section>
+
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Hébergements' }]} />
+        </div>
 
         {/* Garanties critiques pour hébergements à Dakar */}
         <section className="py-8 bg-slate-50 border-b border-slate-200/80">

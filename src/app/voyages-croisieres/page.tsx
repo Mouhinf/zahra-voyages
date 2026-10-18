@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import VoyagesCroisieresGrid from '@/components/sections/voyages-croisieres-grid';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { fetchPublicCollection } from '@/lib/public-data';
@@ -11,9 +12,14 @@ import Image from 'next/image';
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504520/hero-section-voyages.jpg';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Voyages & Croisières - SLAAC Voyages' },
-  description: 'Voyages sur mesure et croisières vers des destinations de rêve. Préparez votre prochaine aventure avec SLAAC Voyages.',
+  title: 'Voyages sur mesure et croisières d’exception | SLAAC Voyages',
+  description: "Séjours organisés sur mesure, forfaits Omra et croisières maritimes au départ de Dakar avec SLAAC Voyages. Conseil personnalisé et devis sous 24 h.",
   alternates: { canonical: '/voyages-croisieres' },
+  openGraph: {
+    title: 'Voyages sur mesure et croisières d’exception | SLAAC Voyages',
+    description: "Séjours organisés et croisières d’exception au départ de Dakar avec SLAAC Voyages.",
+    url: '/voyages-croisieres',
+  },
 };
 
 export const revalidate = 300;
@@ -39,6 +45,10 @@ export default async function VoyagesCroisieresPage() {
             </p>
           </div>
         </section>
+
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Voyages & Croisières' }]} />
+        </div>
 
         <section className="py-20 sm:py-28 bg-background">
           <div className="container mx-auto max-w-7xl px-4">

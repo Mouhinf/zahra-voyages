@@ -13,6 +13,7 @@ import { MapPin, Mail, Send, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -94,6 +95,9 @@ export default function ContactPage() {
     <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow">
+            <div className="container mx-auto max-w-7xl px-4 pt-4">
+              <Breadcrumbs items={[{ label: 'Contact' }]} />
+            </div>
             <section className="py-20 sm:py-28 bg-secondary">
                 <div className="container mx-auto max-w-7xl px-4 text-center">
                     <span className="text-sm font-semibold uppercase tracking-widest text-primary">Restons en contact</span>

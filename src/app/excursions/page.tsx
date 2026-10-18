@@ -1,5 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import ExcursionsGrid from '@/components/sections/excursions-grid';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { fetchPublicCollection } from '@/lib/public-data';
@@ -19,6 +20,17 @@ export async function generateMetadata(): Promise<Metadata> {
     title: content.metaTitle,
     description: content.metaDescription,
     alternates: { canonical: '/excursions' },
+    openGraph: {
+      title: content.metaTitle,
+      description: content.metaDescription,
+      url: '/excursions',
+      images: content.hero.image ? [{ url: content.hero.image, width: 1200, height: 630, alt: content.hero.title }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.metaTitle,
+      description: content.metaDescription,
+    },
   };
 }
 
@@ -46,6 +58,10 @@ export default async function CircuitsExcursionsPage() {
             </p>
           </div>
         </section>
+
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Circuits & Excursions' }]} />
+        </div>
 
         <section className="py-20 sm:py-28 bg-background">
           <div className="container mx-auto max-w-7xl px-4">

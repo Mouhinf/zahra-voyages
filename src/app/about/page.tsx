@@ -2,14 +2,20 @@ import Image from 'next/image';
 import { Users, Globe, Heart, Building, Award, Target, Download, Send, MessageCircle, Phone } from 'lucide-react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'À propos — Agence de voyage à Dakar',
-  description: "SLAAC Voyages, agence de voyages basée à Dakar Plateau : billetterie, assistance visa, hébergement, circuits et tourisme d'affaires. Notre histoire, notre mission, nos valeurs.",
+  title: 'À propos de SLAAC Voyages | Agence agréée à Dakar Plateau',
+  description: "SLAAC Voyages, agence de voyage et conciergerie locale à Dakar Plateau (NINEA, RCCM) : billetterie, assistance visas, hébergements vérifiés et accueil VIP au Sénégal.",
   alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'À propos de SLAAC Voyages | Agence agréée à Dakar Plateau',
+    description: "Présentation de SLAAC Voyages, agence de voyages et conciergerie locale immatriculée à Dakar Plateau.",
+    url: '/about',
+  },
 };
 
 const whyUs = [
@@ -53,6 +59,9 @@ export default function AboutPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'À propos' }]} />
+        </div>
         <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-primary">À propos de nous</span>

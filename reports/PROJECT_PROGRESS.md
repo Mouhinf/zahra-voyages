@@ -1,7 +1,7 @@
 # Journal de Progression Global — SLAAC Voyages
 
 > **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
-> **Branche de travail actuelle :** `feat/slaac-perf-core-web-vitals`  
+> **Branche de travail actuelle :** `feat/slaac-technical-seo`  
 > **Dernière mise à jour :** 18 octobre 2026  
 > **Responsable Technique :** Architecte Logiciel Senior & Lead DevOps  
 
@@ -16,7 +16,7 @@
 | **03/12** | **Benchmark Concurrentiel, Intelligence de Marché & Positionnement Premium** | **TERMINÉ** | `feat/slaac-market-benchmark` | 17 oct. 2026 |
 | **04/12** | **Refonte UX/UI Premium, Mobile-First & Optimisation des Conversions** | **TERMINÉ** | `feat/slaac-design-system` | 17 oct. 2026 |
 | **05/12** | **Optimisation Extrême des Performances, Core Web Vitals & Coûts Cloud** | **TERMINÉ** | `feat/slaac-perf-core-web-vitals` | 18 oct. 2026 |
-| **06/12** | Module Billetterie Aérienne & Moteur de Cotation Express | *Prêt au lancement* | `feat/slaac-flight-booking` | - |
+| **06/12** | **SEO Technique Avancé, Indexation Google & Architecture de Référencement** | **TERMINÉ** | `feat/slaac-technical-seo` | 18 oct. 2026 |
 | **07/12** | Expérience Dakar 2026 & Réservations Événementielles (JOJ) | *Planifié* | - | - |
 | **08/12** | CMS Hébergements, Résidences & Gestion des Disponibilités | *Planifié* | - | - |
 | **09/12** | SEO Technique International & Données Structurées Schema.org | *Planifié* | - | - |
@@ -26,7 +26,33 @@
 
 ---
 
-## 2. Bilan de la Phase 05/12 (Performances, Core Web Vitals & Coûts Cloud)
+## 2. Bilan de la Phase 06/12 (SEO Technique Avancé & Indexation Google)
+
+### 2.1. Réalisations Majeures & Métriques Clés
+1. **Éradication Totale des Soft 404 :**
+   - Appel explicite à `notFound()` de `next/navigation` sur l'ensemble des 5 routes dynamiques (`/hebergement/[id]`, `/excursions/[id]`, `/transport/[id]`, `/tourisme-affaires/[id]`, `/voyages-croisieres/[id]`).
+   - Page 404 de prestige personnalisée (`src/app/not-found.tsx`) avec statut HTTP 404 strict, directive `robots: { index: false, follow: false }` et parcours de rétention utilisateur (WhatsApp, retour accueil).
+2. **Sitemap XML Dynamique Fiabilisé :**
+   - Remplacement de l'anti-pattern `new Date()` regénéré à chaque requête par un horodatage certifié (`2026-10-18T00:00:00.000Z`) ou parsing réel de Firestore.
+   - Exclusion stricte des brouillons (`statut === 'brouillon' || status === 'draft'`), offres supprimées ou indisponibles.
+   - Protection contre les blocages réseau via `Promise.race` (2,5s max) et parallélisation `Promise.all`.
+3. **Protection de l'Espace Administration :**
+   - Création de `src/app/admin/layout.tsx` avec balise meta native `<meta name="robots" content="noindex, nofollow, nocache" />`.
+   - Fichier `src/app/robots.ts` interdisant `/admin/`, `/api/`, `/_next/` et autorisant `/` et `Googlebot-Image`.
+4. **Infrastructure Schema.org JSON-LD (`src/lib/seo-schema.ts`) :**
+   - Schémas réels certifiés sans avis inventés : `TravelAgency`, `LocalBusiness` (coordonnées GPS de Dakar Plateau, téléphone officiel, devises XOF/EUR/USD, horaires), `BreadcrumbList`, `Service`, `LodgingBusiness`, `TouristAttraction`.
+   - Injection du schéma `TravelAgency` dans le layout racine.
+   - Composant universel `Breadcrumbs` déployé sur l'ensemble des 6 hubs et des 5 pages de détail.
+5. **SEO International & Découvrabilité Bilingue :**
+   - Sélecteur de langue crawlable (`FR | EN`) avec attributs `hrefLang` et `lang` dans le header desktop, le menu mobile et le footer.
+   - Configuration `metadataBase: new URL('https://slaacvoyages.com')` et `alternates` bilingues (`fr-SN`, `en-US`, `x-default`).
+6. **20 Livrables Documentaires & 100% de Tests Validés :**
+   - Suite de validation automatisée `tests/seo-technical.test.mjs` validant les 20/20 critères techniques.
+   - 20 rapports complets livrés dans `reports/06/` + `url-inventory.csv`, `seo-issues.csv` et `seo-test-results.json`.
+
+---
+
+## 3. Bilan de la Phase 05/12 (Performances, Core Web Vitals & Coûts Cloud)
 
 ### 2.1. Réalisations Majeures & Métriques Clés
 1. **Éradication Totale du Cumulative Layout Shift (CLS) :**
