@@ -117,6 +117,10 @@ export function sanitizeUtm(str?: string | null, maxLen = 60): string | undefine
 }
 
 /** Calcule un hash de session anonymisé pour le comptage de sessions uniques journalières */
+// Cache mémoire éphémère par instance pour éviter des lectures Firestore répétées sur les sessions actives
+const sessionCache = new Set<string>();
+let sessionCacheDate = '';
+
 function computeDailySessionHash(ip = '', userAgent = '', date: string): string {
   // Sel quotidien lié à la date pour que le hash ne soit pas corrélable dans le temps
   const salt = `slaac-salt-${date}`;
@@ -129,6 +133,12 @@ function computeDailySessionHash(ip = '', userAgent = '', date: string): string 
 /**
  * Enregistre un événement analytique et incrémente atomiquement
  * les compteurs journaliers agrégés (`analyticsDaily/YYYY-MM-DD`).
+ *
+ * Optimisations :
+ * - Déduplication mémoire des sessions pour économiser les lectures Firestore.
+ * - Écriture directe dans analyticsDaily avec FieldValue.increment.
+ * - Journal brut analyticsEvents réservé aux conversions réelles (quote, whatsapp, cta),
+ *   évitant des milliers d'écritures inutiles sur de simples pages vues.
  */
 export async function recordAnalyticsEvent(input: AnalyticsLogInput): Promise<void> {
   const dateStr = getDakarDate();
@@ -169,31 +179,40 @@ export async function recordAnalyticsEvent(input: AnalyticsLogInput): Promise<vo
     updates.quoteStarts = FieldValue.increment(1);
   }
 
-  // Vérification de session unique journalière (via sous-collection légère éphémère)
+  // Vérification de session unique journalière avec cache mémoire local
   if (input.ip && eventType === 'page_view') {
+    if (sessionCacheDate !== dateStr) {
+      sessionCache.clear();
+      sessionCacheDate = dateStr;
+    }
     const sessionHash = computeDailySessionHash(input.ip, input.userAgent, dateStr);
-    const sessionRef = dailyRef.collection('sessions').doc(sessionHash);
-    const sessionSnap = await sessionRef.get();
-    if (!sessionSnap.exists) {
-      await sessionRef.set({ at: now });
-      updates.uniqueSessions = FieldValue.increment(1);
+    if (!sessionCache.has(sessionHash)) {
+      const sessionRef = dailyRef.collection('sessions').doc(sessionHash);
+      const sessionSnap = await sessionRef.get();
+      if (!sessionSnap.exists) {
+        await sessionRef.set({ at: now });
+        updates.uniqueSessions = FieldValue.increment(1);
+      }
+      sessionCache.add(sessionHash);
     }
   }
 
   // Écriture de l'agrégation
   await dailyRef.set(updates, { merge: true });
 
-  // Événement brut (journal avec TTL/rétention pour audit de traçabilité)
-  await db().collection('analyticsEvents').add({
-    date: dateStr,
-    page,
-    eventType,
-    source,
-    campaign: campaign || null,
-    country,
-    device,
-    timestamp: now,
-  });
+  // Événements de conversion tracés individuellement (actions commerciales clés)
+  if (eventType !== 'page_view') {
+    await db().collection('analyticsEvents').add({
+      date: dateStr,
+      page,
+      eventType,
+      source,
+      campaign: campaign || null,
+      country,
+      device,
+      timestamp: now,
+    });
+  }
 }
 
 /**

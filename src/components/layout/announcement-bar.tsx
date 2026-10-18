@@ -72,7 +72,7 @@ function BannerContent({ banner }: { banner: PublicPromoBanner }) {
 }
 
 export default function AnnouncementBar() {
-  const [banners, setBanners] = useState<PublicPromoBanner[] | null>(null);
+  const [banners, setBanners] = useState<PublicPromoBanner[]>([FALLBACK]);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const reducedMotion = useRef(false);
@@ -82,14 +82,14 @@ export default function AnnouncementBar() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/promo-banners', { cache: 'no-cache' });
+        const res = await fetch('/api/promo-banners');
         const body = await res.json().catch(() => ({}));
         const list: PublicPromoBanner[] = Array.isArray(body?.banners) ? body.banners : [];
-        if (!cancelled) {
+        if (!cancelled && list.length > 0) {
           setBanners(list.filter((b) => b && typeof b.message === 'string'));
         }
       } catch {
-        if (!cancelled) setBanners([]);
+        // En cas d'erreur réseau, FALLBACK reste affiché sans perturber l'UI
       }
     })();
     return () => {
@@ -97,7 +97,7 @@ export default function AnnouncementBar() {
     };
   }, []);
 
-  const list = banners === null ? null : banners.length > 0 ? banners : [FALLBACK];
+  const list = banners.length > 0 ? banners : [FALLBACK];
 
   const next = useCallback(() => {
     setIndex((i) => (list ? (i + 1) % list.length : 0));

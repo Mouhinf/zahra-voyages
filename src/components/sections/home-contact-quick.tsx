@@ -13,8 +13,6 @@ import { MapPin, Mail, Send, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const FALLBACK_AGENCY = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png';
 
@@ -28,26 +26,8 @@ import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
 
 export default function HomeContactQuick() {
   const { toast } = useToast();
-  const [agenceImg, setAgenceImg] = useState<string>(FALLBACK_AGENCY);
+  const agenceImg = FALLBACK_AGENCY;
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const db = getDbInstance();
-        const q = query(collection(db, 'hebergements'), orderBy('ordre', 'asc'), limit(1));
-        const snap = await getDocs(q);
-        snap.forEach((docSnap) => {
-          const d = docSnap.data() as { image?: string; disponible?: boolean };
-          if (d.disponible !== false && d.image && mounted) setAgenceImg(d.image.includes('unsplash') ? FALLBACK_AGENCY : d.image);
-        });
-      } catch (e) {
-        console.error('Erreur fetch agence img:', e);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
 
   const form = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),

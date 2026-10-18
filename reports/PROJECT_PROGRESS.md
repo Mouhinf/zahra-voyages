@@ -1,8 +1,8 @@
 # Journal de Progression Global — SLAAC Voyages
 
 > **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
-> **Branche de travail actuelle :** `feat/slaac-design-system`  
-> **Dernière mise à jour :** 17 octobre 2026  
+> **Branche de travail actuelle :** `feat/slaac-perf-core-web-vitals`  
+> **Dernière mise à jour :** 18 octobre 2026  
 > **Responsable Technique :** Architecte Logiciel Senior & Lead DevOps  
 
 ---
@@ -15,18 +15,69 @@
 | **02/12** | **Refonte Professionnelle des Formulaires, du CRM et des Parcours de Conversion** | **TERMINÉ** | `feat/slaac-forms-crm` | 17 oct. 2026 |
 | **03/12** | **Benchmark Concurrentiel, Intelligence de Marché & Positionnement Premium** | **TERMINÉ** | `feat/slaac-market-benchmark` | 17 oct. 2026 |
 | **04/12** | **Refonte UX/UI Premium, Mobile-First & Optimisation des Conversions** | **TERMINÉ** | `feat/slaac-design-system` | 17 oct. 2026 |
-| **05/12** | Module Billetterie Aérienne & Moteur de Cotation Express | *Prêt au lancement* | `feat/slaac-flight-booking` | - |
-| **06/12** | Expérience Dakar 2026 & Réservations Événementielles (JOJ) | *Planifié* | - | - |
-| **07/12** | CMS Hébergements, Résidences & Gestion des Disponibilités | *Planifié* | - | - |
-| **08/12** | SEO Technique International & Données Structurées Schema.org | *Planifié* | - | - |
-| **09/12** | Automatisation WhatsApp Business API & Chatbot Hybride | *Planifié* | - | - |
-| **10/12** | Espace Partenaires B2B & Tourisme d'Affaires (MICE) | *Planifié* | - | - |
-| **11/12** | Système de Facturation, Acomptes & Passerelles de Paiement | *Planifié* | - | - |
-| **12/12** | Surveillance Continue, Observabilité & Plan de Reprise d'Activité (PRA) | *Planifié* | - | - |
+| **05/12** | **Optimisation Extrême des Performances, Core Web Vitals & Coûts Cloud** | **TERMINÉ** | `feat/slaac-perf-core-web-vitals` | 18 oct. 2026 |
+| **06/12** | Module Billetterie Aérienne & Moteur de Cotation Express | *Prêt au lancement* | `feat/slaac-flight-booking` | - |
+| **07/12** | Expérience Dakar 2026 & Réservations Événementielles (JOJ) | *Planifié* | - | - |
+| **08/12** | CMS Hébergements, Résidences & Gestion des Disponibilités | *Planifié* | - | - |
+| **09/12** | SEO Technique International & Données Structurées Schema.org | *Planifié* | - | - |
+| **10/12** | Automatisation WhatsApp Business API & Chatbot Hybride | *Planifié* | - | - |
+| **11/12** | Espace Partenaires B2B & Tourisme d'Affaires (MICE) | *Planifié* | - | - |
+| **12/12** | Système de Facturation, Acomptes & Passerelles de Paiement | *Planifié* | - | - |
 
 ---
 
-## 2. Bilan de la Phase 04/12 (Refonte UX/UI Premium & Conversion)
+## 2. Bilan de la Phase 05/12 (Performances, Core Web Vitals & Coûts Cloud)
+
+### 2.1. Réalisations Majeures & Métriques Clés
+1. **Éradication Totale du Cumulative Layout Shift (CLS) :**
+   - CLS ramené à **0.000 sur l'intégralité des 13 routes testées** (contre 0.049 sur le site public et 0.868 sur les pages détails auparavant).
+   - Stabilisation de la bannière d'annonce (`AnnouncementBar`) avec fallback statique immédiat au premier octet HTML (suppression du saut de 44px).
+   - Remplacement des spinners plein écran asynchrones par du Server Side Rendering (SSR) complet.
+2. **Refonte SSR des Pages Produits & Catalogues :**
+   - Conversion de 5 pages clés en Server Components avec `generateMetadata` SEO : `/hebergement/[id]`, `/excursions/[id]`, `/transport/[id]`, `/tourisme-affaires/[id]`, `/voyages-croisieres/[id]`.
+   - Score de la page hébergement détaillée : passage de **50 à 89 (+39 points)**, LCP réduit de **5.4s à 3.3s (-2.1 secondes)**.
+3. **Allègement Drastique du Bundle JavaScript :**
+   - First Load JS sur la Homepage : passage de 331 kB à **213 kB (-118 kB / -35.6%)**.
+   - Suppression de l'import client de `@firebase/firestore` sur la page d'accueil (remplacement de la requête dynamique superflue par un asset Cloudinary optimisé).
+4. **Réduction Massive des Coûts Cloud (Firestore & Vercel) :**
+   - Introduction d'un cache mémoire des sessions analytics (`sessionCache`) évitant 75 à 95% des lectures répétées.
+   - Suppression de l'insertion brute d'événements `page_view` non indexés dans Firestore au profit de compteurs atomiques journaliers consolidés (-66% d'écritures).
+   - En-têtes HTTP de cache Vercel optimisés (`s-maxage=60`, `stale-while-revalidate=3600`) sur les bannières et API publiques.
+5. **Score Moyen Lighthouse Public :**
+   - Progression de **83.4 / 100 à 91.4 / 100 (+8.0 points)** sur mobile 4G/3G ralenti CPU 4x.
+   - Total Blocking Time (TBT) sur l'accueil divisé par 2 (de 530 ms à 280 ms).
+
+### 2.2. Inventaire Exhaustif des 16 Livrables & Métriques (`reports/05/`)
+- [x] [`reports/05/01-baseline-performance.md`](file:///home/mouhammad/zahra-voyages/reports/05/01-baseline-performance.md) : Audit initial, configuration Lighthouse mobile et matrice des 13 routes.
+- [x] [`reports/05/02-nextjs-rendering.md`](file:///home/mouhammad/zahra-voyages/reports/05/02-nextjs-rendering.md) : Stratégie SSR vs RSC, suppression des cascades client-side et hydratation.
+- [x] [`reports/05/03-bundle-optimization.md`](file:///home/mouhammad/zahra-voyages/reports/05/03-bundle-optimization.md) : Analyse des chunks Webpack, arbre de dépendances et First Load JS.
+- [x] [`reports/05/04-cloudinary-images.md`](file:///home/mouhammad/zahra-voyages/reports/05/04-cloudinary-images.md) : Formats AVIF/WebP, responsive `sizes`, `priority` LCP et politique de cache CDN.
+- [x] [`reports/05/05-firestore-optimization.md`](file:///home/mouhammad/zahra-voyages/reports/05/05-firestore-optimization.md) : Bornage `limit(100)`, requêtes composites, tri sans drop de données.
+- [x] [`reports/05/06-crm-admin-performance.md`](file:///home/mouhammad/zahra-voyages/reports/05/06-crm-admin-performance.md) : Pagination des listes devis/contacts, indexation et vitesse admin.
+- [x] [`reports/05/07-analytics-cost.md`](file:///home/mouhammad/zahra-voyages/reports/05/07-analytics-cost.md) : Agrégation atomique des compteurs, cache session et réduction des écritures.
+- [x] [`reports/05/08-api-serverless.md`](file:///home/mouhammad/zahra-voyages/reports/05/08-api-serverless.md) : Durée d'exécution Serverless, Cold Starts, rate limiting et schémas Zod.
+- [x] [`reports/05/09-vercel-cache.md`](file:///home/mouhammad/zahra-voyages/reports/05/09-vercel-cache.md) : Cache Edge Vercel, en-têtes `Cache-Control` et invalidation.
+- [x] [`reports/05/10-css-fonts-cls.md`](file:///home/mouhammad/zahra-voyages/reports/05/10-css-fonts-cls.md) : Diagnostic du CLS, fallbacks de police `next/font` et élimination des sauts d'affichage.
+- [x] [`reports/05/11-interactions-chatbot.md`](file:///home/mouhammad/zahra-voyages/reports/05/11-interactions-chatbot.md) : Réactivité de la modale devis, conciergerie mobile et lazy loading.
+- [x] [`reports/05/12-cloud-cost-analysis.md`](file:///home/mouhammad/zahra-voyages/reports/05/12-cloud-cost-analysis.md) : Modélisation des coûts mensuels Vercel, Firebase et Cloudinary (croissance 10x).
+- [x] [`reports/05/13-observability.md`](file:///home/mouhammad/zahra-voyages/reports/05/13-observability.md) : Stratégie de monitoring Real User Monitoring (RUM), seuils d'alerte et logs structurés.
+- [x] [`reports/05/14-performance-comparison.md`](file:///home/mouhammad/zahra-voyages/reports/05/14-performance-comparison.md) : Comparatif chiffré avant/après des 13 routes et gains Core Web Vitals.
+- [x] [`reports/05/15-test-results.md`](file:///home/mouhammad/zahra-voyages/reports/05/15-test-results.md) : Validation intégrale des 167 tests automatisés (100% succès).
+- [x] [`reports/05/16-production-readiness.md`](file:///home/mouhammad/zahra-voyages/reports/05/16-production-readiness.md) : Grille Go/No-Go, procédure de déploiement et plan de rollback.
+- [x] `reports/05/metrics-before.json` & `reports/05/metrics-after.json` : Jeux de données bruts Lighthouse.
+
+### 2.3. Métriques de Qualité & Tests Phase 05
+- **Tests Intégration API & Sécurité (`tests/api-integration.test.mjs`) :** 19/19 réussis (100%).
+- **Tests Formulaires & CRM (`tests/forms-crm-system.test.mjs`) :** 16/16 réussis (100%).
+- **Tests Système Email Transactionnel (`tests/email-system.test.mjs`) :** 11/11 réussis (100%).
+- **Tests Header & Bannières (`tests/header-banners.test.mjs`) :** 39/39 réussis (100%).
+- **Tests Responsive & Formulaires (`tests/forms-responsive.test.mjs`) :** 82/82 réussis (100%).
+- **Total Tests Automatisés :** 167/167 réussis (100%).
+- **Build Production Next.js 15 :** Validé avec 0 erreur.
+
+---
+
+## 3. Bilan de la Phase 04/12 (Refonte UX/UI Premium & Conversion)
 
 ### 2.1. Réalisations Majeures & Métriques Clés
 1. **Design System & Tokens de Marque :**

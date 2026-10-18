@@ -1,0 +1,431 @@
+[
+  {
+    "route": "/",
+    "url": "http://localhost:3100/",
+    "timestamp": "2026-10-17T23:58:59.094Z",
+    "scores": {
+      "performance": 86,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1068,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3350,
+      "tbt": "280 ms",
+      "tbtNumeric": 281,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.4 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 13
+    },
+    "network": {
+      "requestsCount": 35,
+      "totalBytes": 434848,
+      "totalKiB": 425,
+      "jsBytes": 234973,
+      "jsKiB": 229,
+      "imgBytes": 42836,
+      "imgKiB": 42
+    }
+  },
+  {
+    "route": "/hebergement",
+    "url": "http://localhost:3100/hebergement",
+    "timestamp": "2026-10-17T23:59:13.477Z",
+    "scores": {
+      "performance": 92,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1067,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3269,
+      "tbt": "120 ms",
+      "tbtNumeric": 118,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 7
+    },
+    "network": {
+      "requestsCount": 34,
+      "totalBytes": 456821,
+      "totalKiB": 446,
+      "jsBytes": 243267,
+      "jsKiB": 238,
+      "imgBytes": 61582,
+      "imgKiB": 60
+    }
+  },
+  {
+    "route": "/transport",
+    "url": "http://localhost:3100/transport",
+    "timestamp": "2026-10-17T23:59:27.909Z",
+    "scores": {
+      "performance": 92,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1064,
+      "lcp": "3.1 s",
+      "lcpNumeric": 3095,
+      "tbt": "150 ms",
+      "tbtNumeric": 150,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 7
+    },
+    "network": {
+      "requestsCount": 33,
+      "totalBytes": 411876,
+      "totalKiB": 402,
+      "jsBytes": 244180,
+      "jsKiB": 238,
+      "imgBytes": 15392,
+      "imgKiB": 15
+    }
+  },
+  {
+    "route": "/voyages-croisieres",
+    "url": "http://localhost:3100/voyages-croisieres",
+    "timestamp": "2026-10-17T23:59:43.327Z",
+    "scores": {
+      "performance": 89,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1064,
+      "lcp": "3.4 s",
+      "lcpNumeric": 3388,
+      "tbt": "200 ms",
+      "tbtNumeric": 198,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 12
+    },
+    "network": {
+      "requestsCount": 36,
+      "totalBytes": 489735,
+      "totalKiB": 478,
+      "jsBytes": 239350,
+      "jsKiB": 234,
+      "imgBytes": 101364,
+      "imgKiB": 99
+    }
+  },
+  {
+    "route": "/excursions",
+    "url": "http://localhost:3100/excursions",
+    "timestamp": "2026-10-17T23:59:59.155Z",
+    "scores": {
+      "performance": 91,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1063,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3332,
+      "tbt": "130 ms",
+      "tbtNumeric": 133,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 14
+    },
+    "network": {
+      "requestsCount": 35,
+      "totalBytes": 489881,
+      "totalKiB": 478,
+      "jsBytes": 239468,
+      "jsKiB": 234,
+      "imgBytes": 94062,
+      "imgKiB": 92
+    }
+  },
+  {
+    "route": "/tourisme-affaires",
+    "url": "http://localhost:3100/tourisme-affaires",
+    "timestamp": "2026-10-18T00:00:15.672Z",
+    "scores": {
+      "performance": 92,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1062,
+      "lcp": "3.2 s",
+      "lcpNumeric": 3247,
+      "tbt": "120 ms",
+      "tbtNumeric": 118,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 8
+    },
+    "network": {
+      "requestsCount": 35,
+      "totalBytes": 629715,
+      "totalKiB": 615,
+      "jsBytes": 242232,
+      "jsKiB": 237,
+      "imgBytes": 239296,
+      "imgKiB": 234
+    }
+  },
+  {
+    "route": "/assistance-voyage",
+    "url": "http://localhost:3100/assistance-voyage",
+    "timestamp": "2026-10-18T00:00:30.390Z",
+    "scores": {
+      "performance": 88,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1062,
+      "lcp": "3.4 s",
+      "lcpNumeric": 3379,
+      "tbt": "220 ms",
+      "tbtNumeric": 223,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 6
+    },
+    "network": {
+      "requestsCount": 33,
+      "totalBytes": 401319,
+      "totalKiB": 392,
+      "jsBytes": 236085,
+      "jsKiB": 231,
+      "imgBytes": 15392,
+      "imgKiB": 15
+    }
+  },
+  {
+    "route": "/destinations",
+    "url": "http://localhost:3100/destinations",
+    "timestamp": "2026-10-18T00:00:45.420Z",
+    "scores": {
+      "performance": 94,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "0.9 s",
+      "fcpNumeric": 912,
+      "lcp": "3.0 s",
+      "lcpNumeric": 2980,
+      "tbt": "120 ms",
+      "tbtNumeric": 120,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "0.9 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 6
+    },
+    "network": {
+      "requestsCount": 36,
+      "totalBytes": 588304,
+      "totalKiB": 575,
+      "jsBytes": 236803,
+      "jsKiB": 231,
+      "imgBytes": 204458,
+      "imgKiB": 200
+    }
+  },
+  {
+    "route": "/dakar-2026",
+    "url": "http://localhost:3100/dakar-2026",
+    "timestamp": "2026-10-18T00:01:00.012Z",
+    "scores": {
+      "performance": 90,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1060,
+      "lcp": "3.4 s",
+      "lcpNumeric": 3403,
+      "tbt": "170 ms",
+      "tbtNumeric": 165,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 5
+    },
+    "network": {
+      "requestsCount": 31,
+      "totalBytes": 441114,
+      "totalKiB": 431,
+      "jsBytes": 234973,
+      "jsKiB": 229,
+      "imgBytes": 62647,
+      "imgKiB": 61
+    }
+  },
+  {
+    "route": "/contact",
+    "url": "http://localhost:3100/contact",
+    "timestamp": "2026-10-18T00:01:18.250Z",
+    "scores": {
+      "performance": 92,
+      "accessibility": 95,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "0.9 s",
+      "fcpNumeric": 911,
+      "lcp": "3.1 s",
+      "lcpNumeric": 3074,
+      "tbt": "170 ms",
+      "tbtNumeric": 168,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "0.9 s",
+      "ttfb": "Root document took 0 ms",
+      "ttfbNumeric": 4
+    },
+    "network": {
+      "requestsCount": 49,
+      "totalBytes": 874190,
+      "totalKiB": 854,
+      "jsBytes": 688724,
+      "jsKiB": 673,
+      "imgBytes": 41245,
+      "imgKiB": 40
+    }
+  },
+  {
+    "route": "/en",
+    "url": "http://localhost:3100/en",
+    "timestamp": "2026-10-18T00:01:33.595Z",
+    "scores": {
+      "performance": 92,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1061,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3276,
+      "tbt": "100 ms",
+      "tbtNumeric": 104,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 11
+    },
+    "network": {
+      "requestsCount": 33,
+      "totalBytes": 440225,
+      "totalKiB": 430,
+      "jsBytes": 236804,
+      "jsKiB": 231,
+      "imgBytes": 53784,
+      "imgKiB": 53
+    }
+  },
+  {
+    "route": "/hebergement/azalai-hotel-dakar",
+    "url": "http://localhost:3100/hebergement/azalai-hotel-dakar",
+    "timestamp": "2026-10-18T00:02:33.878Z",
+    "scores": {
+      "performance": 89,
+      "accessibility": 93,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.0 s",
+      "fcpNumeric": 956,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3254,
+      "tbt": "220 ms",
+      "tbtNumeric": 224,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "1.9 s",
+      "ttfb": "Root document took 810 ms",
+      "ttfbNumeric": 808
+    },
+    "network": {
+      "requestsCount": 42,
+      "totalBytes": 551774,
+      "totalKiB": 539,
+      "jsBytes": 360541,
+      "jsKiB": 352,
+      "imgBytes": 41081,
+      "imgKiB": 40
+    }
+  },
+  {
+    "route": "/admin/login",
+    "url": "http://localhost:3100/admin/login",
+    "timestamp": "2026-10-18T00:02:47.881Z",
+    "scores": {
+      "performance": 95,
+      "accessibility": 98,
+      "bestPractices": 100,
+      "seo": 63
+    },
+    "metrics": {
+      "fcp": "0.9 s",
+      "fcpNumeric": 908,
+      "lcp": "2.3 s",
+      "lcpNumeric": 2258,
+      "tbt": "210 ms",
+      "tbtNumeric": 212,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "0.9 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 6
+    },
+    "network": {
+      "requestsCount": 23,
+      "totalBytes": 397281,
+      "totalKiB": 388,
+      "jsBytes": 285092,
+      "jsKiB": 278,
+      "imgBytes": 0,
+      "imgKiB": 0
+    }
+  }
+]
