@@ -1,0 +1,29 @@
+Scope,Component_Or_Page,FR_Status,EN_Status,Coverage_Pct,Automated_Tests,Manual_Audit_Status
+Page,Homepage (/) vs (/en),100%,100%,100%,Yes,Verified
+Page,Transport & AIBD (/transport) vs (/en/transport),100%,100%,100%,Yes,Verified
+Page,Accommodation & Stays (/hebergement) vs (/en/hebergement),100%,100%,100%,Yes,Verified
+Page,Excursions & Tours (/excursions) vs (/en/excursions),100%,100%,100%,Yes,Verified
+Page,Corporate Travel (/tourisme-affaires) vs (/en/tourisme-affaires),100%,100%,100%,Yes,Verified
+Page,Travel Assistance (/assistance-voyage) vs (/en/assistance-voyage),100%,100%,100%,Yes,Verified
+Page,Destinations (/destinations) vs (/en/destinations),100%,100%,100%,Yes,Verified
+Page,About Us (/about) vs (/en/about),100%,100%,100%,Yes,Verified
+Page,Contact & Office (/contact) vs (/en/contact),100%,100%,100%,Yes,Verified
+Page,Dakar 2026 Event Hub (/dakar-2026) vs (/en/dakar-2026),100%,100%,100%,Yes,Verified
+Page,Travel Guides Collection (/guides) vs (/en/guides),100%,100%,100%,Yes,Verified
+Page,Individual Practical Guides (6 guides /guides/[slug] vs /en/guides/[slug]),100%,100%,100%,Yes,Verified
+Navigation,Header Desktop & Mobile Nav,100%,100%,100%,Yes,Verified
+Navigation,Footer Columns & Links,100%,100%,100%,Yes,Verified
+Navigation,Language Switcher (FR / EN toggle),100%,100%,100%,Yes,Verified
+Interaction,Quote Request Modal Dialog,100%,100%,100%,Yes,Verified
+Interaction,Quote Request Button,100%,100%,100%,Yes,Verified
+Interaction,Contact Form,100%,100%,100%,Yes,Verified
+Email,Customer Quote Confirmation Email,100%,100%,100%,Yes,Verified
+Email,Agency Quote Notification Email,100%,100%,100%,Yes,Verified
+Email,Manager Quote Notification Email,100%,100%,100%,Yes,Verified
+Email,Customer Contact Receipt Email,100%,100%,100%,Yes,Verified
+Email,Agency Contact Notification Email,100%,100%,100%,Yes,Verified
+Email,Newsletter Welcome Email,100%,100%,100%,Yes,Verified
+SEO,Sitemap.xml Hreflang Alternates,100%,100%,100%,Yes,Verified
+SEO,Document Root SSR <html lang>,100%,100%,100%,Yes,Verified
+CRM,Firestore Quotes 'locale' attribute,100%,100%,100%,Yes,Verified
+CRM,Firestore Contacts 'locale' attribute,100%,100%,100%,Yes,Verified

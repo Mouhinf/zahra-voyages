@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Inter, Playfair_Display } from 'next/font/google';
 import ChatbotLoader from '@/components/chatbot-loader';
 import AnalyticsBeacon from '@/components/analytics-beacon';
+import { FloatingConciergeBar } from '@/components/layout/floating-concierge-bar';
+import { ConsentBanner } from '@/components/tracking/consent-banner';
 import type {ReactNode} from 'react';
 import { SITE_URL, SITE_NAME, CONTACT } from '@/lib/site';
 
@@ -17,7 +19,17 @@ export const metadata: Metadata = {
     template: '%s | SLAAC Voyages',
   },
   description: "Découvrez le monde avec SLAAC Voyages, votre agence de confiance à Dakar. Billets d'avion, séjours sur mesure, et assistance visa. L'aventure vous attend.",
-  keywords: "agence de voyage Dakar, billets d’avion Sénégal, SLAAC Voyages Dakar, packages touristiques Sénégal, Merveille Voyage Dakar, voyage sur mesure",
+  keywords: "agence de voyage Dakar, conciergerie voyage Sénégal, billets d’avion Sénégal, SLAAC Voyages Dakar, transfert aéroport AIBD, séjour Dakar 2026, voyage sur mesure, visas d'affaires Dakar",
+  alternates: {
+    canonical: '/',
+    languages: {
+      'fr-SN': '/',
+      'fr': '/',
+      'en-US': '/en',
+      'en': '/en',
+      'x-default': '/',
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'fr_SN',
@@ -33,40 +45,31 @@ export const metadata: Metadata = {
   },
 };
 
-// Données structurées : agence de voyages (adresse, contacts vérifiés).
-const travelAgencyJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'TravelAgency',
-  name: SITE_NAME,
-  url: SITE_URL,
-  telephone: CONTACT.phoneIntl,
-  email: CONTACT.email,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: CONTACT.address.street,
-    addressLocality: CONTACT.address.city,
-    addressCountry: CONTACT.address.country,
-  },
-  areaServed: ['SN', 'FR', 'IT', 'ES', 'BE', 'GB', 'CA', 'US'],
-  availableLanguage: ['fr'],
-};
+import { getTravelAgencySchema } from '@/lib/seo-schema';
+import { headers } from 'next/headers';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const headersList = await headers();
+  const locale = headersList.get('x-slaac-locale') === 'en' ? 'en' : 'fr';
+  const travelAgencyJsonLd = getTravelAgencySchema();
+
   return (
-    <html lang="fr" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html lang={locale} className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${playfair.variable} font-body antialiased`}>
         {children}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(travelAgencyJsonLd) }}
         />
+        <FloatingConciergeBar />
         <Toaster />
         <ChatbotLoader />
         <AnalyticsBeacon />
+        <ConsentBanner />
       </body>
     </html>
   );

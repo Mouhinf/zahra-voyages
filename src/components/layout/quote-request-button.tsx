@@ -10,6 +10,8 @@ const LazyQuoteRequestModal = React.lazy(() =>
   }))
 );
 
+import { usePathname } from 'next/navigation';
+
 type QuoteRequestButtonProps = Omit<ButtonProps, 'onClick' | 'type'> & {
   /** Service préselectionné dans le formulaire (ex. depuis une page d'offre). */
   defaultService?:
@@ -26,16 +28,21 @@ type QuoteRequestButtonProps = Omit<ButtonProps, 'onClick' | 'type'> & {
   defaultDestination?: string;
   /** Traçabilité commerciale : page / contexte à l'origine de la demande. */
   source?: string;
+  /** Langue d'affichage du modal ('fr' ou 'en'). Si omis, auto-détecté depuis l'URL. */
+  locale?: 'fr' | 'en';
 };
 
 export function QuoteRequestButton({
   defaultService,
   defaultDestination,
   source,
+  locale,
   children,
   disabled,
   ...buttonProps
 }: QuoteRequestButtonProps) {
+  const pathname = usePathname();
+  const currentLocale = locale || (pathname?.startsWith('/en') ? 'en' : 'fr');
   const [shouldLoadDialog, setShouldLoadDialog] = React.useState(false);
   const [open, setOpen] = React.useState(false);
 
@@ -58,9 +65,11 @@ export function QuoteRequestButton({
             defaultService={defaultService}
             defaultDestination={defaultDestination}
             source={source}
+            locale={currentLocale}
           />
         </React.Suspense>
       ) : null}
     </>
   );
 }
+

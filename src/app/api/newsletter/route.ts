@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as z from 'zod';
 import { adminApp, assertAdminConfigured, ConfigError } from '@/lib/firebase-admin';
 import { clientIpFromHeaders, rateLimit } from '@/lib/rate-limit';
+import { sendNewsletterNotifications } from '@/lib/email';
 
 export const runtime = 'nodejs';
 
@@ -54,6 +55,11 @@ export async function POST(req: NextRequest) {
       ip: ip === 'unknown' ? null : ip,
       createdAt: new Date().toISOString(),
       status: 'subscribed',
+    });
+
+    // Envoi de l'accusé de réception / bienvenue et notification agence (asynchrone)
+    sendNewsletterNotifications(email).catch((err) => {
+      console.error('Newsletter welcome email dispatch error:', err);
     });
 
     return NextResponse.json({ ok: true });

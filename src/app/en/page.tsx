@@ -90,7 +90,7 @@ export default function EnglishHomePage() {
               Flights, visa assistance, airport transfers, hotels and private tours — organised from Dakar by SLAAC Voyages, your trusted local agency.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <QuoteRequestButton variant="gold" size="lg" source="en-hero" className="w-full sm:w-auto">
+              <QuoteRequestButton locale="en" variant="gold" size="lg" source="en-hero" className="w-full sm:w-auto">
                 <Send className="mr-2 h-5 w-5" /> Request a free quote
               </QuoteRequestButton>
               <a href="https://wa.me/221773129090?text=Hello%2C%20I%20would%20like%20information%20about%20your%20services." target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
@@ -151,15 +151,15 @@ export default function EnglishHomePage() {
                 ))}
               </ul>
               <div className="mt-8 flex flex-wrap gap-4">
-                <QuoteRequestButton variant="gold" size="lg" source="en-audiences">
+                <QuoteRequestButton locale="en" variant="gold" size="lg" source="en-audiences">
                   <Send className="mr-2 h-4 w-4" /> Request a quote
                 </QuoteRequestButton>
                 <Button asChild size="lg" variant="outline">
-                  <Link href="/destinations">Browse destinations <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                  <Link href="/en/destinations">Browse destinations <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                The quote form and most site pages are in French. You are welcome to send your request in English — we will get back to you as soon as possible.
+                Our advisors assist international visitors and corporate delegations in English. Request your free quote online or via WhatsApp.
               </p>
             </div>
             <div className="relative h-80 lg:h-[420px] rounded-2xl overflow-hidden shadow-xl">
@@ -183,7 +183,7 @@ export default function EnglishHomePage() {
             </p>
             <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
               <Button asChild variant="gold" size="lg">
-                <Link href="/dakar-2026">Plan my stay (page in French)</Link>
+                <Link href="/en/dakar-2026">Plan my stay in Dakar</Link>
               </Button>
               <a href="https://tickets.dakar2026.org/" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20 hover:text-white">
@@ -200,7 +200,7 @@ export default function EnglishHomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Talk to a Real Advisor</h2>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg text-muted-foreground">
-              Rue Mouhamed 5, Immeuble Djolof Chicken (3rd floor), Dakar Plateau — Senegal
+              Rue Mouhamed 5, Immeuble Djolof Chicken, 3rd floor, Dakar Plateau — Senegal
             </p>
             <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center gap-4">
               <a href="tel:+221773129090">
@@ -209,9 +209,12 @@ export default function EnglishHomePage() {
               <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
                 <Button size="lg" variant="outline"><MessageCircle className="mr-2 h-5 w-5" /> WhatsApp</Button>
               </a>
-              <QuoteRequestButton size="lg" source="en-contact">
+              <QuoteRequestButton locale="en" size="lg" source="en-contact">
                 <Send className="mr-2 h-4 w-4" /> Free quote
               </QuoteRequestButton>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/en/contact">Contact details <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
             </div>
           </div>
         </section>

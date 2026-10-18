@@ -1,5 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import HebergementGrid from '@/components/sections/hebergement-grid';
 import FaqSection from '@/components/sections/faq-section';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
@@ -8,6 +9,7 @@ import { fetchPageContent } from '@/lib/page-content';
 import type { Hebergement } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const revalidate = 300;
@@ -18,6 +20,17 @@ export async function generateMetadata(): Promise<Metadata> {
     title: content.metaTitle,
     description: content.metaDescription,
     alternates: { canonical: '/hebergement' },
+    openGraph: {
+      title: content.metaTitle,
+      description: content.metaDescription,
+      url: '/hebergement',
+      images: content.hero.image ? [{ url: content.hero.image, width: 1200, height: 630, alt: content.hero.title }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.metaTitle,
+      description: content.metaDescription,
+    },
   };
 }
 
@@ -46,7 +59,39 @@ export default async function HebergementPage() {
           </div>
         </section>
 
-        <section className="py-20 sm:py-28 bg-background">
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Hébergements' }]} />
+        </div>
+
+        {/* Garanties critiques pour hébergements à Dakar */}
+        <section className="py-8 bg-slate-50 border-b border-slate-200/80">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">⚡</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Groupe Électrogène 24/7</div>
+                <div className="text-[11px] text-slate-500">Zéro coupure Senelec</div>
+              </div>
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">📶</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Fibre Optique Vérifiée</div>
+                <div className="text-[11px] text-slate-500">Idéal télétravail & business</div>
+              </div>
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">💧</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Réserve d'Eau & Surpresseur</div>
+                <div className="text-[11px] text-slate-500">Approvisionnement continu</div>
+              </div>
+              <div className="card-premium p-4 text-center">
+                <div className="text-xl mb-1">🛡️</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">Gardiennage & Concierge</div>
+                <div className="text-[11px] text-slate-500">Sécurité et assistance 7j/7</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-24 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
             <div className="text-center mb-14">
               <span className="text-sm font-semibold uppercase tracking-widest text-primary">{content.gridSection.badge}</span>
@@ -57,6 +102,27 @@ export default async function HebergementPage() {
               </p>
             </div>
             <HebergementGrid initialItems={hebergementItems} />
+          </div>
+        </section>
+
+        {/* Encart Guide Éditorial Quartiers Dakar */}
+        <section className="py-12 bg-slate-50 border-y border-slate-200">
+          <div className="container mx-auto max-w-5xl px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <span className="text-xs uppercase font-bold text-slaac-gold-600 tracking-wider">Conseil Hébergement & Sécurité</span>
+              <h3 className="text-xl font-bold text-slate-900 font-headline mt-1">
+                Où loger à Dakar : Le comparatif des quartiers
+              </h3>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+                Plateau pour les affaires, Almadies pour le bord de mer ou Mermoz pour le calme résidentiel : retrouvez nos critères d'audit (groupe électrogène automatique, fibre optique et gardiennage 24/7).
+              </p>
+            </div>
+            <Link
+              href="/guides/ou-loger-a-dakar-quartiers-residences"
+              className="shrink-0 inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-800 hover:border-slaac-gold-500 hover:text-slaac-gold-600 transition-colors bg-white shadow-xs"
+            >
+              Lire le guide comparatif &rarr;
+            </Link>
           </div>
         </section>
 

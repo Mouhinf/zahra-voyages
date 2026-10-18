@@ -4,9 +4,14 @@ import Footer from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Politique de confidentialité - SLAAC Voyages' },
-  description: "Comment SLAAC Voyages collecte, utilise et protège vos données personnelles : demandes de devis, formulaires, newsletter, statistiques. Vos droits et contacts.",
+  title: 'Politique de confidentialité et données personnelles | SLAAC Voyages',
+  description: "Comment SLAAC Voyages collecte, utilise et protège vos données personnelles : demandes de devis, formulaires, newsletter et CRM à Dakar Plateau.",
   alternates: { canonical: '/confidentialite' },
+  openGraph: {
+    title: 'Politique de confidentialité et données personnelles | SLAAC Voyages',
+    description: "Protection de la vie privée et conformité du traitement des données personnelles chez SLAAC Voyages.",
+    url: '/confidentialite',
+  },
 };
 
 const LAST_UPDATE = 'Octobre 2026';

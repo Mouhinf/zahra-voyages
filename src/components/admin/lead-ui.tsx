@@ -3,7 +3,7 @@
 // Briques partagées par la liste CRM, la fiche d'une demande et la vue d'ensemble.
 import { Badge } from '@/components/ui/badge';
 import { getAuthInstance } from '@/lib/firebase';
-import { MailWarning } from 'lucide-react';
+import { MailWarning, Calendar } from 'lucide-react';
 
 export type Row = Record<string, unknown> & { id: string };
 
@@ -19,6 +19,16 @@ export const STATUS: Array<{ value: CrmStatus; label: string; badgeClass: string
 ];
 
 export const STATUS_LABEL: Record<string, string> = Object.fromEntries(STATUS.map((s) => [s.value, s.label]));
+
+export const PRIORITIES = ['basse', 'normale', 'haute', 'urgente'] as const;
+export type Priority = (typeof PRIORITIES)[number];
+
+export const PRIORITY_CONFIG: Record<Priority, { label: string; badgeClass: string }> = {
+  urgente: { label: 'Urgente', badgeClass: 'bg-rose-100 text-rose-800 border-rose-300 font-bold' },
+  haute: { label: 'Haute', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300 font-semibold' },
+  normale: { label: 'Normale', badgeClass: 'bg-slate-100 text-slate-700 border-slate-200' },
+  basse: { label: 'Basse', badgeClass: 'bg-gray-100 text-gray-600 border-gray-200' },
+};
 
 export function str(v: unknown): string {
   return typeof v === 'string' ? v : v == null ? '' : String(v);
@@ -74,7 +84,59 @@ export function StatusBadge({ value }: { value: string }) {
   return <Badge variant="outline" className={s.badgeClass}>{s.label}</Badge>;
 }
 
-export function NotifyBadge({ value }: { value: unknown }) {
+export function PriorityBadge({ value }: { value?: unknown }) {
+  const v = (str(value) || 'normale') as Priority;
+  const cfg = PRIORITY_CONFIG[v] ?? PRIORITY_CONFIG.normale;
+  return <Badge variant="outline" className={cfg.badgeClass}>{cfg.label}</Badge>;
+}
+
+export function FollowUpBadge({ value }: { value?: unknown }) {
+  const v = str(value);
+  if (!v) return null;
+  const targetDate = new Date(v).getTime();
+  const isOverdue = !isNaN(targetDate) && targetDate < Date.now();
+  return (
+    <Badge
+      variant="outline"
+      className={`gap-1 text-xs ${
+        isOverdue
+          ? 'bg-red-50 text-red-700 border-red-300 font-semibold'
+          : 'bg-blue-50 text-blue-700 border-blue-200'
+      }`}
+    >
+      <Calendar className="h-3 w-3" />
+      {isOverdue ? 'Relance en retard : ' : 'Relance : '}
+      {v}
+    </Badge>
+  );
+}
+
+export function NotifyBadge({ value, emailStatus }: { value?: unknown; emailStatus?: unknown }) {
+  if (emailStatus && typeof emailStatus === 'object') {
+    const statuses = Object.values(emailStatus as Record<string, { status?: string }>).map((s) => s?.status);
+    if (statuses.some((s) => s === 'failed' || s === 'permanently_failed')) {
+      return (
+        <Badge variant="destructive" className="gap-1">
+          <MailWarning className="h-3 w-3" /> email en échec
+        </Badge>
+      );
+    }
+    if (statuses.length > 0 && statuses.every((s) => s === 'sent')) {
+      return (
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+          emails livrés
+        </Badge>
+      );
+    }
+    if (statuses.some((s) => s === 'processing' || s === 'pending')) {
+      return (
+        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+          envoi en cours
+        </Badge>
+      );
+    }
+  }
+
   const v = str(value);
   if (!v || v === 'pending') return null;
   if (v === 'sent') return <Badge variant="secondary">email envoyé</Badge>;

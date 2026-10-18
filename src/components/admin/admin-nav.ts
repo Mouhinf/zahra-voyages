@@ -3,15 +3,21 @@ import {
   BedDouble,
   Briefcase,
   Bus,
+  Calendar,
   Compass,
+  FileText,
   Handshake,
   Inbox,
   LayoutDashboard,
   Megaphone,
   MapPin,
+  Mail,
+  ShieldAlert,
   Ship,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
+import type { Permission } from '@/lib/rbac';
 
 // ---------------------------------------------------------------------------
 // Navigation du back-office. Une entrée = une rubrique avec sa propre route.
@@ -22,6 +28,7 @@ export interface AdminNavItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  permission?: Permission;
 }
 
 export interface AdminNavGroup {
@@ -31,28 +38,51 @@ export interface AdminNavGroup {
 
 export const ADMIN_NAV: AdminNavGroup[] = [
   {
-    label: 'Principal',
+    label: 'Direction',
     items: [
       { href: '/admin/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
-      { href: '/admin/statistiques', label: 'Statistiques & Acquisition', icon: BarChart3 },
-      { href: '/admin/demandes', label: 'Demandes et CRM', icon: Inbox },
+      { href: '/admin/statistiques', label: 'Statistiques & Acquisition', icon: BarChart3, permission: 'reports.view' },
+    ],
+  },
+  {
+    label: 'Gestion commerciale',
+    items: [
+      { href: '/admin/demandes', label: 'Demandes & CRM', icon: Inbox, permission: 'crm.view' },
+      { href: '/admin/dossiers', label: 'Dossiers de voyage', icon: Briefcase, permission: 'dossiers.view' },
+      { href: '/admin/proposals', label: 'Devis officiels', icon: FileText, permission: 'quotes.view' },
+    ],
+  },
+  {
+    label: 'Organisation & Équipe',
+    items: [
+      { href: '/admin/tasks', label: 'Tâches & Relances', icon: Calendar, permission: 'tasks.view' },
+      { href: '/admin/users', label: 'Collaborateurs & Rôles', icon: Users, permission: 'users.view' },
     ],
   },
   {
     label: 'Catalogue touristique',
     items: [
-      { href: '/admin/destinations', label: 'Destinations', icon: MapPin },
-      { href: '/admin/hebergements', label: 'Hébergements', icon: BedDouble },
-      { href: '/admin/transports', label: 'Transports', icon: Bus },
-      { href: '/admin/voyages-croisieres', label: 'Voyages et croisières', icon: Ship },
-      { href: '/admin/excursions', label: 'Circuits et excursions', icon: Compass },
-      { href: '/admin/tourisme-affaires', label: "Tourisme d'affaires", icon: Briefcase },
-      { href: '/admin/partenaires', label: 'Partenaires', icon: Handshake },
+      { href: '/admin/destinations', label: 'Destinations', icon: MapPin, permission: 'content.view' },
+      { href: '/admin/hebergements', label: 'Hébergements', icon: BedDouble, permission: 'content.view' },
+      { href: '/admin/transports', label: 'Transports', icon: Bus, permission: 'content.view' },
+      { href: '/admin/voyages-croisieres', label: 'Voyages et croisières', icon: Ship, permission: 'content.view' },
+      { href: '/admin/excursions', label: 'Circuits et excursions', icon: Compass, permission: 'content.view' },
+      { href: '/admin/tourisme-affaires', label: "Tourisme d'affaires", icon: Briefcase, permission: 'content.view' },
+      { href: '/admin/partenaires', label: 'Partenaires', icon: Handshake, permission: 'content.view' },
     ],
   },
   {
-    label: 'Communication',
-    items: [{ href: '/admin/marketing/bandeau', label: 'Bandeau publicitaire', icon: Megaphone }],
+    label: 'Marketing & Communication',
+    items: [
+      { href: '/admin/marketing/bandeau', label: 'Bandeau publicitaire', icon: Megaphone, permission: 'marketing.manage' },
+    ],
+  },
+  {
+    label: 'Système & Audit',
+    items: [
+      { href: '/admin/audit-logs', label: "Journal d'audit", icon: ShieldAlert, permission: 'audit.view' },
+      { href: '/admin/notifications', label: 'Notifications Emails', icon: Mail, permission: 'notifications.view' },
+    ],
   },
 ];
 

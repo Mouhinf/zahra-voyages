@@ -33,6 +33,16 @@ export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
   perdu: 'Perdu',
 };
 
+export const PRIORITIES = ['basse', 'normale', 'haute', 'urgente'] as const;
+export type Priority = (typeof PRIORITIES)[number];
+
+export const PRIORITY_LABELS: Record<Priority, string> = {
+  basse: 'Basse',
+  normale: 'Normale',
+  haute: 'Haute',
+  urgente: 'Urgente',
+};
+
 const NOTES_CAP = 50;
 const HISTORY_CAP = 100;
 export const UNHANDLED_AFTER_HOURS = 48;
@@ -45,7 +55,9 @@ const patchSchema = z.object({
   collection: z.enum(['quotes', 'contacts']),
   id: z.string().min(1).max(128),
   crmStatus: z.enum(LEAD_STATUSES).optional(),
-  assignee: z.string().trim().max(120).optional().or(z.literal('').transform(() => undefined)),
+  priorite: z.enum(PRIORITIES).optional(),
+  nextFollowUpAt: z.string().trim().max(60).optional().transform((v) => (v === '' ? undefined : v)),
+  assignee: z.string().trim().max(120).optional().transform((v) => (v === '' ? undefined : v)),
   note: noteSchema.optional(),
 });
 
@@ -63,6 +75,8 @@ function asStringArray(value: unknown): Array<Record<string, unknown>> {
 export type LeadPatchResult = {
   updated: boolean;
   crmStatus?: LeadStatus;
+  priorite?: Priority;
+  nextFollowUpAt?: string | null;
   error?: string;
 };
 
@@ -98,6 +112,24 @@ export async function patchLead(patch: LeadPatch, actor: string): Promise<LeadPa
       events.push({ event: `Statut : ${LEAD_STATUS_LABELS[previousStatus as LeadStatus] ?? previousStatus} → ${LEAD_STATUS_LABELS[patch.crmStatus]}` });
     }
 
+    const previousPriorite = (typeof data.priorite === 'string' ? data.priorite : 'normale') as Priority;
+    if (patch.priorite && patch.priorite !== previousPriorite) {
+      updates.priorite = patch.priorite;
+      events.push({ event: `Priorité : ${PRIORITY_LABELS[previousPriorite] ?? previousPriorite} → ${PRIORITY_LABELS[patch.priorite]}` });
+    }
+
+    if (patch.nextFollowUpAt !== undefined) {
+      const previousFollowUp = typeof data.nextFollowUpAt === 'string' ? data.nextFollowUpAt : null;
+      if (patch.nextFollowUpAt !== previousFollowUp) {
+        updates.nextFollowUpAt = patch.nextFollowUpAt || null;
+        events.push({
+          event: patch.nextFollowUpAt
+            ? `Relance programmée au ${patch.nextFollowUpAt}`
+            : 'Relance programmée retirée',
+        });
+      }
+    }
+
     if (patch.assignee !== undefined) {
       const previous = typeof data.assignee === 'string' ? data.assignee : '';
       if (patch.assignee !== previous) {
@@ -117,6 +149,8 @@ export async function patchLead(patch: LeadPatch, actor: string): Promise<LeadPa
     return {
       updated: true,
       crmStatus: (updates.crmStatus as LeadStatus | undefined) ?? (previousStatus as LeadStatus),
+      priorite: (updates.priorite as Priority | undefined) ?? previousPriorite,
+      nextFollowUpAt: (updates.nextFollowUpAt as string | null | undefined) ?? (typeof data.nextFollowUpAt === 'string' ? data.nextFollowUpAt : null),
     };
   });
 }

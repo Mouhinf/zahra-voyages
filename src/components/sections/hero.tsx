@@ -1,11 +1,9 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Send, Clock, ShieldCheck, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
+import { Send, MapPin, Clock, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -13,155 +11,90 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const slides = [
-  {
-    url: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784493934/hero-slide-1.png',
-    alt: 'Voyages SLAAC — Slide 1',
-  },
-  {
-    url: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784493949/hero-slide-2.png',
-    alt: 'Voyages SLAAC — Slide 2',
-  },
-  {
-    url: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784493955/hero-slide-3.png',
-    alt: 'Voyages SLAAC — Slide 3',
-  },
-  {
-    url: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784493960/hero-slide-4.png',
-    alt: 'Voyages SLAAC — Slide 4',
-  },
-];
-
-const SLIDE_INTERVAL = 5000;
-
 export default function Hero() {
-  const [current, setCurrent] = useState(0);
-
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % slides.length);
-  }, []);
-
-  const prev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
-
-  const goTo = (idx: number) => setCurrent(idx);
-
-  const [canLoadRest, setCanLoadRest] = useState(false);
-
-  useEffect(() => {
-    // Diffère le chargement des diapositives secondaires pour prioriser le LCP de la diapositive 1
-    const timer = setTimeout(() => setCanLoadRest(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    // Respect de prefers-reduced-motion : pas de défilement automatique.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = setInterval(next, SLIDE_INTERVAL);
-    return () => clearInterval(timer);
-  }, [next]);
-
   return (
-    <section className="relative w-full h-[80vh] min-h-[500px] flex items-center justify-center text-white overflow-hidden">
-      {/* Slides */}
-      {slides.map((slide, idx) => (
-        <div
-          key={idx}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            idx === current ? 'opacity-100' : 'opacity-0'
-          }`}
-          aria-hidden={idx !== current}
-        >
-          {(idx === 0 || idx === current || canLoadRest) && (
-            <Image
-              src={slide.url}
-              alt={slide.alt}
-              fill
-              className="object-cover"
-              priority={idx === 0}
-              quality={75}
-              sizes="(max-width: 768px) 100vw, 1920px"
-            />
-          )}
+    <section className="relative w-full min-h-[580px] sm:min-h-[640px] md:min-h-[700px] flex items-center justify-center text-white overflow-hidden bg-slaac-navy-950">
+      {/* Photographie de fond premium avec optimisation Cloudinary LCP */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Image
+          src="https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784493934/hero-slide-1.png"
+          alt="Séjour et voyage d'exception au Sénégal avec SLAAC Voyages"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center transform scale-105 transition-transform duration-1000 ease-out"
+        />
+        {/* Dégradé cinématographique équilibré garantissant un contraste WCAG AAA */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slaac-navy-950/95 via-slaac-navy-900/75 to-slaac-navy-900/60" />
+      </div>
+
+      {/* Contenu éditorial centré */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center flex flex-col items-center">
+        {/* Badge de statut institutionnel */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 sm:mb-8 text-xs sm:text-sm font-medium text-white/95">
+          <span className="w-2 h-2 rounded-full bg-slaac-gold-400 animate-pulse" />
+          <span>Conciergerie Touristique & Réceptif DMC · Dakar Plateau</span>
         </div>
-      ))}
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-black/50 to-black/70 z-10" />
-
-      {/* Contenu */}
-      <div className="relative z-20 text-center px-4 max-w-4xl">
-        <span className="inline-block glass-dark px-4 py-1.5 rounded-full text-xs font-medium uppercase tracking-widest mb-6 text-white">
-          Agence de voyage premium · Dakar
-        </span>
-        <h1 className="text-4xl md:text-7xl font-bold tracking-tight drop-shadow-lg font-headline text-white">
-          Votre Passeport pour le Monde
+        {/* Accroche H1 majeure */}
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-headline tracking-tight text-white drop-shadow-md max-w-4xl leading-[1.15]">
+          Votre Conciergerie de Voyage au Sénégal et dans le Monde
         </h1>
-        <div className="w-20 h-0.5 bg-accent mx-auto my-6" />
-        <p className="text-lg md:text-2xl max-w-2xl mx-auto drop-shadow-md text-white/90 text-balance">
-          Voyages sur mesure, billetterie, visas et séjours organisés par une équipe dakaroise à votre écoute.
+
+        {/* Filet décoratif or Teranga */}
+        <div className="w-20 h-1 bg-slaac-gold-500 rounded-full my-6 sm:my-7 shadow-sm" />
+
+        {/* Sous-titre rassurant et explicite */}
+        <p className="text-base sm:text-xl text-slate-100/90 max-w-3xl leading-relaxed text-balance drop-shadow">
+          Navettes aéroport AIBD avec accueil pancarte, résidences meublées avec fibre et groupe électrogène, circuits privés d'exception et assistance visas d'affaires : l'exigence du service et la maîtrise du terrain à Dakar.
         </p>
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <QuoteRequestButton variant="gold" size="lg" source="accueil-hero" className="w-full sm:w-auto">
+
+        {/* Deux CTAs clairs et hiérarchisés sans friction */}
+        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center items-stretch sm:items-center">
+          <QuoteRequestButton
+            variant="gold"
+            size="xl"
+            source="accueil-hero"
+            className="w-full sm:w-auto shadow-lg gold-glow font-semibold"
+          >
             <Send className="mr-2 h-5 w-5" /> Demander un devis
           </QuoteRequestButton>
-          <Link href="#services" className="w-full sm:w-auto">
-            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/50 bg-white/10 text-white hover:bg-white/20 hover:text-white">
-              Explorer les offres
-            </Button>
-          </Link>
+
           <a
-            href="https://wa.me/221773129090"
+            href="https://wa.me/221773129090?text=Bonjour%20SLAAC%20Voyages%2C%20je%20souhaite%20des%20informations%20sur%20vos%20prestations."
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto"
           >
-            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/50 bg-white/10 text-white hover:bg-white/20 hover:text-white">
-              <WhatsAppIcon className="mr-2 h-5 w-5 fill-current" /> WhatsApp
+            <Button
+              variant="whatsapp"
+              size="xl"
+              className="w-full sm:w-auto font-medium"
+            >
+              <WhatsAppIcon className="mr-2 h-5 w-5 fill-current" /> WhatsApp Concierge
             </Button>
           </a>
         </div>
 
-        {/* Réassurance */}
-        <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/85">
-          <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4 text-accent" aria-hidden="true" /> Réponse sous 24 h</span>
-          <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-accent" aria-hidden="true" /> Devis gratuit et sans engagement</span>
-          <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-accent" aria-hidden="true" /> Agence à Dakar Plateau</span>
+        {/* Barre de réassurance immédiate sous le Hero */}
+        <div className="mt-10 sm:mt-14 pt-6 border-t border-white/15 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs sm:text-sm text-slate-200/95 w-full max-w-4xl">
+          <div className="flex items-center justify-center gap-2">
+            <MapPin className="h-4 w-4 text-slaac-gold-400 shrink-0" />
+            <span>Bureau physique au Plateau</span>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <Clock className="h-4 w-4 text-slaac-gold-400 shrink-0" />
+            <span>Devis sous 24h ouvrées</span>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-slaac-gold-400 shrink-0" />
+            <span>Chauffeurs professionnels AIBD</span>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-slaac-gold-400 shrink-0" />
+            <span>Résidences Fibre & Générateur</span>
+          </div>
         </div>
-      </div>
-
-      {/* Flèches navigation */}
-      <button
-        onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full p-2 text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        aria-label="Image précédente"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <button
-        onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full p-2 text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        aria-label="Image suivante"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-
-      {/* Indicateurs (points) */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-        {slides.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => goTo(idx)}
-            aria-label={`Aller au slide ${idx + 1}`}
-            aria-current={idx === current}
-            className="p-1.5 flex items-center"
-          >
-            <span className={`block rounded-full transition-all ${
-              idx === current ? 'w-8 h-2.5 bg-white' : 'w-2.5 h-2.5 bg-white/50 hover:bg-white/70'
-            }`} />
-          </button>
-        ))}
       </div>
     </section>
   );

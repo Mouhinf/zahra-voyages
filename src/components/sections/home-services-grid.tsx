@@ -1,63 +1,110 @@
-import { Card } from '@/components/ui/card';
-import { ArrowRight, Hotel, Car, Ship, MapPinned, Briefcase, Zap } from 'lucide-react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ArrowRight, Hotel, Car, Ship, MapPinned, Briefcase, FileCheck2, Send, CheckCircle2 } from 'lucide-react';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { getDbInstance } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { cache } from 'react';
+import type { ServiceType } from '@/lib/schemas/quote-schema';
 
 const FALLBACK_IMAGES: Record<string, string> = {
-  hebergements: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-hebergement.png',
   transports: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-transport.png',
-  voyagesCroisieres: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png',
+  hebergements: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-hebergement.png',
   excursions: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-excursions.png',
   offresAffaires: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-affaires.png',
+  assistanceVoyage: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png',
+  voyagesCroisieres: 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png',
 };
 
-type ServiceDef = {
+type ServiceItem = {
   href: string;
-  icon: typeof Hotel;
+  icon: React.ElementType;
   title: string;
+  tagline: string;
   description: string;
+  badge: string;
+  badgeVariant?: 'gold' | 'navy' | 'verified';
+  priceCallout?: string;
+  serviceType: ServiceType;
   collectionName: string;
 };
 
-const services: ServiceDef[] = [
-  {
-    href: '/hebergement',
-    icon: Hotel,
-    title: 'Hébergement',
-    description: "Hôtels, résidences et villas sélectionnés au Sénégal et à l'étranger. Confort et qualité garantis à chaque séjour.",
-    collectionName: 'hebergements',
-  },
+const services: ServiceItem[] = [
   {
     href: '/transport',
     icon: Car,
-    title: 'Transport',
-    description: "Billetterie aérienne, location de véhicules avec chauffeur et transferts aéroport partout au Sénégal.",
+    title: 'Transport & Navette AIBD',
+    tagline: 'Chauffeurs privés & Flotte VIP',
+    description: 'Accueil personnalisé avec pancarte nominative à l’arrivée AIBD, berlines récentes climatisées, péage inclus et zéro supplément en cas de retard de vol.',
+    badge: 'Ponctualité Garantie',
+    badgeVariant: 'verified',
+    priceCallout: 'Dès 30 000 FCFA',
+    serviceType: 'transport',
     collectionName: 'transports',
   },
   {
-    href: '/voyages-croisieres',
-    icon: Ship,
-    title: 'Voyages & Croisières',
-    description: "Circuits organisés et croisières inoubliables vers les plus belles destinations du monde.",
-    collectionName: 'voyagesCroisieres',
+    href: '/hebergement',
+    icon: Hotel,
+    title: 'Hébergements & Résidences',
+    tagline: 'Villas & Appartements Meublés',
+    description: 'Logements rigoureusement audités à Dakar (Almadies, Ngor, Plateau, Mermoz). Équipement garanti : fibre optique haut débit, groupe électrogène et réserve d’eau.',
+    badge: 'Fibre & Générateur 24/7',
+    badgeVariant: 'gold',
+    priceCallout: 'Séjours vérifiés',
+    serviceType: 'hebergement',
+    collectionName: 'hebergements',
   },
   {
     href: '/excursions',
     icon: MapPinned,
-    title: 'Excursions',
-    description: "Sorties guidées d'une journée au départ de Dakar : Gorée, Lac Rose, Bandia, Sine-Saloum et Casamance.",
+    title: 'Excursions & Découverte',
+    tagline: 'Circuits Privés d’Exception',
+    description: 'Immersion culturelle et naturelle au Sénégal : Île de Gorée avec guide certifié, safari à la Réserve de Bandia, dunes du Lac Rose et pirogue dans le Saloum.',
+    badge: 'Guides Certifiés',
+    badgeVariant: 'verified',
+    priceCallout: 'Journée dès 35 000 FCFA',
+    serviceType: 'excursions',
     collectionName: 'excursions',
   },
   {
     href: '/tourisme-affaires',
     icon: Briefcase,
-    title: "Tourisme d'Affaires",
-    description: "Séminaires, incentives, délégations et salles de réunion pour vos événements professionnels.",
+    title: "Tourisme d'Affaires & MICE",
+    tagline: 'Séminaires & Délégations VIP',
+    description: 'Coordination logistique de grands événements, conventions d’entreprises, facturation certifiée conforme (TVA/BRS) et accueil au salon d’honneur AIBD.',
+    badge: 'Contrats B2B & Événements',
+    badgeVariant: 'navy',
+    priceCallout: 'Devis sous 24h ouvrées',
+    serviceType: 'tourisme-affaires',
     collectionName: 'offresAffaires',
+  },
+  {
+    href: '/assistance-voyage',
+    icon: FileCheck2,
+    title: 'Assistance Voyage & Visas',
+    tagline: 'Accompagnement Consulaire Rapide',
+    description: 'Traitement express des dossiers de visa d’affaires (Chine, Dubaï, Schengen), délivrance immédiate d’attestation d’assurance voyage et mobilité étudiante.',
+    badge: 'Dossiers Express',
+    badgeVariant: 'gold',
+    priceCallout: 'Conseil sur mesure',
+    serviceType: 'assistance-visa',
+    collectionName: 'assistanceVoyage',
+  },
+  {
+    href: '/voyages-croisieres',
+    icon: Ship,
+    title: 'Voyages, Croisières & Omra',
+    tagline: 'Circuits & Pèlerinages Premium',
+    description: 'Forfaits spirituels Omra grand confort avec hôtels proches du Haram, croisières maritimes internationales et circuits de vacances clé en main.',
+    badge: 'Encadrement Soigné',
+    badgeVariant: 'navy',
+    priceCallout: 'Programmes exclusifs',
+    serviceType: 'voyages-croisieres',
+    collectionName: 'voyagesCroisieres',
   },
 ];
 
@@ -77,7 +124,7 @@ const fetchServiceImages = cache(async (): Promise<Record<string, string>> => {
             }
           });
         } catch {
-          // Utilise le fallback fiable
+          // Utilise le fallback fiable Cloudinary
         }
       })
     );
@@ -91,77 +138,95 @@ export default async function HomeServicesGrid() {
   const images = await fetchServiceImages();
 
   return (
-    <section id="services" className="py-16 sm:py-24 bg-white">
-      <div className="container mx-auto max-w-7xl px-4">
-        <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos prestations</span>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Nos 6 Services pour Voyager Serein</h2>
-          <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">
-            SLAAC Voyages couvre l'ensemble de vos besoins de voyage, du billet d'avion à l'organisation complète de votre séjour.
-          </p>
-        </div>
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section id="services" className="py-16 sm:py-24 bg-white border-b border-slate-200/80">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+        <SectionHeading
+          surtitle="Excellence Opérationnelle"
+          title="Nos 6 Pôles de Prestations Majeures"
+          description="Une maîtrise complète de la chaîne du voyage : de votre arrivée à Dakar jusqu'à vos déplacements d'affaires internationaux."
+        />
+
+        {/* Grille 3x2 des services */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {services.map((service) => {
             const Icon = service.icon;
-            const img = images[service.collectionName] || FALLBACK_IMAGES[service.collectionName];
+            const imgSrc = images[service.collectionName] || FALLBACK_IMAGES[service.collectionName];
+
             return (
-              <Link key={service.title} href={service.href} className="block group">
-                <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col p-0">
-                  <div className="relative h-48 overflow-hidden">
+              <div
+                key={service.href}
+                className="card-premium overflow-hidden flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Visuel Cloudinary */}
+                  <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
                     <Image
-                      src={img}
+                      src={imgSrc}
                       alt={service.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute bottom-3 left-3 w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                      <Icon className="h-6 w-6 text-primary-foreground" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+                    
+                    {/* Badge supérieur */}
+                    <div className="absolute top-3.5 left-3.5">
+                      <Badge variant={service.badgeVariant || 'gold'} className="shadow-sm">
+                        {service.badge}
+                      </Badge>
                     </div>
+
+                    {/* Prix d'appel indicatif */}
+                    {service.priceCallout && (
+                      <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-md bg-slaac-navy-950/90 text-slaac-gold-400 text-xs font-bold shadow">
+                        {service.priceCallout}
+                      </div>
+                    )}
                   </div>
-                  <div className="p-5 flex flex-col flex-grow">
-                    <h3 className="text-xl font-semibold text-primary">{service.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground flex-grow">{service.description}</p>
-                    <div className="mt-4 flex items-center text-primary text-sm font-medium">
-                      Découvrir <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+
+                  {/* Contenu textuel */}
+                  <div className="p-5 sm:p-6">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="p-1.5 rounded-lg bg-slaac-gold-50 text-slaac-gold-600">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs uppercase tracking-wider font-semibold text-slate-500">
+                        {service.tagline}
+                      </span>
                     </div>
+
+                    <h3 className="text-xl font-bold text-slate-900 mb-2.5 group-hover:text-slaac-gold-700 transition-colors">
+                      {service.title}
+                    </h3>
+
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {service.description}
+                    </p>
                   </div>
-                </Card>
-              </Link>
+                </div>
+
+                {/* Actions en bas de carte */}
+                <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-2 flex items-center justify-between gap-3 border-t border-slate-100">
+                  <Link
+                    href={service.href}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-slaac-gold-600 transition-colors"
+                  >
+                    <span>Détails & tarifs</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+
+                  <QuoteRequestButton
+                    variant="gold"
+                    size="sm"
+                    defaultService={service.serviceType}
+                    source={`accueil-grid-${service.serviceType}`}
+                  >
+                    <Send className="h-3.5 w-3.5 mr-1" /> Devis
+                  </QuoteRequestButton>
+                </div>
+              </div>
             );
           })}
-
-          {/* 6e carte : Réservation express */}
-          <QuoteRequestButton asChild source="accueil-reservation-express">
-            <button type="button" className="text-left w-full h-full cursor-pointer">
-              <Card className="overflow-hidden h-full shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-accent/5 border-accent/30 flex flex-col p-0">
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src="https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png"
-                    alt="Réservation express"
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-accent/80 to-transparent" />
-                  <div className="absolute bottom-3 left-3 w-11 h-11 rounded-full bg-accent flex items-center justify-center shadow-lg">
-                    <Zap className="h-6 w-6 text-accent-foreground" />
-                  </div>
-                </div>
-                <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="text-xl font-semibold text-primary">Réservation Express</h3>
-                  <p className="mt-2 text-sm text-muted-foreground flex-grow">
-                    Besoin d'un devis rapide ? Décrivez votre projet, notre équipe vous répond sous 24h.
-                  </p>
-                  <div className="mt-4 flex items-center text-accent-foreground text-sm font-medium">
-                    Demander un devis <ArrowRight className="ml-2 h-4 w-4" />
-                  </div>
-                </div>
-              </Card>
-            </button>
-          </QuoteRequestButton>
         </div>
       </div>
     </section>

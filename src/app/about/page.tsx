@@ -2,14 +2,27 @@ import Image from 'next/image';
 import { Users, Globe, Heart, Building, Award, Target, Download, Send, MessageCircle, Phone } from 'lucide-react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'À propos — Agence de voyage à Dakar',
-  description: "SLAAC Voyages, agence de voyages basée à Dakar Plateau : billetterie, assistance visa, hébergement, circuits et tourisme d'affaires. Notre histoire, notre mission, nos valeurs.",
-  alternates: { canonical: '/about' },
+  title: 'À propos de SLAAC Voyages | Agence agréée à Dakar Plateau',
+  description: "SLAAC Voyages, agence de voyage et conciergerie locale à Dakar Plateau (NINEA, RCCM) : billetterie, assistance visas, hébergements vérifiés et accueil VIP au Sénégal.",
+  alternates: {
+    canonical: '/about',
+    languages: {
+      fr: '/about',
+      en: '/en/about',
+      'x-default': '/about',
+    },
+  },
+  openGraph: {
+    title: 'À propos de SLAAC Voyages | Agence agréée à Dakar Plateau',
+    description: "Présentation de SLAAC Voyages, agence de voyages et conciergerie locale immatriculée à Dakar Plateau.",
+    url: '/about',
+  },
 };
 
 const whyUs = [
@@ -53,6 +66,9 @@ export default function AboutPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow">
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'À propos' }]} />
+        </div>
         <section className="py-20 sm:py-28 bg-secondary">
           <div className="container mx-auto max-w-7xl px-4 text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-primary">À propos de nous</span>
@@ -69,11 +85,10 @@ export default function AboutPage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-80 lg:h-full min-h-[400px] w-full rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?q=80&w=600&h=800&fit=crop"
-                  alt="Globe terrestre et carte du monde"
+                  src="https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png"
+                  alt="Équipe et conciergerie SLAAC Voyages à Dakar"
                   fill
                   className="object-cover"
-                  data-ai-hint="world map travel"
                 />
               </div>
               <div>
@@ -90,14 +105,23 @@ export default function AboutPage() {
                     Que vous soyez à la recherche d'aventure, de culture, d'adrénaline, SLAAC Voyages est votre partenaire incontournable pour la réalisation de vos projets. Grâce à nos experts, nous mettons au service de nos clients un dispositif d'accompagnement personnalisé, un système de filtrage et des outils de dernière génération afin de leurs garantir les meilleures offres et les billets d'avion les moins chers.
                   </p>
                 </div>
-                 <div className="mt-8">
-                   <a href="/brochure-slaac-voyages.pdf" download>
-                     <Button size="lg" variant="default">
-                       <Download className="mr-2 h-5 w-5" />
-                       Télécharger notre brochure
-                     </Button>
-                   </a>
-                 </div>
+
+                {/* Bloc d'enregistrement institutionnel */}
+                <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1.5">
+                  <div className="font-semibold text-slate-900 text-sm mb-1">Informations Légales & Immatriculation :</div>
+                  <div>• <strong>Siège social :</strong> Dakar Plateau, rue Mouhamed 5, Immeuble Djolof Chicken, 3<sup>e</sup> étage</div>
+                  <div>• <strong>Enregistrement :</strong> République du Sénégal (NINEA & Registre du Commerce et du Crédit Mobilier)</div>
+                  <div>• <strong>Licence d'exploitation :</strong> Agréée pour les opérations touristiques et réceptives au Sénégal</div>
+                </div>
+
+                <div className="mt-8">
+                  <a href="/brochure-slaac-voyages.pdf" download>
+                    <Button size="lg" variant="default">
+                      <Download className="mr-2 h-5 w-5" />
+                      Télécharger notre brochure
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

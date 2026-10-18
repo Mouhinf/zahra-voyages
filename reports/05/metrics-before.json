@@ -1,0 +1,431 @@
+[
+  {
+    "route": "/",
+    "url": "http://localhost:3100/",
+    "timestamp": "2026-10-17T23:42:52.633Z",
+    "scores": {
+      "performance": 74,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1067,
+      "lcp": "3.9 s",
+      "lcpNumeric": 3943,
+      "tbt": "530 ms",
+      "tbtNumeric": 533,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.7 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 11
+    },
+    "network": {
+      "requestsCount": 42,
+      "totalBytes": 555132,
+      "totalKiB": 542,
+      "jsBytes": 354353,
+      "jsKiB": 346,
+      "imgBytes": 42840,
+      "imgKiB": 42
+    }
+  },
+  {
+    "route": "/hebergement",
+    "url": "http://localhost:3100/hebergement",
+    "timestamp": "2026-10-17T23:43:07.382Z",
+    "scores": {
+      "performance": 88,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1120,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3276,
+      "tbt": "230 ms",
+      "tbtNumeric": 229,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 11
+    },
+    "network": {
+      "requestsCount": 38,
+      "totalBytes": 574213,
+      "totalKiB": 561,
+      "jsBytes": 362716,
+      "jsKiB": 354,
+      "imgBytes": 61584,
+      "imgKiB": 60
+    }
+  },
+  {
+    "route": "/transport",
+    "url": "http://localhost:3100/transport",
+    "timestamp": "2026-10-17T23:43:22.847Z",
+    "scores": {
+      "performance": 84,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.2 s",
+      "fcpNumeric": 1189,
+      "lcp": "3.5 s",
+      "lcpNumeric": 3480,
+      "tbt": "310 ms",
+      "tbtNumeric": 311,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "2.4 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 12
+    },
+    "network": {
+      "requestsCount": 37,
+      "totalBytes": 529208,
+      "totalKiB": 517,
+      "jsBytes": 363560,
+      "jsKiB": 355,
+      "imgBytes": 15390,
+      "imgKiB": 15
+    }
+  },
+  {
+    "route": "/voyages-croisieres",
+    "url": "http://localhost:3100/voyages-croisieres",
+    "timestamp": "2026-10-17T23:43:37.099Z",
+    "scores": {
+      "performance": 88,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1064,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3256,
+      "tbt": "250 ms",
+      "tbtNumeric": 249,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 12
+    },
+    "network": {
+      "requestsCount": 39,
+      "totalBytes": 601635,
+      "totalKiB": 588,
+      "jsBytes": 358730,
+      "jsKiB": 350,
+      "imgBytes": 95929,
+      "imgKiB": 94
+    }
+  },
+  {
+    "route": "/excursions",
+    "url": "http://localhost:3100/excursions",
+    "timestamp": "2026-10-17T23:43:51.201Z",
+    "scores": {
+      "performance": 87,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1064,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3333,
+      "tbt": "270 ms",
+      "tbtNumeric": 268,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 13
+    },
+    "network": {
+      "requestsCount": 39,
+      "totalBytes": 607253,
+      "totalKiB": 593,
+      "jsBytes": 358848,
+      "jsKiB": 350,
+      "imgBytes": 94062,
+      "imgKiB": 92
+    }
+  },
+  {
+    "route": "/tourisme-affaires",
+    "url": "http://localhost:3100/tourisme-affaires",
+    "timestamp": "2026-10-17T23:44:05.457Z",
+    "scores": {
+      "performance": 90,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1062,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3254,
+      "tbt": "190 ms",
+      "tbtNumeric": 195,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 20 ms",
+      "ttfbNumeric": 17
+    },
+    "network": {
+      "requestsCount": 39,
+      "totalBytes": 747080,
+      "totalKiB": 730,
+      "jsBytes": 361625,
+      "jsKiB": 353,
+      "imgBytes": 239296,
+      "imgKiB": 234
+    }
+  },
+  {
+    "route": "/assistance-voyage",
+    "url": "http://localhost:3100/assistance-voyage",
+    "timestamp": "2026-10-17T23:44:19.718Z",
+    "scores": {
+      "performance": 87,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1061,
+      "lcp": "3.2 s",
+      "lcpNumeric": 3184,
+      "tbt": "280 ms",
+      "tbtNumeric": 278,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 5
+    },
+    "network": {
+      "requestsCount": 37,
+      "totalBytes": 518644,
+      "totalKiB": 506,
+      "jsBytes": 355465,
+      "jsKiB": 347,
+      "imgBytes": 15392,
+      "imgKiB": 15
+    }
+  },
+  {
+    "route": "/destinations",
+    "url": "http://localhost:3100/destinations",
+    "timestamp": "2026-10-17T23:44:34.202Z",
+    "scores": {
+      "performance": 91,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "0.9 s",
+      "fcpNumeric": 915,
+      "lcp": "3.0 s",
+      "lcpNumeric": 3029,
+      "tbt": "200 ms",
+      "tbtNumeric": 196,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "0.9 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 5
+    },
+    "network": {
+      "requestsCount": 40,
+      "totalBytes": 705626,
+      "totalKiB": 689,
+      "jsBytes": 356183,
+      "jsKiB": 348,
+      "imgBytes": 204458,
+      "imgKiB": 200
+    }
+  },
+  {
+    "route": "/dakar-2026",
+    "url": "http://localhost:3100/dakar-2026",
+    "timestamp": "2026-10-17T23:44:48.407Z",
+    "scores": {
+      "performance": 90,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1066,
+      "lcp": "3.2 s",
+      "lcpNumeric": 3217,
+      "tbt": "180 ms",
+      "tbtNumeric": 175,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 8
+    },
+    "network": {
+      "requestsCount": 35,
+      "totalBytes": 558472,
+      "totalKiB": 545,
+      "jsBytes": 354353,
+      "jsKiB": 346,
+      "imgBytes": 62647,
+      "imgKiB": 61
+    }
+  },
+  {
+    "route": "/contact",
+    "url": "http://localhost:3100/contact",
+    "timestamp": "2026-10-17T23:45:05.269Z",
+    "scores": {
+      "performance": 88,
+      "accessibility": 95,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "0.9 s",
+      "fcpNumeric": 915,
+      "lcp": "3.0 s",
+      "lcpNumeric": 3034,
+      "tbt": "290 ms",
+      "tbtNumeric": 291,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "0.9 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 11
+    },
+    "network": {
+      "requestsCount": 53,
+      "totalBytes": 991409,
+      "totalKiB": 968,
+      "jsBytes": 808041,
+      "jsKiB": 789,
+      "imgBytes": 41245,
+      "imgKiB": 40
+    }
+  },
+  {
+    "route": "/en",
+    "url": "http://localhost:3100/en",
+    "timestamp": "2026-10-17T23:45:19.741Z",
+    "scores": {
+      "performance": 88,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "fcp": "1.1 s",
+      "fcpNumeric": 1065,
+      "lcp": "3.3 s",
+      "lcpNumeric": 3338,
+      "tbt": "210 ms",
+      "tbtNumeric": 208,
+      "cls": "0.049",
+      "clsNumeric": 0.049,
+      "speedIndex": "1.1 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 9
+    },
+    "network": {
+      "requestsCount": 37,
+      "totalBytes": 557540,
+      "totalKiB": 544,
+      "jsBytes": 356184,
+      "jsKiB": 348,
+      "imgBytes": 53782,
+      "imgKiB": 53
+    }
+  },
+  {
+    "route": "/hebergement/azalai-hotel-dakar",
+    "url": "http://localhost:3100/hebergement/azalai-hotel-dakar",
+    "timestamp": "2026-10-17T23:46:19.600Z",
+    "scores": {
+      "performance": 50,
+      "accessibility": 93,
+      "bestPractices": 100,
+      "seo": 92
+    },
+    "metrics": {
+      "fcp": "1.0 s",
+      "fcpNumeric": 951,
+      "lcp": "5.4 s",
+      "lcpNumeric": 5368,
+      "tbt": "290 ms",
+      "tbtNumeric": 288,
+      "cls": "0.868",
+      "clsNumeric": 0.868,
+      "speedIndex": "2.1 s",
+      "ttfb": "Root document took 30 ms",
+      "ttfbNumeric": 28
+    },
+    "network": {
+      "requestsCount": 63,
+      "totalBytes": 667333,
+      "totalKiB": 652,
+      "jsBytes": 412782,
+      "jsKiB": 403,
+      "imgBytes": 46910,
+      "imgKiB": 46
+    }
+  },
+  {
+    "route": "/admin/login",
+    "url": "http://localhost:3100/admin/login",
+    "timestamp": "2026-10-17T23:46:33.041Z",
+    "scores": {
+      "performance": 89,
+      "accessibility": 98,
+      "bestPractices": 100,
+      "seo": 63
+    },
+    "metrics": {
+      "fcp": "0.9 s",
+      "fcpNumeric": 915,
+      "lcp": "2.7 s",
+      "lcpNumeric": 2743,
+      "tbt": "310 ms",
+      "tbtNumeric": 308,
+      "cls": "0",
+      "clsNumeric": 0,
+      "speedIndex": "0.9 s",
+      "ttfb": "Root document took 10 ms",
+      "ttfbNumeric": 9
+    },
+    "network": {
+      "requestsCount": 28,
+      "totalBytes": 534941,
+      "totalKiB": 522,
+      "jsBytes": 422187,
+      "jsKiB": 412,
+      "imgBytes": 0,
+      "imgKiB": 0
+    }
+  }
+]

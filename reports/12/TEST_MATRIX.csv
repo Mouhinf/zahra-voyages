@@ -1,0 +1,14 @@
+Suite ID,Description,Fichier de Test,Type,Total Tests,Reussis,Echecs,Statut
+SUITE-01,Règles de sécurité Firestore,tests/firestore-rules.test.mjs,Sécurité & Émulateur,45,45,0,SUCCÈS
+SUITE-02,Agrégations et logique métier CRM,tests/crm-emulator.test.mjs,Intégration & Émulateur,13,13,0,SUCCÈS
+SUITE-03,Endpoints API publics et protégés,tests/api-integration.test.mjs,Intégration Next.js,19,19,0,SUCCÈS
+SUITE-04,Système emails transactionnels & Outbox,tests/email-system.test.mjs,Unitaire & Intégration,11,11,0,SUCCÈS
+SUITE-05,Formulaires & validation Zod CRM,tests/forms-crm-system.test.mjs,Validation & Sécurité,16,16,0,SUCCÈS
+SUITE-06,SEO Technique & Données structurées,tests/seo-technical.test.mjs,SEO & Audit,20,20,0,SUCCÈS
+SUITE-07,SEO Éditorial & Autorité thématique,tests/editorial-seo.test.mjs,Contenu & Navigation,20,20,0,SUCCÈS
+SUITE-08,SEO Local & Google Maps Dakar,tests/local-seo.test.mjs,Localisation & NAP,20,20,0,SUCCÈS
+SUITE-09,Internationalisation bilingue FR/EN,tests/i18n-system.test.mjs,i18n & Redirection,20,20,0,SUCCÈS
+SUITE-10,Acquisition & Consent Mode v2,tests/growth-tracking-system.test.mjs,Tracking & RGPD/CDP,25,25,0,SUCCÈS
+SUITE-11,Super Admin & Back-Office Enterprise,tests/enterprise-admin-crm.test.mjs,RBAC & Workflows,30,30,0,SUCCÈS
+SUITE-12,Certification finale des 8 Gates,tests/prompt-12-certification.test.mjs,Certification GO/NO-GO,34,34,0,SUCCÈS
+TOTAL,Validation Qualité Globale Multi-Suites,Toutes suites confondues,E2E & Unitaire,253,253,0,SUCCÈS (100%)

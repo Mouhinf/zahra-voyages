@@ -80,7 +80,7 @@ function renderStars(note: number) {
 
 export default function HomeTestimonials() {
   return (
-    <section id="testimonials" className="py-16 sm:py-24 bg-background">
+    <section id="testimonials" className="py-16 sm:py-24 bg-background overflow-hidden">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="text-center">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">Témoignages</span>
@@ -127,8 +127,8 @@ export default function HomeTestimonials() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            <CarouselPrevious className="hidden xl:flex" />
+            <CarouselNext className="hidden xl:flex" />
           </Carousel>
         </div>
       </div>

@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, LogOut, Menu, UserRound } from 'lucide-react';
+import { ChevronDown, ChevronRight, LogOut, Menu, UserRound, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -13,20 +14,32 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import {
   ADMIN_NAV, activeNavHref, breadcrumbsFor, type AdminNavGroup,
 } from '@/components/admin/admin-nav';
+import { type AdminRole, type Permission, ROLE_LABELS } from '@/lib/rbac';
 
 // ---------------------------------------------------------------------------
 // Coquille du back-office : sidebar (desktop fixe, mobile en panneau),
 // topbar (fil d'Ariane, titre, session) et zone de contenu.
-// Chaque rubrique est une route Next.js ; la coquille ne contient aucune donnée.
+// Chaque rubrique est une route Next.js ; la coquille filtre la navigation
+// selon les permissions de la session active.
 // ---------------------------------------------------------------------------
 
 interface AdminShellProps {
   email: string | null;
+  role?: AdminRole | null;
+  hasPermission?: (perm: Permission) => boolean;
   onLogout: () => void;
   children: React.ReactNode;
 }
 
-function SidebarNav({ groups, onNavigate }: { groups: AdminNavGroup[]; onNavigate?: () => void }) {
+function SidebarNav({
+  groups,
+  hasPermission,
+  onNavigate,
+}: {
+  groups: AdminNavGroup[];
+  hasPermission?: (perm: Permission) => boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   const active = activeNavHref(pathname);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -34,6 +47,13 @@ function SidebarNav({ groups, onNavigate }: { groups: AdminNavGroup[]; onNavigat
   return (
     <nav aria-label="Navigation d'administration" className="flex flex-col gap-4 py-4">
       {groups.map((group) => {
+        // Filtrage des éléments selon les permissions du rôle courant
+        const allowedItems = group.items.filter(
+          (item) => !item.permission || (hasPermission && hasPermission(item.permission))
+        );
+
+        if (allowedItems.length === 0) return null;
+
         const isCollapsed = !!collapsed[group.label];
         const panelId = `admin-group-${group.label.replace(/\s+/g, '-').toLowerCase()}`;
         return (
@@ -49,7 +69,7 @@ function SidebarNav({ groups, onNavigate }: { groups: AdminNavGroup[]; onNavigat
               {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" aria-hidden /> : <ChevronDown className="h-3.5 w-3.5" aria-hidden />}
             </button>
             <ul id={panelId} hidden={isCollapsed} className="mt-1 flex flex-col gap-0.5 px-2">
-              {group.items.map((item) => {
+              {allowedItems.map((item) => {
                 const isActive = item.href === active;
                 const Icon = item.icon;
                 return (
@@ -87,18 +107,19 @@ function Brand() {
   );
 }
 
-export default function AdminShell({ email, onLogout, children }: AdminShellProps) {
+export default function AdminShell({ email, role, hasPermission, onLogout, children }: AdminShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const crumbs = breadcrumbsFor(pathname);
   const title = crumbs[crumbs.length - 1]?.label ?? 'Administration';
+  const roleLabel = role ? ROLE_LABELS[role] ?? role : 'Administrateur';
 
   return (
     <div className="min-h-screen bg-secondary/40 lg:flex">
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:sticky lg:top-0 lg:h-screen border-r bg-background overflow-y-auto">
         <Brand />
-        <SidebarNav groups={ADMIN_NAV} />
+        <SidebarNav groups={ADMIN_NAV} hasPermission={hasPermission} />
       </aside>
 
       {/* Navigation mobile */}
@@ -109,7 +130,11 @@ export default function AdminShell({ email, onLogout, children }: AdminShellProp
             <SheetDescription>Navigation entre les rubriques du back-office</SheetDescription>
           </SheetHeader>
           <Brand />
-          <SidebarNav groups={ADMIN_NAV} onNavigate={() => setMobileOpen(false)} />
+          <SidebarNav
+            groups={ADMIN_NAV}
+            hasPermission={hasPermission}
+            onNavigate={() => setMobileOpen(false)}
+          />
         </SheetContent>
       </Sheet>
 
@@ -119,7 +144,7 @@ export default function AdminShell({ email, onLogout, children }: AdminShellProp
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden md:hidden"
               onClick={() => setMobileOpen(true)}
               aria-label="Ouvrir le menu"
             >
@@ -149,12 +174,21 @@ export default function AdminShell({ email, onLogout, children }: AdminShellProp
                 <Button variant="outline" size="sm" className="gap-2" aria-label="Menu du profil">
                   <UserRound className="h-4 w-4" aria-hidden />
                   <span className="hidden max-w-[12rem] truncate md:inline">{email ?? 'Session'}</span>
+                  {role === 'SUPER_ADMIN' && (
+                    <Badge variant="secondary" className="ml-1 text-[10px] bg-amber-500/15 text-amber-600 border-amber-300">
+                      Super Admin
+                    </Badge>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel className="font-normal">
                   <p className="text-xs text-muted-foreground">Connecté en tant que</p>
-                  <p className="truncate text-sm">{email ?? '—'}</p>
+                  <p className="truncate text-sm font-medium">{email ?? '—'}</p>
+                  <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                    <Shield className="h-3 w-3 text-primary" />
+                    <span>{roleLabel}</span>
+                  </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={onLogout}>
@@ -166,7 +200,7 @@ export default function AdminShell({ email, onLogout, children }: AdminShellProp
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-auto">
           <div className="mx-auto w-full max-w-7xl">{children}</div>
         </main>
       </div>

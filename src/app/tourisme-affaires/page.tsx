@@ -1,5 +1,6 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import TourismeGrid from '@/components/sections/tourisme-grid';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { fetchPublicCollection } from '@/lib/public-data';
@@ -7,6 +8,7 @@ import { fetchPageContent } from '@/lib/page-content';
 import type { OffreAffaires } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const revalidate = 300;
@@ -17,6 +19,17 @@ export async function generateMetadata(): Promise<Metadata> {
     title: content.metaTitle,
     description: content.metaDescription,
     alternates: { canonical: '/tourisme-affaires' },
+    openGraph: {
+      title: content.metaTitle,
+      description: content.metaDescription,
+      url: '/tourisme-affaires',
+      images: content.hero.image ? [{ url: content.hero.image, width: 1200, height: 630, alt: content.hero.title }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.metaTitle,
+      description: content.metaDescription,
+    },
   };
 }
 
@@ -45,6 +58,10 @@ export default async function TourismeAffairesPage() {
           </div>
         </section>
 
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: "Tourisme d'Affaires & MICE" }]} />
+        </div>
+
         <section className="py-20 sm:py-28 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
             <div className="text-center mb-14">
@@ -56,6 +73,63 @@ export default async function TourismeAffairesPage() {
               </p>
             </div>
             <TourismeGrid initialItems={tourismeItems} />
+          </div>
+        </section>
+
+        {/* Garanties Corporate B2B & Délégations */}
+        <section className="py-12 bg-slate-50 border-y border-slate-200">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <span className="text-xs uppercase font-bold text-slaac-gold-600 tracking-wider">Services Corporate Dédiés</span>
+              <h3 className="text-2xl font-bold text-slate-900 font-headline mt-1">
+                La garantie d'une logistique d'entreprise sans accroc à Dakar
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="text-xl mb-2">📑</div>
+                <h4 className="text-base font-bold text-slate-900 mb-1 font-headline">Facturation d'Entreprise</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Factures conformes aux normes sénégalaises (TVA, NINEA, RCCM), paiements par virement bancaire et conventions de compte pour les missions régulières.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="text-xl mb-2">🚘</div>
+                <h4 className="text-base font-bold text-slate-900 mb-1 font-headline">Flottes & Chauffeurs VIP</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Berlines haut de gamme et vans VIP avec chauffeurs professionnels bilingues, habitués aux exigences protocolaires des délégations et conférences.
+                </p>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="text-xl mb-2">👤</div>
+                <h4 className="text-base font-bold text-slate-900 mb-1 font-headline">Chargé de Compte Unique</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Un interlocuteur dédié basé à Dakar Plateau, joignable directement pour ajuster les plannings et les réservations en temps réel.
+                </p>
+              </div>
+            </div>
+
+            {/* Encart Guide Mobilité Asie / Chine */}
+            <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <span className="text-xs uppercase font-bold text-slaac-gold-400 tracking-wider">Guide d'Affaires International</span>
+                <h4 className="text-xl font-bold font-headline text-white mt-1">
+                  Déplacements professionnels et sourcing commercial en Chine
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+                  Préparez vos missions commerciales à Canton, Yiwu ou Shanghai : démarches du visa M, documents indispensables et optimisation des vols.
+                </p>
+              </div>
+              <Link
+                href="/guides/voyage-affaires-chine-depuis-dakar"
+                className="shrink-0 inline-flex items-center px-4 py-2.5 rounded-lg bg-slaac-gold-500 hover:bg-slaac-gold-600 text-slate-950 font-bold text-xs transition-colors"
+              >
+                Lire le guide Chine Affaires &rarr;
+              </Link>
+            </div>
           </div>
         </section>
 

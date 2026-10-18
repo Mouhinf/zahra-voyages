@@ -14,6 +14,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { captureAttribution, getStoredAttribution } from '@/lib/tracking/attribution';
 
 export type ClientEventType = 'page_view' | 'cta_click' | 'whatsapp_click' | 'quote_start';
 
@@ -62,16 +63,20 @@ export function trackAnalyticsEvent(
   // Pas de suivi sur l'administration
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return;
 
+  const storedAttr = getStoredAttribution();
   const utm = parseUtmParams();
   const referrer = document.referrer || '';
-  const source = details?.source || detectSource(referrer, utm.source);
+  const effectiveSource = details?.source || utm.source || storedAttr.utmSource;
+  const source = detectSource(referrer, effectiveSource);
+  const campaign = details?.campaign || utm.campaign || storedAttr.utmCampaign;
+  const medium = utm.medium || storedAttr.utmMedium;
 
   const payload = JSON.stringify({
     page: pathname.slice(0, 200),
     eventType,
     source,
-    medium: utm.medium,
-    campaign: details?.campaign || utm.campaign,
+    medium,
+    campaign,
     referrer: referrer ? referrer.slice(0, 500) : null,
     device: getDeviceType(),
     method: 'POST',
@@ -100,6 +105,9 @@ export default function AnalyticsBeacon() {
 
   useEffect(() => {
     if (!pathname) return;
+    // Capture et persistance automatique des paramètres UTM/clics à chaque navigation
+    captureAttribution();
+
     // Anti-doublon StrictMode
     if (lastPath.current === pathname) return;
     lastPath.current = pathname;

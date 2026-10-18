@@ -9,12 +9,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Mail, Send, MessageCircle } from 'lucide-react';
+import { MapPin, Mail, Send, MessageCircle, Phone, Navigation } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getDbInstance } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { CONTACT } from '@/lib/site';
 
 const FALLBACK_AGENCY = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png';
 
@@ -24,42 +23,19 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
-  email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }),
-  phone: z.string().optional(),
-  message: z.string().min(10, { message: 'Le message doit contenir au moins 10 caractères.' }),
-});
+import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
 
 export default function HomeContactQuick() {
   const { toast } = useToast();
-  const [agenceImg, setAgenceImg] = useState<string>(FALLBACK_AGENCY);
+  const agenceImg = FALLBACK_AGENCY;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const db = getDbInstance();
-        const q = query(collection(db, 'hebergements'), orderBy('ordre', 'asc'), limit(1));
-        const snap = await getDocs(q);
-        snap.forEach((docSnap) => {
-          const d = docSnap.data() as { image?: string; disponible?: boolean };
-          if (d.disponible !== false && d.image && mounted) setAgenceImg(d.image.includes('unsplash') ? FALLBACK_AGENCY : d.image);
-        });
-      } catch (e) {
-        console.error('Erreur fetch agence img:', e);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: '', email: '', phone: '', message: '' },
+  const form = useForm<ContactInput>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: { name: '', email: '', phone: '', message: '', website: '' },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: ContactInput) {
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/contact', {
@@ -75,7 +51,7 @@ export default function HomeContactQuick() {
 
       toast({
         title: 'Message envoyé !',
-        description: 'Merci de nous avoir contactés. Nous reviendrons vers vous sous 24h.',
+        description: 'Merci de nous avoir contactés. Notre équipe commerciale traite votre message dans les meilleurs délais.',
       });
       form.reset();
     } catch (err: unknown) {
@@ -91,7 +67,7 @@ export default function HomeContactQuick() {
   }
 
   return (
-    <section id="contact-quick" className="py-16 sm:py-24 bg-white">
+    <section id="contact-quick" className="py-16 sm:py-24 bg-white overflow-hidden">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="text-center">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">Contact</span>
@@ -101,8 +77,8 @@ export default function HomeContactQuick() {
             Une question, un devis, une envie d'évasion ? Écrivez-nous ou contactez-nous directement sur WhatsApp.
           </p>
         </div>
-        <div className="mt-12 grid lg:grid-cols-2 gap-8 items-start">
-          <div className="space-y-6">
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-start w-full">
+          <div className="space-y-6 w-full min-w-0">
             <div className="relative h-56 rounded-lg overflow-hidden shadow-md">
               <Image src={agenceImg} alt="SLAAC Voyages — Dakar" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent" />
@@ -113,62 +89,92 @@ export default function HomeContactQuick() {
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-full"><MapPin className="h-6 w-6 text-primary" /></div>
-              <div>
-                <h3 className="text-lg font-semibold text-primary">Notre Bureau</h3>
-                <p className="text-muted-foreground">Dakar Plateau rue Mouhamed 5 à l'Immeuble Djolof Chicken à la Troisième étage</p>
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="p-3 bg-primary/10 rounded-full shrink-0"><MapPin className="h-6 w-6 text-primary" /></div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-semibold text-primary font-headline">Notre Bureau</h3>
+                <p className="text-muted-foreground text-sm break-words leading-relaxed">{CONTACT.address.formatted}</p>
+                <p className="text-xs text-muted-foreground/75 mt-0.5">Repère : 3e étage Immeuble Djolof Chicken, Rue Mohamed V, Dakar Plateau.</p>
               </div>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-full"><WhatsAppIcon className="h-6 w-6 text-primary" /></div>
-              <div>
-                <h3 className="text-lg font-semibold text-primary">WhatsApp</h3>
-                <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2" aria-label="Contacter SLAAC Voyages sur WhatsApp">
-                  <WhatsAppIcon className="h-4 w-4 fill-current" /> +221 77 312 90 90
+
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="p-3 bg-primary/10 rounded-full shrink-0"><Phone className="h-6 w-6 text-primary" /></div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-semibold text-primary font-headline">Téléphone</h3>
+                <div className="space-y-0.5 text-sm">
+                  <a href={`tel:${CONTACT.phoneIntl}`} className="text-muted-foreground hover:text-primary flex items-center gap-2 font-medium">
+                    {CONTACT.phone} <span className="text-xs text-primary/80 font-normal">(Accueil)</span>
+                  </a>
+                  <a href={`tel:${CONTACT.phoneSecondaryIntl}`} className="text-muted-foreground hover:text-primary flex items-center gap-2">
+                    {CONTACT.phoneSecondary} <span className="text-xs text-muted-foreground/70">(Commercial)</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="p-3 bg-primary/10 rounded-full shrink-0"><WhatsAppIcon className="h-6 w-6 text-primary" /></div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-semibold text-primary font-headline">WhatsApp Pro</h3>
+                <a href={CONTACT.whatsapp} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2 text-sm" aria-label="Contacter SLAAC Voyages sur WhatsApp">
+                  <WhatsAppIcon className="h-4 w-4 fill-current" /> {CONTACT.phone} (Réponse rapide)
                 </a>
               </div>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-full"><Mail className="h-6 w-6 text-primary" /></div>
-              <div>
-                <h3 className="text-lg font-semibold text-primary">Écrivez-nous</h3>
-                <p className="text-muted-foreground">mdslaacvoyages@gmail.com</p>
+
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="p-3 bg-slaac-navy-50 rounded-xl text-slaac-navy-900 border border-slate-200/80 shrink-0"><Mail className="h-5 w-5" /></div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold text-slate-900 font-headline">Email Officiel</h3>
+                <p className="text-sm text-slate-600 break-all">{CONTACT.email}</p>
+                <p className="text-xs text-slate-400 break-all">Direction : {CONTACT.emailInternal}</p>
               </div>
             </div>
-            <a
-              href="https://wa.me/221773129090"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-4"
-              aria-label="Discuter avec SLAAC Voyages sur WhatsApp"
-            >
-              <Button size="lg" className="bg-green-700 hover:bg-green-800">
-                <MessageCircle className="mr-2 h-5 w-5" /> Discuter sur WhatsApp
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <a
+                href="https://wa.me/221773129090?text=Bonjour%20SLAAC%20Voyages%2C%20je%20souhaite%20des%20informations%20sur%20vos%20prestations."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2"
+                aria-label="Discuter avec SLAAC Voyages sur WhatsApp"
+              >
+                <Button size="lg" variant="whatsapp" className="w-full sm:w-auto font-medium">
+                  <MessageCircle className="mr-2 h-5 w-5 fill-current" /> Discuter sur WhatsApp
+                </Button>
+              </a>
+              <Button asChild size="lg" variant="outline" className="border-primary/40 text-primary hover:bg-primary hover:text-white">
+                <a href={CONTACT.directionsUrl} target="_blank" rel="noopener noreferrer">
+                  <Navigation className="mr-2 h-4 w-4" /> Itinéraire Maps
+                </a>
               </Button>
-            </a>
+            </div>
+
             <div className="pt-2">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d913.4299840693265!2d-17.4343981!3d14.668668499999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec173b82ee767bd%3A0x95a2e5d20c75be4a!2sDjolof%20Chicken%20Dakar-Plateau!5e1!3m2!1sfr!2ssn!4v1784546169277!5m2!1sfr!2ssn"
-                title="Localisation SLAAC Voyages à Dakar"
+                title="Localisation SLAAC Voyages à Dakar Plateau"
                 width="100%"
                 height="200"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
-                referrerPolicy="strict-origin-when-cross-origin"
-                className="rounded-lg shadow-md"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full max-w-full rounded-lg shadow-sm border border-slate-200"
               />
             </div>
-            <div className="pt-2">
-              <Link href="/contact">
-                <Button variant="link" className="p-0 text-primary">
-                  Voir la page contact complète
-                </Button>
+
+            <div className="pt-1 flex items-center justify-between text-xs">
+              <Link href="/contact" className="text-primary hover:underline font-semibold">
+                Voir toutes les coordonnées et horaires d'accueil &rarr;
               </Link>
+              <a href={CONTACT.directionsUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                Google Maps &rarr;
+              </a>
             </div>
           </div>
-          <Card className="w-full">
+          <Card className="w-full min-w-0">
             <CardHeader>
               <CardTitle>Envoyez-nous un message</CardTitle>
             </CardHeader>
@@ -229,8 +235,8 @@ export default function HomeContactQuick() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                    {isSubmitting ? 'Envoi en cours…' : <>Envoyer ma demande <Send className="ml-2 h-4 w-4" /></>}
+                  <Button type="submit" variant="gold" className="w-full text-base font-semibold shadow-md" size="xl" disabled={isSubmitting}>
+                    {isSubmitting ? 'Envoi en cours…' : <>Envoyer mon message <Send className="ml-2 h-4 w-4" /></>}
                   </Button>
                 </form>
               </Form>

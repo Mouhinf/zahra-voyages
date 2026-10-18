@@ -15,11 +15,25 @@ import { useEffect, useState } from 'react';
  * layouts ; useGuard() conserve l'ancienne signature booléenne.
  */
 
+import type { AdminRole, Permission } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
+
 export type AdminSessionStatus = 'loading' | 'ok' | 'denied';
 
-export function useAdminSession(): { status: AdminSessionStatus; email: string | null } {
+export interface AdminSessionState {
+  status: AdminSessionStatus;
+  email: string | null;
+  role: AdminRole | null;
+  permissions: readonly Permission[];
+  hasPermission: (perm: Permission) => boolean;
+}
+
+export function useAdminSession(): AdminSessionState {
   const [status, setStatus] = useState<AdminSessionStatus>('loading');
   const [email, setEmail] = useState<string | null>(null);
+  const [role, setRole] = useState<AdminRole | null>(null);
+  const [permissions, setPermissions] = useState<readonly Permission[]>([]);
+  const [customPermissions, setCustomPermissions] = useState<Permission[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,6 +48,8 @@ export function useAdminSession(): { status: AdminSessionStatus; email: string |
         if (!user) {
           setStatus('denied');
           setEmail(null);
+          setRole(null);
+          setPermissions([]);
           return;
         }
 
@@ -45,9 +61,23 @@ export function useAdminSession(): { status: AdminSessionStatus; email: string |
             headers: { Authorization: `Bearer ${token}` },
           });
           if (cancelled) return;
-          setStatus(res.ok ? 'ok' : 'denied');
+          if (res.ok) {
+            const data = await res.json();
+            setStatus('ok');
+            setRole(data.role ?? 'ADMIN');
+            setPermissions(data.permissions ?? []);
+            setCustomPermissions(data.customPermissions ?? []);
+          } else {
+            setStatus('denied');
+            setRole(null);
+            setPermissions([]);
+          }
         } catch {
-          if (!cancelled) setStatus('denied');
+          if (!cancelled) {
+            setStatus('denied');
+            setRole(null);
+            setPermissions([]);
+          }
         }
       });
 
@@ -62,7 +92,12 @@ export function useAdminSession(): { status: AdminSessionStatus; email: string |
     };
   }, []);
 
-  return { status, email };
+  const checkPerm = (perm: Permission): boolean => {
+    if (!role) return false;
+    return hasPermission(role, perm, customPermissions);
+  };
+
+  return { status, email, role, permissions, hasPermission: checkPerm };
 }
 
 /** Compatibilité : renvoie true uniquement si le serveur a confirmé le rôle admin. */
@@ -70,3 +105,4 @@ export function useGuard(): boolean {
   const { status } = useAdminSession();
   return status === 'ok';
 }
+

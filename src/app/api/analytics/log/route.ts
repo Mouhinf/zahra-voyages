@@ -17,10 +17,25 @@ export const runtime = 'nodejs';
 // - Incréments atomiques dans les documents journaliers pré-agrégés.
 // ---------------------------------------------------------------------------
 
+const ALLOWED_SOURCES = [
+  'direct',
+  'googlebot',
+  'facebook',
+  'google',
+  'google_search',
+  'google_ads',
+  'instagram',
+  'tiktok',
+  'twitter',
+  'whatsapp',
+  'referral',
+  'inconnu',
+] as const;
+
 const eventSchema = z.object({
   page: z.string().max(200).regex(/^\//, 'page doit commencer par /').optional(),
   eventType: z.enum(['page_view', 'cta_click', 'whatsapp_click', 'quote_start']).optional(),
-  source: z.string().max(50).optional(),
+  source: z.enum(ALLOWED_SOURCES).optional(),
   medium: z.string().max(50).optional(),
   campaign: z.string().max(80).optional(),
   referrer: z.string().max(500).optional().nullable(),

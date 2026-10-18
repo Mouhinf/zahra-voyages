@@ -1,18 +1,27 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import FaqSection from '@/components/sections/faq-section';
 import { Send, FileText, ShieldCheck, GraduationCap, CalendarCheck, Globe, HelpCircle } from 'lucide-react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const HERO_IMG = 'https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/v1784504518/hero-section-transport.jpg';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Assistance Voyage (visas, assurance, préinscriptions) - SLAAC Voyages' },
-  description: "Assistance visas, assurance voyage, préinscriptions universitaires et prise de rendez-vous. SLAAC Voyages vous accompagne dans toutes vos démarches à Dakar.",
+  title: 'Assistance voyage et formalités à Dakar | SLAAC Voyages',
+  description: "Assistance visas Chine, Dubaï, Schengen, assurance voyage et préinscriptions universitaires à Dakar Plateau. Démarches accompagnées par SLAAC Voyages.",
   alternates: { canonical: '/assistance-voyage' },
+  openGraph: {
+    title: 'Assistance voyage et formalités à Dakar | SLAAC Voyages',
+    description: "Assistance visas, assurance voyage et préinscriptions à Dakar Plateau avec SLAAC Voyages.",
+    url: '/assistance-voyage',
+  },
 };
 
 const assistanceServices = [
@@ -91,14 +100,18 @@ export default function AssistanceVoyagePage() {
           </div>
         </section>
 
-        <section className="py-20 sm:py-28 bg-background">
+        <div className="container mx-auto max-w-7xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Assistance & Visas' }]} />
+        </div>
+
+        <section className="py-20 sm:py-24 bg-background">
           <div className="container mx-auto max-w-7xl px-4">
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos services</span>
-              <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Services d'Assistance</h2>
+              <span className="text-sm font-semibold uppercase tracking-widest text-primary">Nos prestations</span>
+              <h2 className="mt-2 text-3xl md:text-4xl font-bold text-primary font-headline">Services d'Assistance & Formalités</h2>
               <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-balance">
-                Simplifiez vos démarches administratives et partez serein. Notre équipe d'experts vous accompagne à chaque étape de votre préparation de voyage.
+                Simplifiez vos démarches administratives et partez serein. Notre équipe d'experts à Dakar Plateau vous accompagne à chaque étape de votre préparation.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -114,10 +127,82 @@ export default function AssistanceVoyagePage() {
                     <p className="text-muted-foreground leading-relaxed">{service.description}</p>
                   </CardContent>
                   <div className="mt-5">
-                    <QuoteRequestButton variant="link">Demander un devis</QuoteRequestButton>
+                    <QuoteRequestButton variant="link" defaultService="assistance-visa" defaultDestination={service.title}>
+                      Demander un accompagnement &rarr;
+                    </QuoteRequestButton>
                   </div>
                 </Card>
               ))}
+            </div>
+
+            {/* Focus Destinations Clés d'Affaires & Tourisme */}
+            <div className="mt-20 pt-16 border-t border-border/60">
+              <div className="text-center mb-12">
+                <span className="text-xs uppercase tracking-widest text-slaac-gold-600 font-bold">Expertise Pays</span>
+                <h3 className="text-2xl md:text-3xl font-bold text-primary font-headline mt-1">
+                  Destinations Régulièrement Accompagnées depuis Dakar
+                </h3>
+                <p className="text-sm text-muted-foreground mt-2 max-w-2xl mx-auto">
+                  Des procédures adaptées à la réalité économique des voyageurs sénégalais.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-2xl bg-secondary/40 border border-border/60 flex flex-col justify-between">
+                  <div>
+                    <Badge variant="outline" className="mb-3">Asie & Commerce</Badge>
+                    <h4 className="text-lg font-bold text-primary font-headline mb-2">Chine (Affaires M & Foires)</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                      Vérification de la lettre d'invitation (Canton, Yiwu, Shanghai), conformité du dossier d'entreprise à Dakar et optimisation des vols long-courriers avec franchises bagages adaptées.
+                    </p>
+                  </div>
+                  <QuoteRequestButton variant="gold" size="sm" defaultService="assistance-visa" defaultDestination="Chine Affaires" className="w-full justify-center">
+                    Devis Visa Chine
+                  </QuoteRequestButton>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-secondary/40 border border-border/60 flex flex-col justify-between">
+                  <div>
+                    <Badge variant="outline" className="mb-3">Orient & Shopping</Badge>
+                    <h4 className="text-lg font-bold text-primary font-headline mb-2">Dubaï / Émirats Arabes Unis</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                      Visas de court séjour tourisme et affaires, réservations d'hôtels partenaires et forfaits vols réguliers au départ de Dakar AIBD.
+                    </p>
+                  </div>
+                  <QuoteRequestButton variant="gold" size="sm" defaultService="assistance-visa" defaultDestination="Dubaï EAU" className="w-full justify-center">
+                    Devis Séjour Dubaï
+                  </QuoteRequestButton>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-secondary/40 border border-border/60 flex flex-col justify-between">
+                  <div>
+                    <Badge variant="outline" className="mb-3">Europe & Mobilité</Badge>
+                    <h4 className="text-lg font-bold text-primary font-headline mb-2">Espace Schengen & Études</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                      Revue critique des justificatifs d'hébergement, attestations d'assurances rapatriement agréées (minimum 30 000 €) et conseil personnalisé.
+                    </p>
+                  </div>
+                  <QuoteRequestButton variant="gold" size="sm" defaultService="assistance-visa" defaultDestination="Espace Schengen" className="w-full justify-center">
+                    Devis Espace Schengen
+                  </QuoteRequestButton>
+                </div>
+              </div>
+
+              {/* Raccordement aux Guides Pratiques */}
+              <div className="mt-10 p-6 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div>
+                  <span className="text-xs text-slaac-gold-400 font-bold uppercase tracking-wider">Guides Pratiques</span>
+                  <h4 className="text-lg font-bold font-headline text-white mt-1">
+                    Consultez nos dossiers complets de préparation
+                  </h4>
+                  <p className="text-xs text-slate-300 mt-1">
+                    Démarches visa Chine, liste des pièces pour les consulats et exigences d'assurance voyage.
+                  </p>
+                </div>
+                <Button asChild variant="gold" size="sm" className="shrink-0">
+                  <Link href="/guides">Accéder aux guides pratiques</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -146,14 +231,16 @@ export default function AssistanceVoyagePage() {
                     </li>
                   ))}
                 </ul>
+                <div className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+                  <strong>Mention légale consulaire :</strong> SLAAC Voyages est un intermédiaire professionnel d'accompagnement logistique et administratif. L'acceptation d'un dossier de visa relève exclusivement de la décision souveraine de l'ambassade ou du consulat compétent.
+                </div>
               </div>
               <div className="relative h-80 lg:h-full min-h-[300px] w-full rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=600&h=700&fit=crop"
-                  alt="Documents de voyage et passeport"
+                  src="https://res.cloudinary.com/dvnq5qwbd/image/upload/f_auto,q_auto/hero-section-voyages.png"
+                  alt="Assistance démarches de voyage et visas SLAAC Voyages Dakar"
                   fill
                   className="object-cover"
-                  data-ai-hint="travel documents passport visa"
                 />
               </div>
             </div>
@@ -169,9 +256,11 @@ export default function AssistanceVoyagePage() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <QuoteRequestButton size="lg"><Send className="mr-2 h-4 w-4" /> Demander un devis</QuoteRequestButton>
-              <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
-                <QuoteRequestButton size="lg" variant="outline">Nous écrire sur WhatsApp</QuoteRequestButton>
-              </a>
+              <Button asChild size="lg" variant="outline">
+                <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer">
+                  Nous écrire sur WhatsApp
+                </a>
+              </Button>
             </div>
           </div>
         </section>

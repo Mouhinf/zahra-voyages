@@ -1,0 +1,16 @@
+id,semaine,date_cible,titre_contenu,format,cluster_thematique,cible_audience,mot_cle_principal,statut
+CAL-001,S1,2026-11-02,Guide d'arrivée à l'Aéroport AIBD Diass,Guide Pratique Long-Format,Logistique Réceptive & AIBD,Voyageurs internationaux et diaspora,arrivee aeroport aibd dakar transfert,Publié & Indexable
+CAL-002,S1,2026-11-05,L'île de Gorée : Chaloupe et visite historique,Guide Pratique Long-Format,Patrimoine & Culture,Touristes et familles,visiter ile de goree chaloupe,Publié & Indexable
+CAL-003,S2,2026-11-09,Où loger à Dakar ? Comparatif des quartiers,Guide Pratique Long-Format,Hébergement & Séjour,Professionnels et résidents temporaires,ou loger a dakar quartiers,Publié & Indexable
+CAL-004,S2,2026-11-12,Préparer sa Omra depuis Dakar : Formalités Nusuk,Guide Pratique Long-Format,Tourisme Religieux & Spirituel,Fidèles et familles du Sénégal,preparation omra dakar senegal,Publié & Indexable
+CAL-005,S3,2026-11-16,Missions commerciales et foires en Chine,Guide Pratique Long-Format,Mobilité Internationale & B2B,Commerçants et PME dakaroises,voyage affaires chine dakar,Publié & Indexable
+CAL-006,S3,2026-11-19,L'assurance voyage internationale à Dakar,Guide Pratique Long-Format,Assistance & Formalités,Voyageurs d'agrément et pros,assurance voyage internationale dakar,Publié & Indexable
+CAL-007,S4,2026-11-23,Top 5 des résidences meublées aux Almadies,Article de Blog Comparatif,Hébergement & Séjour,Cadres et diplomates expatriés,residence meublee almadies dakar,Prêt pour Rédaction
+CAL-008,S5,2026-11-30,Navettes VIP Dakar-Diamniadio pour séminaires,Article Corporate B2B,Logistique Réceptive & AIBD,Organisateurs d'événements PME,transfert dakar diamniadio chauffeur,Prêt pour Rédaction
+CAL-009,S6,2026-12-07,Excursion d'une journée au Delta du Sine Saloum,Guide Régional Découverte,Patrimoine & Culture,Amoureux de nature et écotourisme,excursion sine saloum pirogue,Prêt pour Rédaction
+CAL-010,S7,2026-12-14,Les dates clés de la Omra pour le Ramadan 2027,Dossier d'Actualité Spirituelle,Tourisme Religieux & Spirituel,Pèlerins prévoyants,omra ramadan dakar reservation,Prêt pour Rédaction
+CAL-011,S8,2026-12-21,Check-list pour préparer son dossier visa Schengen,Fiche Mémo Pratique,Assistance & Formalités,Particuliers et professionnels,dossier visa schengen senegal,Prêt pour Rédaction
+CAL-012,S9,2026-12-28,Bilan touristique et grands projets Dakar 2026,Analyse de Marché & Synthèse,Gouvernance & JOJ Dakar 2026,Institutions et partenaires hôteliers,dakar 2026 tourisme senegal,Prêt pour Rédaction
+CAL-013,S10,2027-01-04,Visiter Saint-Louis du Sénégal et le parc du Djoudj,Guide Itinéraire Culturel,Patrimoine & Culture,Touristes et passionnés d'histoire,visiter saint louis parc djoudj,Prêt pour Rédaction
+CAL-014,S11,2027-01-11,Guide de l'expatriation temporaire à Dakar Plateau,Dossier Pratique Corporate,Hébergement & Séjour,Nouveaux arrivants et consultants,logement dakar plateau securite,Prêt pour Rédaction
+CAL-015,S12,2027-01-18,Voyager à Dubaï depuis le Sénégal : Formalités,Fiche Pratique Internationale,Mobilité Internationale & B2B,Commerçants et familles,visa dubai depart senegal,Prêt pour Rédaction

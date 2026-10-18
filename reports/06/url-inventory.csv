@@ -1,0 +1,24 @@
+url,type,http_status,indexability_desired,indexability_observed,title,h1_present,canonical,hreflang,sitemap,json_ld
+https://slaacvoyages.com/,static_public,200,index,index,SLAAC Voyages | Agence de voyages à Dakar Sénégal,yes,https://slaacvoyages.com/,fr|en|x-default,yes,TravelAgency|FAQPage
+https://slaacvoyages.com/en,static_public,200,index,index,Travel Agency in Dakar Senegal — Flights Visa Tours | SLAAC Voyages,yes,https://slaacvoyages.com/en,fr|en|x-default,yes,TravelAgency
+https://slaacvoyages.com/hebergement,static_public,200,index,index,Hébergements et séjours au Sénégal | SLAAC Voyages,yes,https://slaacvoyages.com/hebergement,none,yes,BreadcrumbList|Service
+https://slaacvoyages.com/transport,static_public,200,index,index,Transferts AIBD et transport à Dakar | SLAAC Voyages,yes,https://slaacvoyages.com/transport,none,yes,BreadcrumbList|Service
+https://slaacvoyages.com/excursions,static_public,200,index,index,Circuits et excursions au Sénégal | SLAAC Voyages,yes,https://slaacvoyages.com/excursions,none,yes,BreadcrumbList|Service
+https://slaacvoyages.com/tourisme-affaires,static_public,200,index,index,Voyages d'affaires et déplacements professionnels | SLAAC Voyages,yes,https://slaacvoyages.com/tourisme-affaires,none,yes,BreadcrumbList|Service
+https://slaacvoyages.com/voyages-croisieres,static_public,200,index,index,Voyages sur mesure et croisières | SLAAC Voyages,yes,https://slaacvoyages.com/voyages-croisieres,none,yes,BreadcrumbList|Service
+https://slaacvoyages.com/assistance-voyage,static_public,200,index,index,Assistance voyage et formalités à Dakar | SLAAC Voyages,yes,https://slaacvoyages.com/assistance-voyage,none,yes,BreadcrumbList|Service
+https://slaacvoyages.com/destinations,static_public,200,index,index,Destinations de rêve au départ de Dakar | SLAAC Voyages,yes,https://slaacvoyages.com/destinations,none,yes,BreadcrumbList
+https://slaacvoyages.com/services,static_public,200,index,index,Nos prestations de voyage à Dakar | SLAAC Voyages,yes,https://slaacvoyages.com/services,none,yes,BreadcrumbList
+https://slaacvoyages.com/dakar-2026,static_public,200,index,index,Séjour Dakar fin 2026 : logistique hébergement et transport | SLAAC Voyages,yes,https://slaacvoyages.com/dakar-2026,none,yes,BreadcrumbList|EventInfo
+https://slaacvoyages.com/about,static_public,200,index,index,À propos de SLAAC Voyages | Agence agréée à Dakar Plateau,yes,https://slaacvoyages.com/about,none,yes,BreadcrumbList
+https://slaacvoyages.com/contact,static_public,200,index,index,Contact & Agence Dakar Plateau | SLAAC Voyages,yes,https://slaacvoyages.com/contact,none,yes,BreadcrumbList
+https://slaacvoyages.com/confidentialite,static_public,200,index,index,Politique de confidentialité et données personnelles | SLAAC Voyages,yes,https://slaacvoyages.com/confidentialite,none,yes,none
+https://slaacvoyages.com/hebergement/[id],dynamic_public,200,index,index,[Titre Hébergement] | SLAAC Voyages,yes,https://slaacvoyages.com/hebergement/[id],none,yes,LodgingBusiness|BreadcrumbList
+https://slaacvoyages.com/transport/[id],dynamic_public,200,index,index,[Titre Transport] | SLAAC Voyages,yes,https://slaacvoyages.com/transport/[id],none,yes,Service|BreadcrumbList
+https://slaacvoyages.com/excursions/[id],dynamic_public,200,index,index,[Titre Excursion] | SLAAC Voyages,yes,https://slaacvoyages.com/excursions/[id],none,yes,TouristAttraction|BreadcrumbList
+https://slaacvoyages.com/tourisme-affaires/[id],dynamic_public,200,index,index,[Titre Offre] | SLAAC Voyages,yes,https://slaacvoyages.com/tourisme-affaires/[id],none,yes,Service|BreadcrumbList
+https://slaacvoyages.com/voyages-croisieres/[id],dynamic_public,200,index,index,[Titre Voyage] | SLAAC Voyages,yes,https://slaacvoyages.com/voyages-croisieres/[id],none,yes,TouristTrip|BreadcrumbList
+https://slaacvoyages.com/admin/login,admin_private,200,noindex,noindex,Connexion Administration | SLAAC Voyages,yes,none,none,no,none
+https://slaacvoyages.com/admin/dashboard,admin_private,302,noindex,noindex,Tableau de bord CRM | SLAAC Voyages,yes,none,none,no,none
+https://slaacvoyages.com/admin/demandes,admin_private,302,noindex,noindex,Gestion des Demandes | SLAAC Voyages,yes,none,none,no,none
+https://slaacvoyages.com/admin/statistiques,admin_private,302,noindex,noindex,Statistiques Commerciales | SLAAC Voyages,yes,none,none,no,none

@@ -1,0 +1,7 @@
+page_id,path_fr,path_en,primary_service,target_persona,primary_cta,secondary_cta,jsonld_schemas,deployment_status
+LP_01,/lp/transfert-aibd,/en/lp/transfert-aibd,Transfert Aéroport AIBD,Voyageur Solo / Famille / Affaires,Devis Transfert Modal,WhatsApp Chauffeur Direct,"Product, LocalBusiness, FAQPage",PRODUCTION_READY
+LP_02,/services/visa,/en/services/visa,Assistance Visa Chine/Asie,Commerçant Importateur Dakar,Formulaire Visa,WhatsApp Assistance Express,"Service, LocalBusiness, FAQPage",PRODUCTION_READY
+LP_03,/services/billetterie,/en/services/billetterie,Billetterie Aérienne,Familles Diaspora / Pros Dakar,Demande Billet,WhatsApp Tarifs Directs,"Service, LocalBusiness",PRODUCTION_READY
+LP_04,/services/omra,/en/services/omra,Pèlerinage Omra VIP,Pèlerins / Familles Sénégal,Demande Forfait Omra,WhatsApp Conseiller Religieux,"Service, LocalBusiness, FAQPage",PRODUCTION_READY
+LP_05,/destinations/senegal,/en/destinations/senegal,Séjours & Circuits Réceptifs,Diaspora / Touristes Internationaux,Demande Circuit Sur Mesure,WhatsApp Agence Locale,"TouristDestination, LocalBusiness",PRODUCTION_READY
+LP_06,/contact,/en/contact,Agence Physique & Général,Tous Prospects Dakar & Monde,Formulaire Contact,Itinéraire Google Maps / Appel,"LocalBusiness, ContactPage",PRODUCTION_READY

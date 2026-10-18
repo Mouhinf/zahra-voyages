@@ -1,0 +1,11 @@
+internal_event_name,trigger_type,ga4_event_name,meta_pixel_event,tiktok_pixel_event,google_ads_conversion_action,deduplication_key,consent_required
+page_view,SPA Route Change,page_view,PageView,ViewContent,None,none,analytics_storage
+cta_click,DOM Click (CTA buttons),select_content,Custom (CTA_Click),ClickButton,None,none,analytics_storage
+whatsapp_click,DOM Click (wa.me links),contact,Contact,Contact,Click_WhatsApp,event_id,analytics_storage
+phone_call_click,DOM Click (tel: links),contact,Contact,Contact,Click_Phone,event_id,analytics_storage
+quote_start,Modal Open / Field Focus,begin_checkout,InitiateCheckout,InitiateCheckout,None,event_id,analytics_storage
+quote_step_complete,Multi-step Navigation,checkout_progress,Custom (StepComplete),None,None,event_id,analytics_storage
+quote_submit_attempt,Submit Button Click,generate_lead_attempt,Custom (SubmitAttempt),None,None,event_id,analytics_storage
+lead_created,Backend HTTP 200 OK,generate_lead,Lead,CompleteRegistration,Lead_Created_Primary,event_id,ad_storage
+quote_completed,Contract Won / Paid,purchase,Purchase,CompletePayment,Purchase_Offline_OCI,event_id,ad_storage
+scroll_depth_80,Scroll 80% Threshold,scroll,Custom (Scroll80),None,None,none,analytics_storage

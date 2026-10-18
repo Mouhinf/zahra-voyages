@@ -18,6 +18,8 @@ import Footer from '@/components/layout/footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  title: 'SLAAC Voyages | Agence de voyages à Dakar, Sénégal',
+  description: "SLAAC Voyages, votre agence de voyages et conciergerie à Dakar Plateau : billets d'avion, transferts AIBD, hébergements vérifiés, excursions au Sénégal et visas d'affaires. Devis gratuit sous 24 h.",
   alternates: {
     canonical: '/',
     languages: {
@@ -25,6 +27,27 @@ export const metadata: Metadata = {
       en: '/en',
       'x-default': '/',
     },
+  },
+  openGraph: {
+    title: 'SLAAC Voyages | Agence de voyages à Dakar, Sénégal',
+    description: "Conciergerie de voyage au Sénégal : transferts AIBD, hébergements vérifiés, circuits d'exception et visas.",
+    url: '/',
+    locale: 'fr_SN',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'SLAAC Voyages Conciergerie Dakar',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SLAAC Voyages | Agence de voyages à Dakar, Sénégal',
+    description: "Conciergerie de voyage au Sénégal : transferts AIBD, hébergements vérifiés, circuits et visas.",
+    images: ['/og-image.jpg'],
   },
 };
 

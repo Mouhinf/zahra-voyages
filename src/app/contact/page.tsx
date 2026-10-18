@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -8,10 +9,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Mail, Send } from 'lucide-react';
+import { MapPin, Mail, Send, Loader2, Phone, Clock, Navigation } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
+import { CONTACT } from '@/lib/site';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -19,39 +22,103 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères.' }),
-  email: z.string().email({ message: 'Veuillez entrer une adresse email valide.' }),
-  phone: z.string().optional(),
-  message: z.string().min(10, { message: 'Le message doit contenir au moins 10 caractères.' }),
-});
+import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
+import { getStoredAttribution } from '@/lib/tracking/attribution';
+import { dispatchConversionEvent } from '@/lib/tracking/provider';
 
 export default function ContactPage() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [utmParams, setUtmParams] = useState<Record<string, string>>({});
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const search = new URLSearchParams(window.location.search);
+      const params: Record<string, string> = {};
+      const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign'];
+      for (const k of utmKeys) {
+        const val = search.get(k);
+        if (val) params[k] = val;
+      }
+      if (document.referrer) params.referrer = document.referrer;
+      params.landingPage = window.location.pathname;
+      setUtmParams(params);
+    }
+  }, []);
+
+  const form = useForm<ContactInput>({
+    resolver: zodResolver(contactSchema),
     defaultValues: {
       name: '',
       email: '',
       phone: '',
       message: '',
+      website: '',
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-  
-    toast({
-      title: 'Message envoyé !',
-      description: 'Merci de nous avoir contactés. Nous reviendrons vers vous rapidement.',
-    });
-    form.reset();
+  async function onSubmit(values: ContactInput) {
+    setIsSubmitting(true);
+    const attr = getStoredAttribution();
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...values,
+          utmSource: attr.utmSource || utmParams.utm_source,
+          utmMedium: attr.utmMedium || utmParams.utm_medium,
+          utmCampaign: attr.utmCampaign || utmParams.utm_campaign,
+          utmContent: attr.utmContent,
+          utmTerm: attr.utmTerm,
+          gclid: attr.gclid,
+          gbraid: attr.gbraid,
+          wbraid: attr.wbraid,
+          fbclid: attr.fbclid,
+          ttclid: attr.ttclid,
+          referrer: attr.referrer || utmParams.referrer,
+          landingPage: attr.landingPage || utmParams.landingPage,
+          website: '', // pot de miel anti-robots
+        }),
+      });
+
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
+
+      // Conversion lead_created enregistrée
+      dispatchConversionEvent('lead_created', {
+        reference: body?.id || 'CONTACT-FR',
+        leadId: body?.id || 'CONTACT-FR',
+        service: 'contact-general',
+        channel: 'contact',
+        locale: 'fr',
+      });
+
+      toast({
+        title: 'Message envoyé !',
+        description: 'Votre message a bien été transmis à nos conseillers. Nous vous contacterons dans les meilleurs délais.',
+      });
+      form.reset();
+    } catch (err: unknown) {
+      console.error('Contact submit error:', err);
+      toast({
+        title: 'Envoi impossible',
+        description: (err instanceof Error && err.message) || 'Votre message n\'a pas pu être enregistré. Réessayez ou écrivez-nous sur WhatsApp.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-grow">
+            <div className="container mx-auto max-w-7xl px-4 pt-4">
+              <Breadcrumbs items={[{ label: 'Contact' }]} />
+            </div>
             <section className="py-20 sm:py-28 bg-secondary">
                 <div className="container mx-auto max-w-7xl px-4 text-center">
                     <span className="text-sm font-semibold uppercase tracking-widest text-primary">Restons en contact</span>
@@ -67,39 +134,79 @@ export default function ContactPage() {
                     <div className="grid lg:grid-cols-2 gap-8 items-start">
                     <div className="space-y-6">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 bg-primary/10 rounded-full"><MapPin className="h-6 w-6 text-primary" /></div>
+                            <div className="p-3 bg-primary/10 rounded-full shrink-0"><MapPin className="h-6 w-6 text-primary" /></div>
                             <div>
-                                <h3 className="text-lg font-semibold text-primary">Notre Bureau</h3>
-                                <p className="text-muted-foreground">Dakar Plateau rue Mouhamed 5 à l'Immeuble Djolof Chicken à la Troisième étage</p>
+                                <h3 className="text-lg font-semibold text-primary font-headline">Notre Bureau à Dakar</h3>
+                                <p className="text-muted-foreground text-sm leading-relaxed">{CONTACT.address.formatted}</p>
+                                <p className="text-xs text-muted-foreground/80 mt-1">Repère : 3e étage au-dessus du Djolof Chicken, axe Rue Mohamed V, Dakar Plateau.</p>
                             </div>
                         </div>
+
                         <div className="flex items-start gap-4">
-                            <div className="p-3 bg-primary/10 rounded-full"><WhatsAppIcon className="h-6 w-6 text-primary fill-current" /></div>
+                            <div className="p-3 bg-primary/10 rounded-full shrink-0"><Phone className="h-6 w-6 text-primary" /></div>
                             <div>
-                                <h3 className="text-lg font-semibold text-primary">WhatsApp</h3>
-                                <a href="https://wa.me/221773129090" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2">
-                                    <WhatsAppIcon className="h-4 w-4 fill-current" /> +221 77 312 90 90 (Discussion instantanée)
+                                <h3 className="text-lg font-semibold text-primary font-headline">Téléphone Direct</h3>
+                                <div className="space-y-1 text-sm">
+                                    <a href={`tel:${CONTACT.phoneIntl}`} className="text-muted-foreground hover:text-primary flex items-center gap-2 font-medium">
+                                        {CONTACT.phone} <span className="text-xs text-primary/80 font-normal">(Ligne principale)</span>
+                                    </a>
+                                    <a href={`tel:${CONTACT.phoneSecondaryIntl}`} className="text-muted-foreground hover:text-primary flex items-center gap-2">
+                                        {CONTACT.phoneSecondary} <span className="text-xs text-muted-foreground/70">(Commercial & Billetterie)</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-primary/10 rounded-full shrink-0"><WhatsAppIcon className="h-6 w-6 text-primary fill-current" /></div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-primary font-headline">WhatsApp Pro</h3>
+                                <a href={CONTACT.whatsapp} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary flex items-center gap-2 text-sm">
+                                    <WhatsAppIcon className="h-4 w-4 fill-current" /> {CONTACT.phone} (Discussion instantanée & devis rapide)
                                 </a>
                             </div>
                         </div>
+
                         <div className="flex items-start gap-4">
-                            <div className="p-3 bg-primary/10 rounded-full"><Mail className="h-6 w-6 text-primary" /></div>
+                            <div className="p-3 bg-primary/10 rounded-full shrink-0"><Clock className="h-6 w-6 text-primary" /></div>
                             <div>
-                                <h3 className="text-lg font-semibold text-primary">Écrivez-nous</h3>
-                                <p className="text-muted-foreground">infoslaac@slaacvoyages.com</p>
-                                <p className="text-muted-foreground mt-1">contact@slaacvoyages.com</p>
+                                <h3 className="text-lg font-semibold text-primary font-headline">Horaires d'Accueil</h3>
+                                <p className="text-sm text-muted-foreground">Lundi – Vendredi : {CONTACT.openingHours.weekdays}</p>
+                                <p className="text-sm text-muted-foreground">Samedi : {CONTACT.openingHours.saturday}</p>
+                                <p className="text-xs text-muted-foreground/80">Dimanche : {CONTACT.openingHours.sunday} (Permanence WhatsApp d'urgence)</p>
                             </div>
                         </div>
-                        <div className="pt-6">
+
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-primary/10 rounded-full shrink-0"><Mail className="h-6 w-6 text-primary" /></div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-primary font-headline">Courriel Officiel</h3>
+                                <p className="text-muted-foreground text-sm">{CONTACT.email}</p>
+                                <p className="text-muted-foreground text-sm mt-0.5">{CONTACT.emailInfo}</p>
+                            </div>
+                        </div>
+
+                        <div className="pt-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-primary flex items-center gap-1.5">
+                                    <Navigation className="w-4 h-4 text-primary" /> Plan d'Accès & Localisation
+                                </span>
+                                <Button asChild size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary hover:text-white">
+                                    <a href={CONTACT.directionsUrl} target="_blank" rel="noopener noreferrer">
+                                        Obtenir l'itinéraire Google Maps &rarr;
+                                    </a>
+                                </Button>
+                            </div>
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d913.4299840693265!2d-17.4343981!3d14.668668499999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec173b82ee767bd%3A0x95a2e5d20c75be4a!2sDjolof%20Chicken%20Dakar-Plateau!5e1!3m2!1sfr!2ssn!4v1784546169277!5m2!1sfr!2ssn"
-                                title="Localisation SLAAC Voyages à Dakar"
+                                title="Localisation SLAAC Voyages à Dakar Plateau"
                                 width="100%"
-                                height="300"
+                                height="260"
                                 style={{border:0}}
                                 allowFullScreen={true}
                                 loading="lazy"
-                                className="rounded-lg shadow-md"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                className="rounded-lg shadow-sm border border-border"
                             ></iframe>
                         </div>
                     </div>
@@ -162,8 +269,16 @@ export default function ContactPage() {
                                     </FormItem>
                                 )}
                                 />
-                                <Button type="submit" className="w-full" size="lg">
-                                    Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi en cours...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Envoyer ma demande <Send className="ml-2 h-4 w-4" />
+                                        </>
+                                    )}
                                 </Button>
                             </form>
                             </Form>

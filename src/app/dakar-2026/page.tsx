@@ -4,15 +4,28 @@ import Link from 'next/link';
 import { CalendarDays, MapPin, Plane, Hotel, Car, Users, ExternalLink, Info, ShieldCheck, Quote } from 'lucide-react';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { QuoteRequestButton } from '@/components/layout/quote-request-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import FaqSection from '@/components/sections/faq-section';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Séjour à Dakar fin 2026 : préparez votre venue — SLAAC Voyages' },
-  description: "Grand événement sportif international à Dakar, Diamniadio et Saly du 31 octobre au 13 novembre 2026 : transferts AIBD, hébergements, excursions et logistique de groupe sur devis, organisés par une agence locale à Dakar.",
-  alternates: { canonical: '/dakar-2026' },
+  title: 'Séjour Dakar fin 2026 : transferts AIBD & hébergements | SLAAC Voyages',
+  description: "Logistique des séjours et délégations à Dakar, Diamniadio et Saly fin 2026 : flottes privées AIBD, résidences sécurisées et excursions avec SLAAC Voyages.",
+  alternates: {
+    canonical: '/dakar-2026',
+    languages: {
+      fr: '/dakar-2026',
+      en: '/en/dakar-2026',
+      'x-default': '/dakar-2026',
+    },
+  },
+  openGraph: {
+    title: 'Séjour Dakar fin 2026 : transferts AIBD & hébergements | SLAAC Voyages',
+    description: "Organisation de séjours et logistique d'accueil au Sénégal fin 2026 avec l'agence locale SLAAC Voyages.",
+    url: '/dakar-2026',
+  },
 };
 
 // Page éditoriale : information factuelle sur l'événement + offres SLAAC clairement séparées.
@@ -116,6 +129,10 @@ export default function Dakar2026Page() {
             </p>
           </div>
         </section>
+
+        <div className="container mx-auto max-w-5xl px-4 pt-4">
+          <Breadcrumbs items={[{ label: 'Séjour Dakar fin 2026' }]} />
+        </div>
 
         {/* Avertissement légal — distinguo information / commercial */}
         <section aria-label="Mention d'indépendance" className="border-b bg-secondary/60">
