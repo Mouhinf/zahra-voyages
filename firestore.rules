@@ -111,5 +111,27 @@ service cloud.firestore {
     match /emailOutbox/{doc} {
       allow read, write: if false;
     }
+    match /email_outbox/{doc} {
+      allow read, write: if false;
+    }
+    // Collections d'administration et CRM Enterprise
+    match /admin_audit_logs/{doc} {
+      allow read, write: if false;
+    }
+    match /admin_users/{doc} {
+      allow read, write: if false;
+    }
+    match /travel_files/{doc} {
+      allow read, write: if false;
+    }
+    match /proposals/{doc} {
+      allow read, write: if false;
+    }
+    match /team_tasks/{doc} {
+      allow read, write: if false;
+    }
+    match /clients/{doc} {
+      allow read, write: if false;
+    }
   }
 }

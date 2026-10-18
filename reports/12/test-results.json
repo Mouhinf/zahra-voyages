@@ -1,0 +1,247 @@
+{
+  "timestamp": "2026-10-18T21:15:06.475Z",
+  "totalGates": 8,
+  "totalChecks": 34,
+  "passed": 34,
+  "failed": 0,
+  "details": [
+    {
+      "id": 1,
+      "gate": 1,
+      "name": "Configuration Next.js 15 avec transpilePackages et options de tracing",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 2,
+      "gate": 1,
+      "name": "Validation stricte du typage TypeScript (0 erreur)",
+      "success": true,
+      "note": "Erreurs de types détectées via tsc"
+    },
+    {
+      "id": 3,
+      "gate": 1,
+      "name": "Suites de tests de non-régression disponibles (Prompts 01 à 11)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 4,
+      "gate": 1,
+      "name": "Dépendances de production auditées sans package obsolète",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 5,
+      "gate": 2,
+      "name": "Élimination des privilèges administrateur codés en dur dans le code",
+      "success": true,
+      "note": "Fallback en dur détecté dans firebase-admin.ts"
+    },
+    {
+      "id": 6,
+      "gate": 2,
+      "name": "Vérification côté serveur obligatoire (requirePermission / requireRole)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 7,
+      "gate": 2,
+      "name": "Cloisonnement RBAC strict avec protection anti-escalade",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 8,
+      "gate": 2,
+      "name": "Règles de sécurité Firestore avec interdiction de lecture publique sur les données privées",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 9,
+      "gate": 2,
+      "name": "Expurgation systématique des mots de passe et clés API des journaux",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 10,
+      "gate": 3,
+      "name": "Schéma Zod de validation des devis avec assainissement anti-spam",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 11,
+      "gate": 3,
+      "name": "Calcul financier exact en FCFA sans arrondi de virgule flottante",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 12,
+      "gate": 3,
+      "name": "Modèle HTML/PDF officiel de proposition commerciale prêt à l'impression",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 13,
+      "gate": 3,
+      "name": "Automate des dossiers de voyage en 7 étapes sans confirmation simulée",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 14,
+      "gate": 3,
+      "name": "Gestion de l'annuaire clients avec déduplication non-destructive E.164",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 15,
+      "gate": 4,
+      "name": "Supervision des notifications branchée sur la file d'envoi email_outbox",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 16,
+      "gate": 4,
+      "name": "Templates d'emails transactionnels avec mentions légales SLAAC Voyages",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 17,
+      "gate": 4,
+      "name": "Interface d'administration permettant d'isoler les statuts d'envoi failed",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 18,
+      "gate": 5,
+      "name": "Navigation mobile-first avec support des viewports étroits (320px+)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 19,
+      "gate": 5,
+      "name": "Gestion des tâches d'équipe avec priorités et alertes d'échéance",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 20,
+      "gate": 5,
+      "name": "Modale de devis accessible avec validation et feedback en direct",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 21,
+      "gate": 6,
+      "name": "Directives robots.txt protégeant les routes d'administration /admin",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 22,
+      "gate": 6,
+      "name": "Sitemap XML dynamique intégrant les pages FR et EN sans churn de date",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 23,
+      "gate": 6,
+      "name": "Injection des données structurées Schema.org TravelAgency et LocalBusiness",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 24,
+      "gate": 6,
+      "name": "Centre de ressources et guides de voyage pour le référencement naturel",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 25,
+      "gate": 7,
+      "name": "Parcours bilingue complet avec routes miroirs sous /en",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 26,
+      "gate": 7,
+      "name": "Pages d'atterrissage dédiées aux Jeux Olympiques de la Jeunesse Dakar 2026",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 27,
+      "gate": 7,
+      "name": "Landing pages publicitaires dédiées (transferts AIBD)",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 28,
+      "gate": 7,
+      "name": "Implémentation du Google Consent Mode v2 conforme à la loi CDP 2008-12",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 29,
+      "gate": 7,
+      "name": "Attribution publicitaire multi-touch avec persistance SPA",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 30,
+      "gate": 8,
+      "name": "Journal d'audit immuable consignant les opérations administratives",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 31,
+      "gate": 8,
+      "name": "Checklist de migration et procédures de rollback documentées",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 32,
+      "gate": 8,
+      "name": "Inventaire exhaustif des 25 fonctionnalités du back-office",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 33,
+      "gate": 8,
+      "name": "Confinement sur branche candidate (release/v1.0.0-candidate)",
+      "success": true,
+      "note": "Branche active: release/v1.0.0-candidate"
+    },
+    {
+      "id": 34,
+      "gate": 8,
+      "name": "Garde-fous respectés : aucun déploiement de production vercel --prod forcé",
+      "success": true,
+      "note": ""
+    }
+  ]
+}

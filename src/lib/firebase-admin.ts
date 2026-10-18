@@ -9,7 +9,7 @@ const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'slaac-voyages'
  * Le mécanisme recommandé reste le custom claim `admin: true`
  * (voir scripts/set-admin-claim.mjs).
  */
-const ADMIN_EMAILS: string[] = (process.env.ADMIN_EMAILS || 'mouhopap@gmail.com')
+const ADMIN_EMAILS: string[] = (process.env.ADMIN_EMAILS || '')
   .split(',')
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);

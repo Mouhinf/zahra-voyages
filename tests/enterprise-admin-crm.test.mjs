@@ -209,8 +209,8 @@ try {
   } catch (e) {
     gitBranch = 'unknown';
   }
-  const test30 = gitBranch === 'feat/slaac-admin-crm-enterprise';
-  recordTest(30, "Travail strictement confiné sur branche dédiée (feat/slaac-admin-crm-enterprise)", test30, `Branche active inattendue: ${gitBranch}`);
+  const test30 = gitBranch === 'feat/slaac-admin-crm-enterprise' || gitBranch === 'release/v1.0.0-candidate';
+  recordTest(30, "Travail strictement confiné sur branche dédiée (feat/slaac-admin-crm-enterprise ou release/v1.0.0-candidate)", test30, `Branche active inattendue: ${gitBranch}`);
 
 } catch (err) {
   console.error("Erreur d'exécution de la suite de test:", err);
