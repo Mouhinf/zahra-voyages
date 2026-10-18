@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    google: '6ElmrLDCGkGe-Qrf27HeUxzhemAtFSQh6oGKl4nBusM',
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     other: {
       ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
