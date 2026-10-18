@@ -1,0 +1,12 @@
+support,type_support,nom_affiche,adresse_affichee,telephone_principal,telephone_secondaire,email_affiche,statut_coherence,action_requise
+Site_Lib_Site,Code Source Interne,SLAAC Voyages,"Rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage, Dakar Plateau",+221 77 312 90 90,+221 77 624 58 58,contact@slaacvoyages.com,Conforme & Centralisé,Référentiel validé
+Page_Contact,Page Web Interne,SLAAC Voyages,"Dakar Plateau, Rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage",+221 77 312 90 90,+221 77 624 58 58,contact@slaacvoyages.com,Conforme & Centralisé,Bouton itinéraire intégré
+Page_About,Page Web Interne,SLAAC Voyages,"Dakar Plateau (Immeuble Djolof Chicken, 3e étage)",+221 77 312 90 90,Non spécifié,contact@slaacvoyages.com,Conforme,Maintenir
+Footer_Universel,Composant UI,SLAAC Voyages,"Dakar Plateau, rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage",+221 77 312 90 90,Non spécifié,contact@slaacvoyages.com,Conforme,Lien Maps interactif intégré
+Schema_Org_JSONLD,Données Structurées,SLAAC Voyages,"Rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage, Dakar Plateau",+221 77 312 90 90,+221 77 624 58 58,contact@slaacvoyages.com,Conforme & Certifié,Geo coordinates réalignées
+Google_Business_Profile,Fiche Moteur Externe,SLAAC Voyages,À confirmer (Plateau vs Sacré-Cœur),+221 77 312 90 90,+221 77 624 58 58,contact@slaacvoyages.com,En attente accès propriétaire,Revendiquer ou mettre à jour
+Go_Africa_Online,Annuaire B2B Sénégal,SLAAC VOYAGES,"Sacré-Cœur 3 / VDN, Immeuble Dieynaba, 3e étage",+221 77 624 58 58,+221 77 624 95 95,contact@slaacvoyages.com,Ancienne Adresse,Formulaire de mise à jour requis
+Petit_Fute_Senegal,Guide Touristique Externe,SLAAC Voyages,"Immeuble Dieynaba (3e étage), Sacré-Cœur 3 - VDN",+221 77 624 58 58,+221 77 312 90 90,Non affiché,Ancienne Adresse,Formulaire de mise à jour requis
+Senpages,Annuaire Entreprises Sénégal,SLAAC Voyages,"Sacré-Cœur 3 / VDN, Immeuble Dieynaba",+221 77 312 90 90,Non spécifié,Non affiché,Ancienne Adresse,Formulaire de mise à jour requis
+Facebook_Officiel,Réseau Social,SLAAC Voyages,À vérifier,+221 77 312 90 90,Non spécifié,contact@slaacvoyages.com,À contrôler,Aligner avec la nouvelle adresse
+Instagram_Officiel,Réseau Social,SLAAC Voyages,Dakar Plateau,+221 77 312 90 90,Non spécifié,contact@slaacvoyages.com,À contrôler,Lien bio vers https://slaacvoyages.com

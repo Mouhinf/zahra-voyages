@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
+import { CONTACT } from '@/lib/site';
 
-const WHATSAPP_URL = 'https://wa.me/221773129090';
+const WHATSAPP_URL = CONTACT.whatsapp;
 
 const navigation = [
   { href: '/', label: 'Accueil' },
@@ -107,16 +108,25 @@ export default function Footer() {
             <ul className="mt-2 space-y-2 text-sm text-primary-foreground/80">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
-                <span>Dakar Plateau, rue Mouhamed 5, Immeuble Djolof Chicken, 3<sup>e</sup> étage</span>
-              </li>
-              <li>
-                <a href="tel:+221773129090" className="flex items-center gap-2 hover:text-accent transition-colors">
-                  <Phone className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" /> +221 77 312 90 90
+                <a
+                  href={CONTACT.directionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent transition-colors"
+                  title="Ouvrir l'itinéraire Google Maps vers notre agence"
+                >
+                  <span>Dakar Plateau, rue Mouhamed 5, Immeuble Djolof Chicken, 3<sup>e</sup> étage</span>
+                  <span className="block text-[11px] text-accent/90 underline mt-0.5">Obtenir l'itinéraire Maps &rarr;</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:contact@slaacvoyages.com" className="flex items-center gap-2 hover:text-accent transition-colors">
-                  <Mail className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" /> contact@slaacvoyages.com
+                <a href={`tel:${CONTACT.phoneIntl}`} className="flex items-center gap-2 hover:text-accent transition-colors">
+                  <Phone className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" /> {CONTACT.phone}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-2 hover:text-accent transition-colors">
+                  <Mail className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" /> {CONTACT.email}
                 </a>
               </li>
             </ul>

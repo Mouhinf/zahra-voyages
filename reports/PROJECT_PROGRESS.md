@@ -1,7 +1,7 @@
 # Journal de Progression Global — SLAAC Voyages
 
 > **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
-> **Branche de travail actuelle :** `feat/slaac-editorial-seo`  
+> **Branche de travail actuelle :** `feat/slaac-local-seo`  
 > **Dernière mise à jour :** 18 octobre 2026  
 > **Responsable Technique :** Architecte Logiciel Senior & Lead DevOps  
 
@@ -18,7 +18,7 @@
 | **05/12** | **Optimisation Extrême des Performances, Core Web Vitals & Coûts Cloud** | **TERMINÉ** | `feat/slaac-perf-core-web-vitals` | 18 oct. 2026 |
 | **06/12** | **SEO Technique Avancé, Indexation Google & Architecture de Référencement** | **TERMINÉ** | `feat/slaac-technical-seo` | 18 oct. 2026 |
 | **07/12** | **Domination Éditoriale SEO, Pages de Services, Destinations & Stratégie de Contenus** | **TERMINÉ** | `feat/slaac-editorial-seo` | 18 oct. 2026 |
-| **08/12** | CMS Hébergements, Résidences & Gestion des Disponibilités | *Planifié* | - | - |
+| **08/12** | **SEO Local Avancé, Google Business Profile, Google Maps & E-Réputation** | **TERMINÉ** | `feat/slaac-local-seo` | 18 oct. 2026 |
 | **09/12** | SEO Technique International & Données Structurées Schema.org | *Planifié* | - | - |
 | **10/12** | Automatisation WhatsApp Business API & Chatbot Hybride | *Planifié* | - | - |
 | **11/12** | Espace Partenaires B2B & Tourisme d'Affaires (MICE) | *Planifié* | - | - |
@@ -26,7 +26,35 @@
 
 ---
 
-## 2. Bilan de la Phase 07/12 (Domination Éditoriale SEO, Pages de Services & Stratégie de Contenus)
+## 2. Bilan de la Phase 08/12 (SEO Local Avancé, Google Business Profile, Google Maps & E-Réputation)
+
+### 2.1. Réalisations Majeures & Métriques Clés
+1. **Audit Approfondi de la Fiche Google Business & Détection du Déménagement :**
+   - Mise au jour de la scission historique entre l'ancienne adresse répertoriée (`Sacré-Cœur 3 / VDN, Immeuble Dieynaba`) et l'adresse actuelle des bureaux (`Dakar Plateau, Rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage`).
+   - Analyse critique de l'iframe Google Maps intégrée sur le site qui pointait vers le restaurant du rez-de-chaussée (« Djolof Chicken ») plutôt que sur une fiche d'agence vérifiée.
+   - Protocole anti-doublon et guide de transfert d'adresse établi sans perte d'historique ni d'avis clients.
+2. **Standardisation & Centralisation du NAP dans le Code :**
+   - Refonte de l'objet `CONTACT` dans `src/lib/site.ts` intégrant le téléphone principal (`+221 77 312 90 90`), la ligne commerciale secondaire (`+221 77 624 58 58`), l'email officiel (`contact@slaacvoyages.com`), les coordonnées GPS exactes (`14.6687, -17.4344`), l'URL de navigation Google Maps et les horaires d'accueil.
+   - Matrice d'audit comparative [`reports/08/nap-audit.csv`](file:///home/mouhammad/zahra-voyages/reports/08/nap-audit.csv) documentant 11 supports internes et externes.
+3. **Amélioration de l'Expérience Visiteur Local & Parcours Mobile :**
+   - **Page `/contact` :** Ajout de boutons click-to-call directs (`tel:`), affichage des horaires d'accueil physique et bouton interactif *« Obtenir l'itinéraire Google Maps »*.
+   - **Section Accueil :** Intégration du bouton d'itinéraire et de la double ligne d'appel dans le composant `home-contact-quick.tsx`.
+   - **Footer universel :** Adresse rendue cliquable pour lancer la navigation GPS sur smartphone en 1 clic.
+4. **Données Structurées Schema.org `TravelAgency` Enrichies :**
+   - Injection de `hasMap`, géolocalisation GPS alignée avec la toiture de l'immeuble, identifiant `@id` pérenne et points de contact multiples (`customer service` et `sales`) avec langues gérées (français, anglais, wolof).
+   - Zéro `AggregateRating` inventé afin de préserver une conformité totale avec les consignes anti-spam de Google.
+5. **Stratégie d'E-Réputation Éthique & Playbook de Réponses :**
+   - Procédure de sollicitation post-prestation sans filtrage discriminatoire (*anti-review-gating*) et maquette de chevalet de comptoir avec QR Code.
+   - Playbook de réponses personnalisées sous 48h couvrant avis positifs, neutres et insatisfactions, avec stricte protection des données personnelles.
+6. **21 Rapports Documentaires, 3 Fichiers CSV & 1 Checklist Direction :**
+   - 21 rapports complets livrés dans [`reports/08/`](file:///home/mouhammad/zahra-voyages/reports/08/).
+   - 3 matrices CSV : `nap-audit.csv`, `citation-audit.csv`, `local-competitor-matrix.csv`.
+   - Checklist pas-à-pas pour l'approbation du dirigeant : `google-business-approval-checklist.md`.
+   - Validation 20/20 par `tests/local-seo.test.mjs` et succès total au build Next.js 15 (64 routes générées).
+
+---
+
+## 3. Bilan de la Phase 07/12 (Domination Éditoriale SEO, Pages de Services & Stratégie de Contenus)
 
 ### 2.1. Réalisations Majeures & Métriques Clés
 1. **Création du Hub Pratique & Guides de Référence (`/guides`) :**

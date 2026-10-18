@@ -21,19 +21,37 @@ export function getTravelAgencySchema() {
     description:
       "Agence de voyages et conciergerie touristique à Dakar Plateau. Billetterie aérienne, transferts aéroport AIBD, hébergements vérifiés, excursions au Sénégal et visas d'affaires.",
     telephone: CONTACT.phoneIntl,
-    email: 'contact@slaacvoyages.com',
+    email: CONTACT.email,
+    hasMap: CONTACT.directionsUrl,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage, Dakar Plateau',
-      addressLocality: 'Dakar',
-      postalCode: '10200',
-      addressCountry: 'SN',
+      streetAddress: `${CONTACT.address.street}, Dakar Plateau`,
+      addressLocality: CONTACT.address.city,
+      addressRegion: CONTACT.address.district,
+      postalCode: CONTACT.address.postalCode,
+      addressCountry: CONTACT.address.country,
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 14.6713,
-      longitude: -17.4334,
+      latitude: CONTACT.geo.latitude, // Coordonnées GPS Dakar Plateau 14.6687 (~14.67)
+      longitude: CONTACT.geo.longitude,
     },
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        telephone: CONTACT.phoneIntl,
+        contactType: 'customer service',
+        areaServed: 'SN',
+        availableLanguage: ['French', 'English', 'Wolof'],
+      },
+      {
+        '@type': 'ContactPoint',
+        telephone: CONTACT.phoneSecondaryIntl,
+        contactType: 'sales',
+        areaServed: 'SN',
+        availableLanguage: ['French', 'English'],
+      },
+    ],
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -61,7 +79,8 @@ export function getTravelAgencySchema() {
       { '@type': 'Country', name: 'Canada' },
     ],
     sameAs: [
-      'https://wa.me/221773129090',
+      CONTACT.whatsapp,
+      CONTACT.directionsUrl,
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
