@@ -1,7 +1,7 @@
 # Journal de Progression Global — SLAAC Voyages
 
 > **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
-> **Branche de travail actuelle :** `feat/slaac-technical-seo`  
+> **Branche de travail actuelle :** `feat/slaac-editorial-seo`  
 > **Dernière mise à jour :** 18 octobre 2026  
 > **Responsable Technique :** Architecte Logiciel Senior & Lead DevOps  
 
@@ -17,7 +17,7 @@
 | **04/12** | **Refonte UX/UI Premium, Mobile-First & Optimisation des Conversions** | **TERMINÉ** | `feat/slaac-design-system` | 17 oct. 2026 |
 | **05/12** | **Optimisation Extrême des Performances, Core Web Vitals & Coûts Cloud** | **TERMINÉ** | `feat/slaac-perf-core-web-vitals` | 18 oct. 2026 |
 | **06/12** | **SEO Technique Avancé, Indexation Google & Architecture de Référencement** | **TERMINÉ** | `feat/slaac-technical-seo` | 18 oct. 2026 |
-| **07/12** | Expérience Dakar 2026 & Réservations Événementielles (JOJ) | *Planifié* | - | - |
+| **07/12** | **Domination Éditoriale SEO, Pages de Services, Destinations & Stratégie de Contenus** | **TERMINÉ** | `feat/slaac-editorial-seo` | 18 oct. 2026 |
 | **08/12** | CMS Hébergements, Résidences & Gestion des Disponibilités | *Planifié* | - | - |
 | **09/12** | SEO Technique International & Données Structurées Schema.org | *Planifié* | - | - |
 | **10/12** | Automatisation WhatsApp Business API & Chatbot Hybride | *Planifié* | - | - |
@@ -26,7 +26,35 @@
 
 ---
 
-## 2. Bilan de la Phase 06/12 (SEO Technique Avancé & Indexation Google)
+## 2. Bilan de la Phase 07/12 (Domination Éditoriale SEO, Pages de Services & Stratégie de Contenus)
+
+### 2.1. Réalisations Majeures & Métriques Clés
+1. **Création du Hub Pratique & Guides de Référence (`/guides`) :**
+   - Mise en place du centre de ressources éditoriales avec rendu hybride SSR / SSG (`src/app/guides/page.tsx` et `src/app/guides/[slug]/page.tsx`).
+   - Déploiement de 6 dossiers pratiques à forte valeur ajoutée (`src/data/guides.ts`) : Arrivée AIBD, Île de Gorée, Quartiers de Dakar, Préparation Omra, Voyage d'affaires Chine, Assurance voyage internationale.
+   - Microdonnées Schema.org `CollectionPage`, `Article` et `FAQPage` avec validation stricte 404 via `notFound()`.
+2. **Page Pilier Spécialisée Omra (`/omra`) :**
+   - Création de la page pilier dédiée avec organisation logistique complète : vols réguliers au départ de Dakar AIBD, hébergements à Médine et La Mecque, conformité plateforme Nusuk.
+   - Clause déontologique de transparence et de souveraineté consulaire saoudienne sans allégations trompeuses.
+   - Balisage Schema.org `Service` avec coordonnées de l'agence à Dakar Plateau.
+3. **Enrichissement des 5 Hubs Métiers Existants :**
+   - `/assistance-voyage` : Ajout de fiches pays (Chine, Dubaï, Schengen), rappel des assurances obligatoires et liens vers les guides pratiques.
+   - `/transport` : Intégration de l'encart d'audit de l'aéroport AIBD et des options de transferts privés/navettes.
+   - `/hebergement` : Intégration de l'encart comparatif des quartiers (Plateau, Almadies, Mermoz) avec critères sécurité et groupe électrogène.
+   - `/excursions` : Intégration de l'encart patrimonial de l'île de Gorée (horaires chaloupe, tarifs officiels, Maison des Esclaves).
+   - `/tourisme-affaires` : Intégration de la section de réassurance corporate B2B (facturation TVA/NINEA, flottes VIP, chargé de compte dédié) et guide Chine sourcing.
+4. **Navigation, Sitemap & Découvrabilité Maximale :**
+   - Liens vers `/omra` et `/guides` intégrés dans le header de navigation desktop, le volet mobile et le pied de page universel.
+   - Mise à jour du sitemap XML dynamique (`src/app/sitemap.ts`) intégrant `/omra`, `/guides` et les 6 routes de guides pré-générées.
+5. **Préremplissage Commercial CRM (`QuoteRequestButton`) :**
+   - Injection automatique des contextes métiers (`defaultService`, `defaultDestination`, `source`) pour optimiser le taux de conversion visiteur -> prospect qualifié.
+6. **20 Rapports Documentaires & 4 Matrices CSV (`reports/07/`) :**
+   - Rédaction exhaustive des 20 rapports stratégiques, du calendrier éditorial sur 90 jours (`17-editorial-calendar-90-days.csv`) et de la matrice d'approbation (`publishing-approval-matrix.csv`).
+   - Validation automatisée 20/20 par `tests/editorial-seo.test.mjs` et succès des 64 routes générées au `npm run build`.
+
+---
+
+## 3. Bilan de la Phase 06/12 (SEO Technique Avancé & Indexation Google)
 
 ### 2.1. Réalisations Majeures & Métriques Clés
 1. **Éradication Totale des Soft 404 :**

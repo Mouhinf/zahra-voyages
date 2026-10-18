@@ -1,0 +1,9 @@
+id,ressource_url,type_contenu,redacteur_initial,validateur_metier,validateur_juridique_deontologie,statut_approbation,date_approbation,criteres_conformite
+PAM-001,/guides/arrivee-aeroport-aibd-dakar-transfert,Guide Pratique,Pôle Logistique Dakar,Responsable Réceptif,Direction Agence,Approuvé pour Production,2026-10-18,Tarifs AIBD vérifiés / Aucun surcoût dissimulé
+PAM-002,/guides/visiter-ile-de-goree-conseils-chaloupe,Guide Pratique,Pôle Excursions,Guide Référent Dakar,Direction Agence,Approuvé pour Production,2026-10-18,Horaires Gare Maritime validés / Tarifs officiels
+PAM-003,/guides/ou-loger-a-dakar-quartiers-residences,Guide Pratique,Pôle Hébergement,Chargé Résidences,Direction Agence,Approuvé pour Production,2026-10-18,Critères sécurité et générateurs vérifiés
+PAM-004,/guides/preparation-omra-depuis-le-senegal,Guide Pratique,Pôle Pèlerinages,Conseiller Religieux,Direction Juridique,Approuvé pour Production,2026-10-18,Conformité Nusuk / Aucune promesse de visa garanti
+PAM-005,/guides/voyage-affaires-chine-depuis-dakar,Guide Pratique,Pôle Mobilité Pro,Chargé d'Affaires Asie,Direction Juridique,Approuvé pour Production,2026-10-18,Vérification CVASC / Démarches visa M exactes
+PAM-006,/guides/assurance-voyage-internationale-dakar,Guide Pratique,Pôle Assurances,Courtier Partenaire,Direction Juridique,Approuvé pour Production,2026-10-18,Plafonds CIMA & Schengen 30k€ respectés
+PAM-007,/omra,Page Pilier Métier,Pôle Pèlerinages,Responsable Agence,Direction Générale,Approuvé pour Production,2026-10-18,Clause de souveraineté saoudienne explicite
+PAM-008,/guides,Index / Hub Éditorial,Équipe Marketing SEO,Lead Developer,Direction Générale,Approuvé pour Production,2026-10-18,Schema.org CollectionPage / Rendu SSG validé

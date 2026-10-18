@@ -11,6 +11,7 @@ const WHATSAPP_URL = 'https://wa.me/221773129090';
 
 const navigation = [
   { href: '/', label: 'Accueil' },
+  { href: '/guides', label: 'Guides & Conseils' },
   { href: '/about', label: 'À propos' },
   { href: '/contact', label: 'Contact' },
   { href: '/assistance-voyage', label: 'Assistance voyage' },
@@ -21,6 +22,7 @@ const navigation = [
 const services = [
   { href: '/hebergement', label: 'Hébergement' },
   { href: '/transport', label: 'Transport & Billetterie' },
+  { href: '/omra', label: 'Pèlerinage Omra' },
   { href: '/voyages-croisieres', label: 'Voyages & Croisières' },
   { href: '/excursions', label: 'Circuits et Excursions' },
   { href: '/tourisme-affaires', label: "Tourisme d'Affaires" },

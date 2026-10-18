@@ -9,6 +9,7 @@ import { fetchPageContent } from '@/lib/page-content';
 import type { Hebergement } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const revalidate = 300;
@@ -101,6 +102,27 @@ export default async function HebergementPage() {
               </p>
             </div>
             <HebergementGrid initialItems={hebergementItems} />
+          </div>
+        </section>
+
+        {/* Encart Guide Éditorial Quartiers Dakar */}
+        <section className="py-12 bg-slate-50 border-y border-slate-200">
+          <div className="container mx-auto max-w-5xl px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <span className="text-xs uppercase font-bold text-slaac-gold-600 tracking-wider">Conseil Hébergement & Sécurité</span>
+              <h3 className="text-xl font-bold text-slate-900 font-headline mt-1">
+                Où loger à Dakar : Le comparatif des quartiers
+              </h3>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+                Plateau pour les affaires, Almadies pour le bord de mer ou Mermoz pour le calme résidentiel : retrouvez nos critères d'audit (groupe électrogène automatique, fibre optique et gardiennage 24/7).
+              </p>
+            </div>
+            <Link
+              href="/guides/ou-loger-a-dakar-quartiers-residences"
+              className="shrink-0 inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-800 hover:border-slaac-gold-500 hover:text-slaac-gold-600 transition-colors bg-white shadow-xs"
+            >
+              Lire le guide comparatif &rarr;
+            </Link>
           </div>
         </section>
 

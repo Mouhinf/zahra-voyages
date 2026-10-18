@@ -26,6 +26,8 @@ import {
   FileCheck2,
   Phone,
   Flame,
+  Compass,
+  BookOpen,
 } from 'lucide-react';
 import { QuoteRequestButton } from './quote-request-button';
 import AnnouncementBar from './announcement-bar';
@@ -35,6 +37,7 @@ const servicesList = [
   { href: '/transport', label: 'Transport & Navette AIBD', icon: Car, desc: 'Chauffeurs privés, transferts aéroport, berlines VIP' },
   { href: '/hebergement', label: 'Hébergements & Résidences', icon: Hotel, desc: 'Appartements meublés, groupe électrogène & fibre' },
   { href: '/excursions', label: 'Excursions & Découverte', icon: MapPinned, desc: 'Gorée, Lac Rose, Bandia, Sine Saloum' },
+  { href: '/omra', label: 'Pèlerinage Omra', icon: Compass, desc: 'Séjours spirituels, vols AIBD, hôtels proches du Haram' },
   { href: '/tourisme-affaires', label: "Tourisme d'Affaires & MICE", icon: Briefcase, desc: 'Séminaires, délégations, facturation entreprise' },
   { href: '/assistance-voyage', label: 'Assistance & Visas', icon: FileCheck2, desc: 'Visas Chine, Dubaï, Schengen, assurances' },
   { href: '/voyages-croisieres', label: 'Voyages & Croisières', icon: Ship, desc: 'Séjours organisés et croisières mondiales' },
@@ -55,6 +58,7 @@ export default function Header() {
     { href: '/transport', label: 'AIBD Airport Transfers & Shuttles', icon: Car, desc: 'Private drivers, AIBD meet & greet, VIP sedans' },
     { href: '/hebergement', label: 'Accommodations & Serviced Stays', icon: Hotel, desc: 'Furnished apartments, guaranteed fiber & generator' },
     { href: '/excursions', label: 'Private Tours & Discoveries', icon: MapPinned, desc: 'Gorée Island, Pink Lake, Bandia Safari' },
+    { href: '/omra', label: 'Umrah Pilgrimage Support', icon: Compass, desc: 'Tailored stays, flights & hotels near holy mosques' },
     { href: '/tourisme-affaires', label: 'Corporate Travel & MICE', icon: Briefcase, desc: 'Conferences, delegations, B2B invoicing' },
     { href: '/assistance-voyage', label: 'Visa Support & Insurance', icon: FileCheck2, desc: 'China, Dubai, Schengen visas and assistance' },
     { href: '/voyages-croisieres', label: 'Voyages & Cruises', icon: Ship, desc: 'Tailor-made itineraries and global cruises' },
@@ -156,6 +160,16 @@ export default function Header() {
               )}
             >
               {isEn ? 'About Us' : 'À propos'}
+            </Link>
+
+            <Link
+              href="/guides"
+              className={cn(
+                "text-sm font-medium transition-colors px-3 py-2 rounded-md hover:text-slaac-navy-900 hover:bg-slate-100/80",
+                pathname.startsWith('/guides') ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
+              )}
+            >
+              {isEn ? 'Guides' : 'Guides'}
             </Link>
 
             <Link
@@ -350,6 +364,21 @@ export default function Header() {
                           )}
                         >
                           {isEn ? 'About Us' : 'À propos de nous'}
+                        </Link>
+                      </SheetClose>
+
+                      <SheetClose asChild>
+                        <Link
+                          href="/guides"
+                          className={cn(
+                            "flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-medium transition-colors",
+                            pathname.startsWith('/guides') ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                          )}
+                        >
+                          <span className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-slaac-gold-600" />
+                            {isEn ? 'Practical Guides' : 'Guides pratiques'}
+                          </span>
                         </Link>
                       </SheetClose>
 

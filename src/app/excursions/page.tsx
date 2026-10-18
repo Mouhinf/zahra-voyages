@@ -8,6 +8,7 @@ import { fetchPageContent } from '@/lib/page-content';
 import type { Excursion } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { featuredExcursions } from '@/data/featured-excursions';
 import { excursionEnrichments } from '@/data/excursion-enrichments';
 import type { Metadata } from 'next';
@@ -74,6 +75,27 @@ export default async function CircuitsExcursionsPage() {
               </p>
             </div>
             <ExcursionsGrid initialItems={excursionItems} staticItems={featuredExcursions} enrichments={excursionEnrichments} />
+          </div>
+        </section>
+
+        {/* Encart Guide Éditorial Gorée */}
+        <section className="py-12 bg-slate-50 border-y border-slate-200">
+          <div className="container mx-auto max-w-5xl px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <span className="text-xs uppercase font-bold text-slaac-gold-600 tracking-wider">Patrimoine UNESCO & Histoire</span>
+              <h3 className="text-xl font-bold text-slate-900 font-headline mt-1">
+                Visiter l'île de Gorée : Le guide pratique complet
+              </h3>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+                Horaires des traversées en chaloupe depuis le port de Dakar, tarifs des billets, Maison des Esclaves et accompagnement avec nos guides locaux certifiés.
+              </p>
+            </div>
+            <Link
+              href="/guides/visiter-ile-de-goree-conseils-chaloupe"
+              className="shrink-0 inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-800 hover:border-slaac-gold-500 hover:text-slaac-gold-600 transition-colors bg-white shadow-xs"
+            >
+              Lire le guide Gorée &rarr;
+            </Link>
           </div>
         </section>
 

@@ -8,6 +8,8 @@ import { fetchPageContent } from '@/lib/page-content';
 import type { Transport } from '@/types';
 import { Send } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import type { Metadata } from 'next';
 
 export const revalidate = 300;
@@ -186,6 +188,26 @@ export default async function TransportPage() {
               </p>
             </div>
             <TransportGrid initialItems={transportItems} />
+          </div>
+        </section>
+
+        {/* Encart Guide Éditorial AIBD */}
+        <section className="py-12 bg-slate-50 border-y border-slate-200">
+          <div className="container mx-auto max-w-5xl px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <span className="text-xs uppercase font-bold text-slaac-gold-600 tracking-wider">Conseils Pratiques Aéroport</span>
+              <h3 className="text-xl font-bold text-slate-900 font-headline mt-1">
+                Guide complet d'arrivée à l'aéroport AIBD (Diass)
+              </h3>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+                Temps de trajet vers Dakar et Saly selon les heures de pointe, consignes d'accueil à la sortie du terminal et conseils pour éviter les négociations informelles.
+              </p>
+            </div>
+            <Button asChild variant="outline" className="shrink-0 border-slate-300 hover:border-slaac-gold-500">
+              <Link href="/guides/arrivee-aeroport-aibd-dakar-transfert">
+                Consulter le guide AIBD &rarr;
+              </Link>
+            </Button>
           </div>
         </section>
 

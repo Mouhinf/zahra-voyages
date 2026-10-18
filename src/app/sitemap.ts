@@ -6,6 +6,7 @@ import { featuredDestinations } from '@/data/featured-destinations';
 import { featuredTransfertsAeroport } from '@/data/featured-transferts';
 import { featuredTransfertsPlage } from '@/data/featured-transferts-plage';
 import { featuredTourismeOffers } from '@/data/featured-tourisme';
+import { guidesData } from '@/data/guides';
 
 // Date de référence de la dernière revue majeure du contenu éditorial statique
 const STATIC_CONTENT_LASTMOD = new Date('2026-10-18T00:00:00.000Z');
@@ -171,6 +172,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/omra`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${SITE_URL}/guides`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
       url: `${SITE_URL}/dakar-2026`,
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
@@ -270,5 +283,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   });
 
-  return [...statiques, ...dynamiques];
+  // 4. Intégration des guides pratiques pérennes
+  const guidesEntries: MetadataRoute.Sitemap = guidesData.map((g) => ({
+    url: `${SITE_URL}/guides/${g.slug}`,
+    lastModified: new Date(g.updatedAt),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
+  return [...statiques, ...guidesEntries, ...dynamiques];
 }
