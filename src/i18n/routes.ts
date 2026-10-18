@@ -15,11 +15,12 @@ export const ROUTE_PAIRS: Array<{ fr: string; en: string }> = [
   { fr: '/about', en: '/en/about' },
   { fr: '/contact', en: '/en/contact' },
   { fr: '/dakar-2026', en: '/en/dakar-2026' },
+  { fr: '/guides', en: '/en/guides' },
 ];
 
 /**
  * Calcule l'URL alternative dans la langue cible en préservant le contexte utilisateur.
- * Si aucun équivalent direct n'existe (ex. guide spécifique non encore traduit),
+ * Si aucun équivalent direct n'existe (ex. page non encore traduite),
  * renvoie vers la racine de la langue cible (/en ou /) pour éviter les erreurs 404.
  */
 export function getAlternatePath(currentPath: string, targetLocale: Locale): string {
@@ -35,6 +36,12 @@ export function getAlternatePath(currentPath: string, targetLocale: Locale): str
     const match = ROUTE_PAIRS.find((p) => p.fr === normalized);
     if (match) return match.en;
 
+    // Correspondance spécifique pour les guides pratiques (/guides/[slug] -> /en/guides/[slug])
+    if (normalized.startsWith('/guides/')) {
+      const slug = normalized.slice('/guides/'.length);
+      return `/en/guides/${slug}`;
+    }
+
     // Gestion des préfixes pour sous-chemins
     const prefixMatch = ROUTE_PAIRS.find((p) => p.fr !== '/' && normalized.startsWith(p.fr));
     if (prefixMatch) {
@@ -48,6 +55,12 @@ export function getAlternatePath(currentPath: string, targetLocale: Locale): str
     }
     const match = ROUTE_PAIRS.find((p) => p.en === normalized);
     if (match) return match.fr;
+
+    // Correspondance spécifique pour les guides pratiques (/en/guides/[slug] -> /guides/[slug])
+    if (normalized.startsWith('/en/guides/')) {
+      const slug = normalized.slice('/en/guides/'.length);
+      return `/guides/${slug}`;
+    }
 
     // Gestion des préfixes anglais
     const prefixMatch = ROUTE_PAIRS.find((p) => normalized.startsWith(p.en));

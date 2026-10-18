@@ -35,7 +35,7 @@
    - Détection de la locale par le middleware Next.js (`src/middleware.ts`) avec en-tête `x-slaac-locale` et injection serveur de `<html lang={locale}>` dans le `RootLayout` sans délai de redirection.
 2. **Sélecteur de Langue Accessible & Préservation du Contexte :**
    - Composant `LanguageSwitcher` (`FR | EN`) intégré au header desktop, au volet mobile (`Sheet`) et au footer universel.
-   - Algorithme de correspondance `getAlternatePath` garantissant la conservation de la page active (ex: `/transport` $\leftrightarrow$ `/en/transport`, `/dakar-2026` $\leftrightarrow$ `/en/dakar-2026`).
+   - Algorithme de correspondance `getAlternatePath` garantissant la conservation de la page active (ex: `/transport` $\leftrightarrow$ `/en/transport`, `/dakar-2026` $\leftrightarrow$ `/en/dakar-2026`, `/guides` $\leftrightarrow$ `/en/guides`, et `/guides/[slug]` $\leftrightarrow$ `/en/guides/[slug]`).
    - Attributs ARIA complets (`aria-current="page"`, `hrefLang="fr"`, `hrefLang="en"`).
 3. **Formulaires, Schémas Zod & Persistance CRM Firestore :**
    - Schémas `quoteSchema` et `contactSchema` enrichis avec l'attribut `locale: z.enum(['fr', 'en']).optional().default('fr')`.
@@ -50,15 +50,26 @@
    - Offres logistiques indépendantes : navettes aéroport AIBD, flottes avec chauffeurs, hébergements vérifiés avec groupe électrogène et excursions.
    - Avertissement légal strict de non-affiliation et renvoi vers la billetterie officielle (`tickets.dakar2026.org`).
    - Données structurées Schema.org `FAQPage` en anglais.
-6. **SEO International & Hreflang Réciproque :**
-   - Annotations `metadata.alternates.languages` réciproques complètes sur les 10 couples d'URLs (`fr`, `en`, `x-default`).
-   - Mise à jour du `sitemap.xml` dynamique avec les 10 routes anglaises et leurs équivalences `xhtml:link`.
-7. **Livrables Documentaires & Validation Qualité 100% :**
-   - 3 fichiers CSV livrés dans `reports/09/` : `route-language-inventory.csv`, `translation-glossary.csv`, `translation-coverage.csv`.
+6. **Traduction Complète du Centre de Guides & Articles Pratiques (`/en/guides`) :**
+   - Traduction intégrale et révision stylistique des 6 dossiers pratiques de référence (`src/data/guides-en.ts`) :
+     1. `arrivee-aeroport-aibd-dakar-transfert` (transferts aéroport AIBD, péages, chauffeurs privés)
+     2. `visiter-ile-de-goree-conseils-chaloupe` (chaloupe, Maison des Esclaves, taxe touristique)
+     3. `ou-loger-a-dakar-quartiers-residences` (Plateau, Almadies, Ngor, groupe électrogène & fibre)
+     4. `preparer-omra-depuis-le-senegal` (démarches, vols Dakar-Djeddah, hôtels Médine/Mecque)
+     5. `voyage-affaires-chine-depuis-dakar` (Canton Fair, Yiwu, visas affaires, fret)
+     6. `demande-visa-voyage-international-dakar` (formalités consulaires, visas Schengen/Chine)
+   - Création de la page collection `/en/guides` et de la route dynamique SSG `/en/guides/[slug]`.
+   - Microdonnées Schema.org `Article` et `FAQPage` en anglais pour chaque guide.
+   - Alignement rigoureux du NAP officiel (`Rue Mouhamed 5, Immeuble Djolof Chicken, 3e étage, Dakar Plateau`) dans les dictionnaires `fr.json`, `en.json` et toutes les pages anglaises.
+7. **SEO International & Hreflang Réciproque :**
+   - Annotations `metadata.alternates.languages` réciproques complètes sur tous les couples d'URLs, y compris `/guides` et les 6 articles de guides (`fr`, `en`, `x-default`).
+   - Mise à jour du `sitemap.xml` dynamique avec les 11 routes statiques anglaises et les 6 guides anglais avec leurs équivalences `xhtml:link`.
+8. **Livrables Documentaires & Validation Qualité 100% :**
+   - 3 fichiers CSV mis à jour dans `reports/09/` : `route-language-inventory.csv`, `translation-glossary.csv`, `translation-coverage.csv`.
    - 21 rapports markdown exhaustifs dans `reports/09/01-i18n-audit.md` à `21-production-readiness.md`.
-   - Validation 25/25 par la suite automatisée `tests/i18n-system.test.mjs` (`reports/09/test-results.json`).
+   - Validation 27/27 par la suite automatisée `tests/i18n-system.test.mjs` (`reports/09/test-results.json`).
    - Non-régression totale sur les suites antérieures (Local SEO 20/20, Editorial SEO 20/20, Technical SEO 20/20, Email 11/11, Forms & CRM 16/16).
-   - Compilation Next.js 15 sans erreur avec 73/73 routes générées au `npm run build`.
+   - Compilation Next.js 15 sans erreur avec 80/80 routes générées au `npm run build`.
 
 ---
 

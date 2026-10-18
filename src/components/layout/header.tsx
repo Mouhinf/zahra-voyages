@@ -169,10 +169,10 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/guides"
+              href={isEn ? '/en/guides' : '/guides'}
               className={cn(
                 "text-sm font-medium transition-colors px-3 py-2 rounded-md hover:text-slaac-navy-900 hover:bg-slate-100/80",
-                pathname.startsWith('/guides') ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
+                (pathname.startsWith('/guides') || pathname.startsWith('/en/guides')) ? "text-slaac-gold-600 font-semibold" : "text-slate-600"
               )}
             >
               {isEn ? 'Guides' : 'Guides'}
@@ -331,10 +331,10 @@ export default function Header() {
 
                       <SheetClose asChild>
                         <Link
-                          href="/guides"
+                          href={isEn ? '/en/guides' : '/guides'}
                           className={cn(
                             "flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-medium transition-colors",
-                            pathname.startsWith('/guides') ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                            (pathname.startsWith('/guides') || pathname.startsWith('/en/guides')) ? "bg-slate-100 text-slaac-gold-600 font-semibold" : "text-slate-700 hover:bg-slate-50"
                           )}
                         >
                           <span className="flex items-center gap-2">

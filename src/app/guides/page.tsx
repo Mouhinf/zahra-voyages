@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   description: "Guides pratiques rédigés par l'équipe SLAAC Voyages : formalités de visas, arrivée aéroport AIBD, visites de Gorée, quartiers de Dakar et préparation Omra.",
   alternates: {
     canonical: '/guides',
+    languages: {
+      fr: '/guides',
+      en: '/en/guides',
+      'x-default': '/guides',
+    },
   },
   openGraph: {
     title: 'Guides pratiques & Conseils voyage au Sénégal | SLAAC Voyages',

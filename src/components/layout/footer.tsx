@@ -25,7 +25,7 @@ const navigationFr = [
 
 const navigationEn = [
   { href: '/en', label: 'Home' },
-  { href: '/guides', label: 'Travel Guides' },
+  { href: '/en/guides', label: 'Travel Guides' },
   { href: '/en/about', label: 'About Us' },
   { href: '/en/contact', label: 'Contact Us' },
   { href: '/en/assistance-voyage', label: 'Visa Support' },

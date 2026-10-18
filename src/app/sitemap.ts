@@ -396,6 +396,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: STATIC_CONTENT_LASTMOD,
       changeFrequency: 'weekly',
       priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/guides`,
+          en: `${SITE_URL}/en/guides`,
+          'x-default': `${SITE_URL}/guides`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/guides`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/guides`,
+          en: `${SITE_URL}/en/guides`,
+          'x-default': `${SITE_URL}/guides`,
+        },
+      },
     },
     {
       url: `${SITE_URL}/services`,
@@ -473,13 +493,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   });
 
-  // 4. Intégration des guides pratiques pérennes
-  const guidesEntries: MetadataRoute.Sitemap = guidesData.map((g) => ({
-    url: `${SITE_URL}/guides/${g.slug}`,
-    lastModified: new Date(g.updatedAt),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
+  // 4. Intégration des guides pratiques pérennes (versions FR et EN avec hreflang réciproque)
+  const guidesEntries: MetadataRoute.Sitemap = guidesData.flatMap((g) => [
+    {
+      url: `${SITE_URL}/guides/${g.slug}`,
+      lastModified: new Date(g.updatedAt),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/guides/${g.slug}`,
+          en: `${SITE_URL}/en/guides/${g.slug}`,
+          'x-default': `${SITE_URL}/guides/${g.slug}`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/guides/${g.slug}`,
+      lastModified: new Date(g.updatedAt),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/guides/${g.slug}`,
+          en: `${SITE_URL}/en/guides/${g.slug}`,
+          'x-default': `${SITE_URL}/guides/${g.slug}`,
+        },
+      },
+    },
+  ]);
 
   return [...statiques, ...guidesEntries, ...dynamiques];
 }

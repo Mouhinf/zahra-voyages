@@ -1,8 +1,8 @@
 {
-  "totalCriteria": 25,
-  "passed": 25,
+  "totalCriteria": 27,
+  "passed": 27,
   "failed": 0,
-  "timestamp": "2026-10-18T17:12:08.428Z",
+  "timestamp": "2026-10-18T17:45:28.337Z",
   "details": [
     {
       "id": 1,
@@ -144,13 +144,25 @@
     },
     {
       "id": 24,
-      "name": "Sitemap dynamique : indexation des 10 URLs anglaises avec alternates.languages réciproques",
+      "name": "Sitemap dynamique : indexation des 11 URLs anglaises avec alternates.languages réciproques",
       "success": true,
       "note": ""
     },
     {
       "id": 25,
       "name": "Non-régression technique : robots.txt accessible et explorabilité garantie",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 26,
+      "name": "Centre de guides en anglais : index /en/guides, template [slug] et hreflang réciproque",
+      "success": true,
+      "note": ""
+    },
+    {
+      "id": 27,
+      "name": "Excellence rédactionnelle : 6 guides pratiques traduits en anglais avec FAQ et sources officielles",
       "success": true,
       "note": ""
     }

@@ -9,6 +9,8 @@ Page,Destinations (/destinations) vs (/en/destinations),100%,100%,100%,Yes,Verif
 Page,About Us (/about) vs (/en/about),100%,100%,100%,Yes,Verified
 Page,Contact & Office (/contact) vs (/en/contact),100%,100%,100%,Yes,Verified
 Page,Dakar 2026 Event Hub (/dakar-2026) vs (/en/dakar-2026),100%,100%,100%,Yes,Verified
+Page,Travel Guides Collection (/guides) vs (/en/guides),100%,100%,100%,Yes,Verified
+Page,Individual Practical Guides (6 guides /guides/[slug] vs /en/guides/[slug]),100%,100%,100%,Yes,Verified
 Navigation,Header Desktop & Mobile Nav,100%,100%,100%,Yes,Verified
 Navigation,Footer Columns & Links,100%,100%,100%,Yes,Verified
 Navigation,Language Switcher (FR / EN toggle),100%,100%,100%,Yes,Verified

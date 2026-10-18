@@ -9,7 +9,7 @@ import { join } from 'path';
 const ROOT = process.cwd();
 
 const results = {
-  totalCriteria: 25,
+  totalCriteria: 27,
   passed: 0,
   failed: 0,
   timestamp: new Date().toISOString(),
@@ -19,16 +19,16 @@ const results = {
 function recordTest(id, name, success, note = '') {
   if (success) {
     results.passed++;
-    console.log(`✔ [CRITERION ${String(id).padStart(2, '0')}/25] ${name}`);
+    console.log(`✔ [CRITERION ${String(id).padStart(2, '0')}/27] ${name}`);
   } else {
     results.failed++;
-    console.log(`✘ [CRITERION ${String(id).padStart(2, '0')}/25] ${name}: ${note}`);
+    console.log(`✘ [CRITERION ${String(id).padStart(2, '0')}/27] ${name}: ${note}`);
   }
   results.details.push({ id, name, success, note });
 }
 
 console.log('================================================================');
-console.log('   SLAAC VOYAGES — SUITE DE VALIDATION I18N & DAKAR 2026 (25/25)');
+console.log('   SLAAC VOYAGES — SUITE DE VALIDATION I18N & DAKAR 2026 (27/27)');
 console.log('================================================================\n');
 
 try {
@@ -238,13 +238,35 @@ try {
     sitemapSrc.includes('/en/destinations') &&
     sitemapSrc.includes('/en/contact') &&
     sitemapSrc.includes('/en/about') &&
+    sitemapSrc.includes('/en/guides') &&
     sitemapSrc.includes('alternates:');
-  recordTest(24, 'Sitemap dynamique : indexation des 10 URLs anglaises avec alternates.languages réciproques', sitemapIncludesAll10);
+  recordTest(24, 'Sitemap dynamique : indexation des 11 URLs anglaises avec alternates.languages réciproques', sitemapIncludesAll10);
 
   // 25. Non-regression on robots.txt and existing infrastructure
   const robotsSrc = readFileSync(join(ROOT, 'src/app/robots.ts'), 'utf-8');
   const noRegression = robotsSrc.includes('sitemap.xml') && !robotsSrc.includes("'/en'");
   recordTest(25, 'Non-régression technique : robots.txt accessible et explorabilité garantie', noRegression);
+
+  // 26. English Guides index and detail pages existence & reciprocal hreflang
+  const guidesEnIndex = existsSync(join(ROOT, 'src/app/en/guides/page.tsx'));
+  const guidesEnDetail = existsSync(join(ROOT, 'src/app/en/guides/[slug]/page.tsx'));
+  const guidesDataEnExists = existsSync(join(ROOT, 'src/data/guides-en.ts'));
+  const frGuidesPageSrc = readFileSync(join(ROOT, 'src/app/guides/page.tsx'), 'utf-8');
+  const enGuidesPageSrc = readFileSync(join(ROOT, 'src/app/en/guides/page.tsx'), 'utf-8');
+  const hasReciprocalHreflang = frGuidesPageSrc.includes('/en/guides') && enGuidesPageSrc.includes('/guides');
+  recordTest(26, 'Centre de guides en anglais : index /en/guides, template [slug] et hreflang réciproque', guidesEnIndex && guidesEnDetail && guidesDataEnExists && hasReciprocalHreflang);
+
+  // 27. Full translation and E-E-A-T depth of all 6 English guides
+  const guidesEnDataSrc = readFileSync(join(ROOT, 'src/data/guides-en.ts'), 'utf-8');
+  const all6GuidesPresent = guidesEnDataSrc.includes('arrivee-aeroport-aibd-dakar-transfert') &&
+    guidesEnDataSrc.includes('visiter-ile-de-goree-conseils-chaloupe') &&
+    guidesEnDataSrc.includes('ou-loger-a-dakar-quartiers-residences') &&
+    guidesEnDataSrc.includes('preparer-omra-depuis-le-senegal') &&
+    guidesEnDataSrc.includes('voyage-affaires-chine-depuis-dakar') &&
+    guidesEnDataSrc.includes('demande-visa-voyage-international-dakar') &&
+    guidesEnDataSrc.includes('practicalFaq') &&
+    guidesEnDataSrc.includes('officialSources');
+  recordTest(27, 'Excellence rédactionnelle : 6 guides pratiques traduits en anglais avec FAQ et sources officielles', all6GuidesPresent);
 
 } catch (err) {
   console.error('Fatal error during i18n testing:', err);

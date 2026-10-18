@@ -200,7 +200,7 @@ export default function EnglishHomePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-primary font-headline">Talk to a Real Advisor</h2>
             <div className="w-16 h-0.5 bg-accent mx-auto my-5" />
             <p className="text-lg text-muted-foreground">
-              14 Rue de Thiong (angle Rue Mohamed V), Immeuble Djolof Chicken (3rd floor), Dakar Plateau — Senegal
+              Rue Mouhamed 5, Immeuble Djolof Chicken, 3rd floor, Dakar Plateau — Senegal
             </p>
             <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center gap-4">
               <a href="tel:+221773129090">

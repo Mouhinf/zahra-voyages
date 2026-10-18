@@ -51,6 +51,11 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
     description: guide.metaDescription,
     alternates: {
       canonical: `/guides/${guide.slug}`,
+      languages: {
+        fr: `/guides/${guide.slug}`,
+        en: `/en/guides/${guide.slug}`,
+        'x-default': `/guides/${guide.slug}`,
+      },
     },
     openGraph: {
       title: guide.metaTitle,
