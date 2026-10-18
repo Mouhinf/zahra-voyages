@@ -5,6 +5,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import ChatbotLoader from '@/components/chatbot-loader';
 import AnalyticsBeacon from '@/components/analytics-beacon';
 import { FloatingConciergeBar } from '@/components/layout/floating-concierge-bar';
+import { ConsentBanner } from '@/components/tracking/consent-banner';
 import type {ReactNode} from 'react';
 import { SITE_URL, SITE_NAME, CONTACT } from '@/lib/site';
 
@@ -68,6 +69,7 @@ export default async function RootLayout({
         <Toaster />
         <ChatbotLoader />
         <AnalyticsBeacon />
+        <ConsentBanner />
       </body>
     </html>
   );

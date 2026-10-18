@@ -1,7 +1,8 @@
 # Journal de Progression Global — SLAAC Voyages
 
 > **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
-> **Branche de travail actuelle :** `feat/slaac-full-internationalization`  
+> **Projet :** SLAAC Voyages (`https://slaacvoyages.com`)  
+> **Branche de travail actuelle :** `feat/slaac-growth-conversion-tracking`  
 > **Dernière mise à jour :** 18 octobre 2026  
 > **Responsable Technique :** Architecte Logiciel Senior & Lead DevOps  
 
@@ -20,13 +21,55 @@
 | **07/12** | **Domination Éditoriale SEO, Pages de Services, Destinations & Stratégie de Contenus** | **TERMINÉ** | `feat/slaac-editorial-seo` | 18 oct. 2026 |
 | **08/12** | **SEO Local Avancé, Google Business Profile, Google Maps & E-Réputation** | **TERMINÉ** | `feat/slaac-local-seo` | 18 oct. 2026 |
 | **09/12** | **Internationalisation Complète FR/EN, Expérience Touristique Internationale & Dakar 2026** | **TERMINÉ** | `feat/slaac-full-internationalization` | 18 oct. 2026 |
-| **10/12** | Automatisation WhatsApp Business API & Chatbot Hybride | *Planifié* | - | - |
+| **10/12** | **Acquisition Digitale, Google Ads, Meta Ads, TikTok, WhatsApp & Tracking CRO** | **TERMINÉ** | `feat/slaac-growth-conversion-tracking` | 18 oct. 2026 |
 | **11/12** | Espace Partenaires B2B & Tourisme d'Affaires (MICE) | *Planifié* | - | - |
 | **12/12** | Système de Facturation, Acomptes & Passerelles de Paiement | *Planifié* | - | - |
 
 ---
 
-## 2. Bilan de la Phase 09/12 (Internationalisation Complète FR/EN, Expérience Touristique Internationale & Dakar 2026)
+## 2. Bilan de la Phase 10/12 (Acquisition Digitale, Tracking Multi-Canal & Conversions)
+
+### 2.1. Réalisations Majeures & Métriques Clés
+1. **Architecture de Mesure & Conformité Hybride (Google Consent Mode v2 & Loi CDP Sénégal 2008-12) :**
+   - Implémentation du gestionnaire de consentement dans `src/lib/tracking/consent.ts` avec états par défaut fixés à `denied` pour `analytics_storage`, `ad_storage`, `ad_user_data`, et `ad_personalization`.
+   - Bannière de consentement responsive et accessible `src/components/tracking/consent-banner.tsx` avec modal de personnalisation granulaire et persistance dans `localStorage` sous `slaac_consent_v2`.
+   - Bouton de réouverture « Gestion des cookies » intégré au Footer (`src/components/layout/footer.tsx`) via l'événement personnalisé `slaac:open-consent-modal`.
+   - Assainissement strict des charges utiles via `sanitizeEventPayload` pour éliminer toute donnée personnelle (PII) en clair avant transmission aux dataLayers et pixels.
+2. **Rétention d'Attribution Multi-Pages Sécurisée (`src/lib/tracking/attribution.ts`) :**
+   - Élimination des pertes de tracking en navigation SPA Next.js grâce à la persistance dans `sessionStorage` (`slaac_attribution_v1`).
+   - Capture automatique à l'atterrissage des 5 paramètres UTMs (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`).
+   - Capture et conservation des identifiants de clic publicitaires : `gclid`, `gbraid`, `wbraid` (Google Ads), `fbclid` (Meta Ads), et `ttclid` (TikTok Ads).
+3. **Taxonomie Rigoureuse & Déduplication Déterministe Client/Serveur :**
+   - Taxonomie à 12 états standardisés dans `src/lib/tracking/events.ts` avec générateur `buildEventId` pour l'alignement Pixel navigateur et APIs serveur (CAPI / Events API).
+   - Dissociation stricte de l'événement commercial : le clic bouton déclenche `quote_submit_attempt`, tandis que `lead_created` n'est émis qu'après réception de la confirmation serveur HTTP 200 OK avec référence unique (`DV-YYYYMMDD-XXXX`).
+4. **Landing Pages Dédiées Haute Conversion (`/lp/transfert-aibd` & `/en/lp/transfert-aibd`) :**
+   - Pages dédiées au trafic payant avec grille tarifaire transparente (35 000 FCFA AIBD -> Dakar), véhicules récents, inclusions claires (péage et attente inclus), et réassurance 24/7.
+   - Double CTA de conversion : formulaire de devis interactif et bouton WhatsApp direct avec message contextuel préformaté.
+   - Balisage Schema.org JSON-LD complet (`Service`, `Product`, `LocalBusiness`, `FAQPage`).
+   - Inclusion dans `sitemap.ts` et correspondance linguistique dans `src/i18n/routes.ts`.
+5. **Enrichissement CRM Firestore & Pilotage Commercial :**
+   - Schémas Zod `quoteSchema` et `contactSchema` enrichis pour valider et stocker les UTMs et Click IDs dans Firestore (`quotes/{id}` et `contacts/{id}`).
+   - Endpoint d'administration `/api/admin/statistiques/overview` optimisé pour ventiler automatiquement le volume de leads et les montants financiers par campagne (`campagne` / `utm_campaign`) et par canal d'acquisition.
+   - Spécification complète de l'import des conversions hors ligne (Google Ads Data Manager / OCI) lors du passage au statut `gagne`.
+6. **Documentation Exhaustive & Matrices Stratégiques :**
+   - 22 rapports d'expertise complets rédigés dans `reports/10/01-*.md` à `reports/10/22-*.md`.
+   - 5 matrices CSV opérationnelles : `campaign-matrix.csv`, `utm-naming-convention.csv`, `conversion-event-mapping.csv`, `landing-page-matrix.csv`, et `budget-planning.csv`.
+   - Garde-fous financiers absolus : toutes les campagnes paramétrées en statut DRAFT (zéro dépense active sans validation de la direction).
+
+### 2.2. Validation Qualité et Banc d'Essai Automatisé
+- **Suite Dédiée Growth & Tracking (`tests/growth-tracking-system.test.mjs`) :** **25/25 critères validés (100% de réussite)**.
+- **Rapport d'exécution :** Sauvegardé dans `reports/10/test-results.json`.
+- **Suites de Régression Antérieures :**
+  - `tests/i18n-system.test.mjs` : 27/27 validés.
+  - `tests/local-seo.test.mjs` : 20/20 validés.
+  - `tests/editorial-seo.test.mjs` : 20/20 validés.
+  - `tests/seo-technical.test.mjs` : 20/20 validés.
+  - `tests/email-system.test.mjs` : 11/11 validés.
+  - `tests/forms-crm-system.test.mjs` : 16/16 validés.
+
+---
+
+## 3. Bilan de la Phase 09/12 (Internationalisation Complète FR/EN, Expérience Touristique Internationale & Dakar 2026)
 
 ### 2.1. Réalisations Majeures & Métriques Clés
 1. **Infrastructure Bilingue Hybride & Rendu SSR `<html lang>` Dynamique :**

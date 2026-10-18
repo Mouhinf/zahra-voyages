@@ -1,0 +1,10 @@
+campaign_id,campaign_name,channel,objective,target_geo,target_audience,primary_kpi,target_cpl_fcfa,landing_page,status
+CAMP_01,sn_dakar_search_transfert-aibd,Google Ads,Search - Leads,Dakar (50km) + AIBD,Voyageurs arrivant/partant Dakar,lead_created,2000,/lp/transfert-aibd,DRAFT
+CAMP_02,sn_dakar_search_billetterie-vols,Google Ads,Search - Leads,Sénégal (Dakar/Thiès),Commerçants & Familles voyage,quote_start,2500,/services/billetterie,DRAFT
+CAMP_03,sn_dakar_search_services-visa,Google Ads,Search - Leads,Dakar (Centres commerciaux),Commerçants Asie (Chine/Dubaï),lead_created,3000,/services/visa,DRAFT
+CAMP_04,sn_dakar_search_omra-senegal,Google Ads,Search - Leads,Sénégal (National),Pèlerins & Familles,lead_created,3500,/services/omra,DRAFT
+CAMP_05,int_eu_search_sejour-receptif,Google Ads,Search - Leads,France / Belgique / Suisse,Diaspora & Touristes,lead_created,4000,/destinations/senegal,DRAFT
+CAMP_06,sn_meta_conv_aibd-chauffeur,Meta Ads,Conversions - Leads,Dakar (Expatriés & Cadres),Voyageurs fréquents + Business,lead_created,1800,/lp/transfert-aibd,DRAFT
+CAMP_07,sn_meta_msg_whatsapp-commercants,Meta Ads,Messages WhatsApp,Dakar (Sandaga/Colobane),Importateurs & Commerçants,whatsapp_click,1200,/services/visa,DRAFT
+CAMP_08,sn_tiktok_lead_aibd-experience,TikTok Ads,Lead Generation,Dakar & Régions,Jeunes actifs & Diaspora,lead_created,1500,/lp/transfert-aibd,DRAFT
+CAMP_09,b2b_dakar2026_receptif-delegations,Google Ads,Search - Corporate,International (Europe/USA),Délégations & Entreprises sport,lead_created,5000,/lp/transfert-aibd,DRAFT

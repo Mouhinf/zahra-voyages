@@ -264,13 +264,17 @@ export async function GET(req: NextRequest) {
         percentage: curViews > 0 ? Math.round((count / curViews) * 100) : 0,
       }));
 
-    // Campagnes marketing
+    // Campagnes marketing (UTM & campagnes payantes)
     const campaigns = Object.entries(campaignsMap)
       .sort((a, b) => b[1] - a[1])
       .map(([campaign, views]) => ({
         campaign,
         views,
-        quotes: quotesSnap.docs.filter((d) => String(d.data().campagne || '').toLowerCase() === campaign.toLowerCase()).length,
+        quotes: quotesSnap.docs.filter((d) => {
+          const docData = d.data();
+          const c = String(docData.utmCampaign || docData.campagne || docData.utm_campaign || '').toLowerCase();
+          return c === campaign.toLowerCase();
+        }).length,
       }));
 
     return NextResponse.json({

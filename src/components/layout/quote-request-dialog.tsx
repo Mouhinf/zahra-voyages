@@ -53,6 +53,8 @@ import {
   getServiceOptions,
 } from '@/lib/schemas/quote-schema';
 import { usePathname } from 'next/navigation';
+import { getStoredAttribution } from '@/lib/tracking/attribution';
+import { dispatchConversionEvent } from '@/lib/tracking/provider';
 
 export function QuoteRequestDialog({
   children,
@@ -192,19 +194,33 @@ export function QuoteRequestModal({
 
   async function onSubmit(values: QuoteInput) {
     setIsSubmitting(true);
+    const attr = getStoredAttribution();
+
+    // Traçabilité de la tentative de soumission (ne constitue pas un lead)
+    dispatchConversionEvent('quote_submit_attempt', {
+      service: values.service,
+      travelers: values.travelers,
+      clientSubmissionId: submissionId || `${instanceId}-${Date.now()}`,
+    });
+
     try {
       const payload = {
         ...values,
         locale: activeLocale,
-        source: source || (isEn ? 'en-modal-quote' : 'modal-quote'),
+        source: source || attr.utmSource || (isEn ? 'en-modal-quote' : 'modal-quote'),
         clientSubmissionId: submissionId || `${instanceId}-${Date.now()}`,
-        utmSource: utmParams.utm_source,
-        utmMedium: utmParams.utm_medium,
-        utmCampaign: utmParams.utm_campaign,
-        utmContent: utmParams.utm_content,
-        utmTerm: utmParams.utm_term,
-        referrer: utmParams.referrer,
-        landingPage: utmParams.landingPage,
+        utmSource: attr.utmSource || utmParams.utm_source,
+        utmMedium: attr.utmMedium || utmParams.utm_medium,
+        utmCampaign: attr.utmCampaign || utmParams.utm_campaign,
+        utmContent: attr.utmContent || utmParams.utm_content,
+        utmTerm: attr.utmTerm || utmParams.utm_term,
+        gclid: attr.gclid,
+        gbraid: attr.gbraid,
+        wbraid: attr.wbraid,
+        fbclid: attr.fbclid,
+        ttclid: attr.ttclid,
+        referrer: attr.referrer || utmParams.referrer,
+        landingPage: attr.landingPage || utmParams.landingPage,
       };
 
       const res = await fetch('/api/quotes', {
@@ -225,6 +241,15 @@ export function QuoteRequestModal({
         reference: ref,
         service: values.service,
         phone: values.phone,
+      });
+
+      // Seul l'enregistrement réussi backend 200 OK déclenche l'événement officiel de conversion lead_created
+      dispatchConversionEvent('lead_created', {
+        reference: ref,
+        leadId: body?.id || ref,
+        service: values.service,
+        channel: 'quote',
+        locale: activeLocale,
       });
 
       toast({

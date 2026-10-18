@@ -1,0 +1,4 @@
+scenario,monthly_budget_fcfa,google_ads_fcfa,meta_ads_fcfa,tiktok_ads_fcfa,est_clicks,est_cpc_fcfa,est_leads,est_cpl_fcfa,closing_rate_pct,est_clients,est_revenue_fcfa,est_roas
+Scenario A (Test Prudent),50000,30000,20000,0,350,143,24,2083,25.0,6,450000,9.0x
+Scenario B (Consolidation Recommandee),150000,80000,50000,20000,1250,120,91,1648,28.0,25,2400000,16.0x
+Scenario C (Acceleration Commerciale),300000,150000,100000,50000,2800,107,222,1351,30.0,67,7200000,24.0x

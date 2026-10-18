@@ -23,6 +23,8 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
+import { getStoredAttribution } from '@/lib/tracking/attribution';
+import { dispatchConversionEvent } from '@/lib/tracking/provider';
 
 export default function ContactPage() {
   const { toast } = useToast();
@@ -57,23 +59,41 @@ export default function ContactPage() {
 
   async function onSubmit(values: ContactInput) {
     setIsSubmitting(true);
+    const attr = getStoredAttribution();
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...values,
-          utmSource: utmParams.utm_source,
-          utmMedium: utmParams.utm_medium,
-          utmCampaign: utmParams.utm_campaign,
-          referrer: utmParams.referrer,
-          landingPage: utmParams.landingPage,
+          utmSource: attr.utmSource || utmParams.utm_source,
+          utmMedium: attr.utmMedium || utmParams.utm_medium,
+          utmCampaign: attr.utmCampaign || utmParams.utm_campaign,
+          utmContent: attr.utmContent,
+          utmTerm: attr.utmTerm,
+          gclid: attr.gclid,
+          gbraid: attr.gbraid,
+          wbraid: attr.wbraid,
+          fbclid: attr.fbclid,
+          ttclid: attr.ttclid,
+          referrer: attr.referrer || utmParams.referrer,
+          landingPage: attr.landingPage || utmParams.landingPage,
           website: '', // pot de miel anti-robots
         }),
       });
 
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body?.error || 'Erreur serveur');
+
+      // Conversion lead_created enregistrée
+      dispatchConversionEvent('lead_created', {
+        reference: body?.id || 'CONTACT-FR',
+        leadId: body?.id || 'CONTACT-FR',
+        service: 'contact-general',
+        channel: 'contact',
+        locale: 'fr',
+      });
 
       toast({
         title: 'Message envoyé !',

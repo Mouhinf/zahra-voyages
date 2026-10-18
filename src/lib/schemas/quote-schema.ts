@@ -150,13 +150,18 @@ export const baseQuoteSchema = z.object({
   studyDegree: z.string().trim().max(120).optional().or(z.literal('').transform(() => undefined)),
   appointmentReason: z.string().trim().max(200).optional().or(z.literal('').transform(() => undefined)),
 
-  // Traçabilité & attribution marketing (UTM)
+  // Traçabilité & attribution marketing (UTM & Click IDs)
   source: z.string().trim().max(100).optional(),
   utmSource: z.string().trim().max(100).optional(),
   utmMedium: z.string().trim().max(100).optional(),
   utmCampaign: z.string().trim().max(100).optional(),
   utmContent: z.string().trim().max(100).optional(),
   utmTerm: z.string().trim().max(100).optional(),
+  gclid: z.string().trim().max(128).optional(),
+  gbraid: z.string().trim().max(128).optional(),
+  wbraid: z.string().trim().max(128).optional(),
+  fbclid: z.string().trim().max(128).optional(),
+  ttclid: z.string().trim().max(128).optional(),
   referrer: z.string().trim().max(250).optional(),
   landingPage: z.string().trim().max(250).optional(),
 

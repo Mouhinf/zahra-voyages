@@ -16,6 +16,7 @@ export const ROUTE_PAIRS: Array<{ fr: string; en: string }> = [
   { fr: '/contact', en: '/en/contact' },
   { fr: '/dakar-2026', en: '/en/dakar-2026' },
   { fr: '/guides', en: '/en/guides' },
+  { fr: '/lp/transfert-aibd', en: '/en/lp/transfert-aibd' },
 ];
 
 /**

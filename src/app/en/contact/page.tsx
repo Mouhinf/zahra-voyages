@@ -15,6 +15,8 @@ import Footer from '@/components/layout/footer';
 import Breadcrumbs from '@/components/seo/breadcrumbs';
 import { CONTACT, SITE_URL } from '@/lib/site';
 import { contactSchema, type ContactInput } from '@/lib/schemas/contact-schema';
+import { getStoredAttribution } from '@/lib/tracking/attribution';
+import { dispatchConversionEvent } from '@/lib/tracking/provider';
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg role="img" aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -59,6 +61,8 @@ export default function EnglishContactPage() {
 
   async function onSubmit(values: ContactInput) {
     setIsSubmitting(true);
+    const attr = getStoredAttribution();
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -66,17 +70,33 @@ export default function EnglishContactPage() {
         body: JSON.stringify({
           ...values,
           locale: 'en',
-          utmSource: utmParams.utm_source,
-          utmMedium: utmParams.utm_medium,
-          utmCampaign: utmParams.utm_campaign,
-          referrer: utmParams.referrer,
-          landingPage: utmParams.landingPage,
+          utmSource: attr.utmSource || utmParams.utm_source,
+          utmMedium: attr.utmMedium || utmParams.utm_medium,
+          utmCampaign: attr.utmCampaign || utmParams.utm_campaign,
+          utmContent: attr.utmContent,
+          utmTerm: attr.utmTerm,
+          gclid: attr.gclid,
+          gbraid: attr.gbraid,
+          wbraid: attr.wbraid,
+          fbclid: attr.fbclid,
+          ttclid: attr.ttclid,
+          referrer: attr.referrer || utmParams.referrer,
+          landingPage: attr.landingPage || utmParams.landingPage,
           website: '', // honeypot
         }),
       });
 
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body?.error || 'Server error');
+
+      // Dispatch verified conversion event
+      dispatchConversionEvent('lead_created', {
+        reference: body?.id || 'CONTACT-EN',
+        leadId: body?.id || 'CONTACT-EN',
+        service: 'contact-general',
+        channel: 'contact',
+        locale: 'en',
+      });
 
       toast({
         title: 'Message sent successfully!',

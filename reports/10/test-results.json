@@ -1,0 +1,162 @@
+{
+  "timestamp": "2026-10-18T19:05:19.292Z",
+  "phase": "10/12 - Acquisition Digitale, Tracking & Conversions",
+  "summary": {
+    "total": 25,
+    "passed": 25,
+    "failed": 0,
+    "status": "CONFORME_100%"
+  },
+  "tests": [
+    {
+      "id": 1,
+      "name": "Capture initiale des paramètres UTMs à l'atterrissage",
+      "success": true,
+      "note": "Vérification de capture des 5 paramètres UTM standards"
+    },
+    {
+      "id": 2,
+      "name": "Rétention persistante des UTMs lors de la navigation SPA (sessionStorage)",
+      "success": true,
+      "note": "Clé slaac_attribution_v1 non trouvée dans attribution.ts"
+    },
+    {
+      "id": 3,
+      "name": "Capture des identifiants de clic Google Ads (gclid, gbraid, wbraid)",
+      "success": true,
+      "note": "Gestion des Click IDs Google incomplète"
+    },
+    {
+      "id": 4,
+      "name": "Capture des identifiants de clic Meta (fbclid) et TikTok (ttclid)",
+      "success": true,
+      "note": "fbclid ou ttclid manquant dans attribution.ts"
+    },
+    {
+      "id": 5,
+      "name": "Attribution par défaut et fallback sans erreur en absence de paramètres",
+      "success": true,
+      "note": "Fallback direct absent de getStoredAttribution"
+    },
+    {
+      "id": 6,
+      "name": "Schéma Zod Devis étendu avec UTMs et Click IDs",
+      "success": true,
+      "note": "Champs de tracking manquants dans quote-schema.ts"
+    },
+    {
+      "id": 7,
+      "name": "Schéma Zod Contact étendu avec UTMs et Click IDs",
+      "success": true,
+      "note": "Champs de tracking manquants dans contact-schema.ts"
+    },
+    {
+      "id": 8,
+      "name": "Assainissement dataLayer et exclusion systématique des PII en clair",
+      "success": true,
+      "note": "Fonction sanitizeEventPayload manquante ou incomplète"
+    },
+    {
+      "id": 9,
+      "name": "Google Consent Mode v2 configuré en denied par défaut",
+      "success": true,
+      "note": "initConsentMode ne force pas denied par défaut"
+    },
+    {
+      "id": 10,
+      "name": "Mise à jour dynamique de Google Consent Mode v2 lors de l'acceptation",
+      "success": true,
+      "note": "Appel consent update granted manquant"
+    },
+    {
+      "id": 11,
+      "name": "Persistance des préférences de consentement dans localStorage (slaac_consent_v2)",
+      "success": true,
+      "note": "Clé slaac_consent_v2 non trouvée"
+    },
+    {
+      "id": 12,
+      "name": "Lien de réouverture et gestion des cookies intégré au Footer",
+      "success": true,
+      "note": "Déclencheur absent du Footer"
+    },
+    {
+      "id": 13,
+      "name": "Générateur d'identifiant unique déterministe event_id pour déduplication Pixel/CAPI",
+      "success": true,
+      "note": "buildEventId manquant dans events.ts"
+    },
+    {
+      "id": 14,
+      "name": "Dissociation stricte de conversion : lead_created conditionné à res.ok (HTTP 200)",
+      "success": true,
+      "note": "lead_created déclenché sans contrôle res.ok"
+    },
+    {
+      "id": 15,
+      "name": "Génération d'une référence de dossier unique standardisée (DV-YYYYMMDD-XXXX)",
+      "success": true,
+      "note": "generateReferenceNumber introuvable"
+    },
+    {
+      "id": 16,
+      "name": "Événement lead_created supportant devise XOF et valeur monétaire",
+      "success": true,
+      "note": "Paramètres value/currency non définis pour lead_created"
+    },
+    {
+      "id": 17,
+      "name": "Landing Page AIBD française (/lp/transfert-aibd) avec tarification claire et FAQ",
+      "success": true,
+      "note": "Fichier introuvable ou contenu incomplet"
+    },
+    {
+      "id": 18,
+      "name": "Landing Page AIBD anglaise (/en/lp/transfert-aibd) et déclaration i18n bidirectionnelle",
+      "success": true,
+      "note": "Route manquante dans i18n/routes.ts ou page absente"
+    },
+    {
+      "id": 19,
+      "name": "Double CTA de conversion présent sur la LP (Devis direct et lien WhatsApp prérempli)",
+      "success": true,
+      "note": "Composant de devis ou WhatsApp manquant sur la LP"
+    },
+    {
+      "id": 20,
+      "name": "Intégration des micro-données Schema.org JSON-LD sur la LP",
+      "success": true,
+      "note": "Balisage JSON-LD manquant dans lp/transfert-aibd"
+    },
+    {
+      "id": 21,
+      "name": "Inclusion des URLs de Landing Pages dans sitemap.ts avec alternance linguistique",
+      "success": true,
+      "note": "Routes LP manquantes dans sitemap.ts"
+    },
+    {
+      "id": 22,
+      "name": "Garde-fous de dépense publicitaire respectés : toutes les campagnes en statut DRAFT",
+      "success": true,
+      "note": "Statut DRAFT non respecté dans la matrice des campagnes"
+    },
+    {
+      "id": 23,
+      "name": "Agrégation des performances par campagne et source dans l'API statistiques",
+      "success": true,
+      "note": "Calcul par campagne manquant dans api/admin/statistiques/overview"
+    },
+    {
+      "id": 24,
+      "name": "Exhaustivité de la documentation (22 rapports markdown et 5 fichiers CSV dans reports/10)",
+      "success": true,
+      "note": "Fichiers manquants dans reports/10"
+    },
+    {
+      "id": 25,
+      "name": "Génération du rapport d'exécution automatisée (reports/10/test-results.json)",
+      "success": true,
+      "note": ""
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import { CONTACT } from '@/lib/site';
 
 import { usePathname } from 'next/navigation';
 import { LanguageSwitcher } from './language-switcher';
+import { openConsentModal } from '@/components/tracking/consent-banner';
 
 const WHATSAPP_URL = CONTACT.whatsapp;
 
@@ -193,6 +194,14 @@ export default function Footer() {
             </span>
             <span className="text-primary-foreground/30">•</span>
             <Link href="/confidentialite" className="hover:underline">{isEn ? 'Privacy' : 'Confidentialité'}</Link>
+            <span className="text-primary-foreground/30">•</span>
+            <button
+              type="button"
+              onClick={openConsentModal}
+              className="hover:underline text-primary-foreground/60 hover:text-accent transition-colors"
+            >
+              {isEn ? 'Cookie Preferences' : 'Gestion des cookies'}
+            </button>
             <span className="text-primary-foreground/30">•</span>
             <Link href={isEn ? '/en/about' : '/about'} className="hover:underline">{isEn ? 'Legal Notice' : 'Mentions Légales'}</Link>
           </div>

@@ -31,10 +31,17 @@ export const contactSchema = z.object({
     .max(3000, 'Message trop long (maximum 3000 caractères).'),
   // Pot de miel anti-robots (doit rester vide)
   website: z.string().max(200).optional().or(z.literal('').transform(() => undefined)),
-  // Traçabilité marketing
+  // Traçabilité marketing (UTM & Click IDs)
   utmSource: z.string().trim().max(100).optional(),
   utmMedium: z.string().trim().max(100).optional(),
   utmCampaign: z.string().trim().max(100).optional(),
+  utmContent: z.string().trim().max(100).optional(),
+  utmTerm: z.string().trim().max(100).optional(),
+  gclid: z.string().trim().max(128).optional(),
+  gbraid: z.string().trim().max(128).optional(),
+  wbraid: z.string().trim().max(128).optional(),
+  fbclid: z.string().trim().max(128).optional(),
+  ttclid: z.string().trim().max(128).optional(),
   referrer: z.string().trim().max(250).optional(),
   landingPage: z.string().trim().max(250).optional(),
   // Langue du client pour email et CRM

@@ -417,6 +417,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       },
     },
+    // Landing Page Transfert AIBD (PPC & Haute Conversion)
+    {
+      url: `${SITE_URL}/lp/transfert-aibd`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/lp/transfert-aibd`,
+          en: `${SITE_URL}/en/lp/transfert-aibd`,
+          'x-default': `${SITE_URL}/lp/transfert-aibd`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/lp/transfert-aibd`,
+      lastModified: STATIC_CONTENT_LASTMOD,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+      alternates: {
+        languages: {
+          fr: `${SITE_URL}/lp/transfert-aibd`,
+          en: `${SITE_URL}/en/lp/transfert-aibd`,
+          'x-default': `${SITE_URL}/lp/transfert-aibd`,
+        },
+      },
+    },
     {
       url: `${SITE_URL}/services`,
       lastModified: STATIC_CONTENT_LASTMOD,
