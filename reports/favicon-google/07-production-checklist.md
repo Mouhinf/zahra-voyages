@@ -12,8 +12,8 @@
 | **DNS LWS (A, CNAME)** | **ACTIF SUR VERCEL** | Aucun (Pointe déjà sur l'Edge Vercel `216.198.79.1`). |
 | **Messagerie LWS (MX, SPF)** | **INTACTE SUR LWS** | Aucun (Messagerie protégée). |
 | **Balise de vérification Search Console** | **DÉPLOYÉE EN PRODUCTION** | Utiliser pour valider la propriété en 1 clic. |
-| **Schéma Schema.org `WebSite` (Site Names)** | **CORRIGÉ DANS LE CODE LOCAL** | En attente de validation pour git push / prod. |
-| **Suite de tests (15/15)** | **VALIDÉE LOCALEMENT** | Code prêt pour livraison. |
+| **Schéma Schema.org `WebSite` (Site Names)** | **DÉPLOYÉ EN PRODUCTION** | En ligne (Vérifié en direct dans le DOM HTML). |
+| **Suite de tests (15/15)** | **VALIDÉE EN PRODUCTION** | 15/15 succès sur le serveur live. |
 
 ---
 

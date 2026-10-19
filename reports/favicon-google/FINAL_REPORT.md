@@ -117,7 +117,7 @@ Google applique une fréquence de rafraîchissement asynchrone pour les favicons
 | :--- | :--- |
 | **Génération et qualité des favicons conformes (48px)** | **DÉPLOYÉ EN PRODUCTION** |
 | **Accessibilité publique et robots.txt** | **ACCESSIBLE À GOOGLEBOT** |
-| **Schéma Schema.org WebSite (Google Site Names)** | **CORRIGÉ DANS LE CODE** |
-| **Suite de tests automatisés (15/15)** | **VALIDÉ SUR ENVIRONNEMENT DE TEST** |
+| **Schéma Schema.org WebSite (Google Site Names)** | **DÉPLOYÉ EN PRODUCTION** |
+| **Suite de tests automatisés (15/15)** | **VALIDÉ EN PRODUCTION** |
 | **Mise à jour dans l'index Search Console** | **EN ATTENTE DE NOUVELLE EXPLORATION GOOGLE** |
 | **Affichage effectif dans les résultats de recherche** | **EN ATTENTE D'OBSERVATION RÉELLE PAR L'UTILISATEUR** (Non confirmé visuellement) |
