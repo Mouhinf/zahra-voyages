@@ -60,7 +60,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { getTravelAgencySchema } from '@/lib/seo-schema';
+import { getTravelAgencySchema, getWebSiteSchema } from '@/lib/seo-schema';
 import { headers } from 'next/headers';
 
 export default async function RootLayout({
@@ -71,11 +71,16 @@ export default async function RootLayout({
   const headersList = await headers();
   const locale = headersList.get('x-slaac-locale') === 'en' ? 'en' : 'fr';
   const travelAgencyJsonLd = getTravelAgencySchema();
+  const webSiteJsonLd = getWebSiteSchema();
 
   return (
     <html lang={locale} className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${playfair.variable} font-body antialiased`}>
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(travelAgencyJsonLd) }}

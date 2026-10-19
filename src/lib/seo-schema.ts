@@ -8,6 +8,17 @@ import { SITE_URL, SITE_NAME, CONTACT } from '@/lib/site';
  * - Sérialisation sécurisée sans injection XSS
  */
 
+export function getWebSiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    alternateName: ['SLAAC'],
+    url: `${SITE_URL}/`,
+  };
+}
+
 export function getTravelAgencySchema() {
   return {
     '@context': 'https://schema.org',
