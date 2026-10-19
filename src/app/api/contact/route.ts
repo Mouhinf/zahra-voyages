@@ -72,14 +72,24 @@ export async function POST(req: NextRequest) {
     // Déduplication : identique (email + message) dans les 10 dernières minutes.
     const fp = fingerprint(data.email, data.message);
     const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-    const dupSnapshot = await db
-      .collection('contacts')
-      .where('fingerprint', '==', fp)
-      .where('createdAt', '>=', tenMinAgo)
-      .limit(1)
-      .get();
-    if (!dupSnapshot.empty) {
-      return NextResponse.json({ ok: true, deduped: true });
+    try {
+      const dupSnapshot = await db
+        .collection('contacts')
+        .where('fingerprint', '==', fp)
+        .limit(5)
+        .get();
+
+      if (!dupSnapshot.empty) {
+        const recentDoc = dupSnapshot.docs.find((d) => {
+          const docData = d.data();
+          return docData.createdAt && docData.createdAt >= tenMinAgo;
+        });
+        if (recentDoc) {
+          return NextResponse.json({ ok: true, deduped: true });
+        }
+      }
+    } catch (dupErr) {
+      console.warn('Contact dedup check skipped due to query error:', dupErr);
     }
 
     const rawRecord: Record<string, unknown> = {

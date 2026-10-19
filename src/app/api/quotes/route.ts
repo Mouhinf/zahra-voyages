@@ -124,46 +124,57 @@ export async function POST(req: NextRequest) {
     const nowIso = new Date().toISOString();
     const twoMinAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
     const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const fp = buildFingerprint(ip, quote);
 
-    // 1. Idempotence par clientSubmissionId
-    if (quote.clientSubmissionId) {
-      const existingSubSnap = await db
+    try {
+      // 1. Idempotence par clientSubmissionId (requête sur champ unique pour éviter tout besoin d'index composite)
+      if (quote.clientSubmissionId) {
+        const existingSubSnap = await db
+          .collection('quotes')
+          .where('clientSubmissionId', '==', quote.clientSubmissionId)
+          .limit(1)
+          .get();
+
+        if (!existingSubSnap.empty) {
+          const doc = existingSubSnap.docs[0];
+          const docData = doc.data();
+          if (!docData.createdAt || docData.createdAt >= tenMinAgo) {
+            return NextResponse.json({
+              ok: true,
+              id: doc.id,
+              reference: docData.reference,
+              deduped: true,
+            });
+          }
+        }
+      }
+
+      // 2. Déduplication par empreinte payload courte durée (2 min, filtrage mémoire résilient)
+      const existingFpSnap = await db
         .collection('quotes')
-        .where('clientSubmissionId', '==', quote.clientSubmissionId)
-        .where('createdAt', '>=', tenMinAgo)
-        .limit(1)
+        .where('fingerprint', '==', fp)
+        .limit(5)
         .get();
 
-      if (!existingSubSnap.empty) {
-        const doc = existingSubSnap.docs[0];
-        const docData = doc.data();
-        return NextResponse.json({
-          ok: true,
-          id: doc.id,
-          reference: docData.reference,
-          deduped: true,
+      if (!existingFpSnap.empty) {
+        const recentDoc = existingFpSnap.docs.find((d) => {
+          const docData = d.data();
+          return docData.createdAt && docData.createdAt >= twoMinAgo;
         });
+
+        if (recentDoc) {
+          const docData = recentDoc.data();
+          return NextResponse.json({
+            ok: true,
+            id: recentDoc.id,
+            reference: docData.reference,
+            deduped: true,
+          });
+        }
       }
-    }
-
-    // 2. Déduplication par empreinte payload courte durée (2 min)
-    const fp = buildFingerprint(ip, quote);
-    const existingFpSnap = await db
-      .collection('quotes')
-      .where('fingerprint', '==', fp)
-      .where('createdAt', '>=', twoMinAgo)
-      .limit(1)
-      .get();
-
-    if (!existingFpSnap.empty) {
-      const doc = existingFpSnap.docs[0];
-      const docData = doc.data();
-      return NextResponse.json({
-        ok: true,
-        id: doc.id,
-        reference: docData.reference,
-        deduped: true,
-      });
+    } catch (dedupErr) {
+      // Le garde-fou d'idempotence ne doit jamais bloquer une soumission client valide
+      console.warn('Quote idempotency/dedup check skipped due to query error:', dedupErr);
     }
 
     // -------------------------------------------------------------------------
