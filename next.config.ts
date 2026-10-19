@@ -46,8 +46,22 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'www.laresidencedakar.com',
-      }
+      },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/transfert-aibd',
+        destination: '/lp/transfert-aibd',
+        permanent: true,
+      },
+      {
+        source: '/en/transfert-aibd',
+        destination: '/en/lp/transfert-aibd',
+        permanent: true,
+      },
+    ];
   },
 };
 
