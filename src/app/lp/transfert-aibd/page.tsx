@@ -105,16 +105,18 @@ export default function LandingTransfertAibdPage() {
       name: f.question,
       acceptedAnswer: {
         '@type': 'Answer',
+        text: f.answer,
       },
     })),
   };
 
   const serviceJsonLd = {
     '@context': 'https://schema.org',
-    '@type': ['Service', 'Product', 'LocalBusiness'],
+    '@type': 'Service',
     name: 'Transfert Aéroport International Blaise Diagne (AIBD) Dakar',
+    serviceType: 'Transfert Aéroport & Chauffeur Privé',
     provider: {
-      '@type': ['TravelAgency', 'LocalBusiness'],
+      '@type': 'TravelAgency',
       name: 'SLAAC Voyages',
       url: SITE_URL,
       telephone: '+221773129090',
@@ -127,6 +129,13 @@ export default function LandingTransfertAibdPage() {
     },
     areaServed: 'Dakar, Diamniadio, Saly Portudal, Senegal',
     description: 'Service de transfert aéroport privé et VIP entre l’Aéroport International Blaise Diagne (AIBD) et Dakar.',
+    offers: {
+      '@type': 'Offer',
+      price: '35000',
+      priceCurrency: 'XOF',
+      availability: 'https://schema.org/InStock',
+      url: `${SITE_URL}/lp/transfert-aibd`,
+    },
   };
 
 
